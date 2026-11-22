@@ -6,6 +6,7 @@ on:
       - main
       - feat/ui-final-polish-v19
       - feat/android-emulator-smoke-v22
+      - feat/dashboard-visual-v23
       - test/web-responsive-e2e-v20
       - test/native-bundle-release-gate-v21
 
