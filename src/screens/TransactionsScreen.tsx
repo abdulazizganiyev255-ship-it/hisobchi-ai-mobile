@@ -4,6 +4,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
 import {DateCalendar} from '../components/DateCalendar';
 import {DateRangeFields} from '../components/ds/DateRangeFields';
+import {EmptyState} from '../components/ds/EmptyState';
 import {ScreenHeader} from '../components/ds/ScreenHeader';
 import {ChoiceChip} from '../components/ds/ChoiceChip';
 import {TransactionRow} from '../components/TransactionRow';
@@ -228,19 +229,15 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
       </View>
 
       {filtered.length === 0 ? (
-        <View style={styles.empty}>
-          <View style={styles.emptyIcon}><AppIcon name="receipt" size={27} color={colors.primarySoft}/></View>
-          <Text style={styles.emptyTitle}>Operatsiya topilmadi</Text>
-          <Text style={styles.emptyBody}>
-            {transactions.length
-              ? 'Bu muddat yoki filtrga mos demo yozuv topilmadi.'
-              : 'Birinchi demo operatsiyani qo‘shishdan boshlang.'}
-          </Text>
-          {hasFilters && (
-            <Pressable onPress={resetFilters} accessibilityRole="button" accessibilityLabel="Barcha filtrlarni bekor qilish" style={styles.clear}>
-              <Text style={styles.clearText}>Filtrni bekor qilish</Text>
-            </Pressable>
-          )}
+        <View style={styles.emptySurface}>
+          <EmptyState
+            title={hasFilters ? 'Mos operatsiya topilmadi' : 'Operatsiyalar hali yo‘q'}
+            description={hasFilters
+              ? 'Tanlangan muddat, tur yoki qidiruvga mos yozuv mavjud emas.'
+              : 'Birinchi operatsiyani kiritib, moliyaviy tarixni boshlang.'}
+            actionLabel={hasFilters ? 'Filtrlarni tozalash' : 'Operatsiya qo‘shish'}
+            onAction={hasFilters ? resetFilters : onAdd}
+          />
         </View>
       ) : groups.map(group => (
         <View key={group.day} style={styles.group}>
@@ -357,7 +354,7 @@ const styles = StyleSheet.create({
   groupCount: {fontSize: 11, color: colors.faint},
   lightCard: {backgroundColor: colors.cardLight, borderRadius: radius.lg, paddingHorizontal: 15, paddingVertical: 7},
   divider: {height: 1, backgroundColor: '#CEE1EB', marginLeft: 57},
-  empty: {padding: 25, alignItems: 'center', gap: 10, backgroundColor: colors.surface, borderRadius: radius.lg},
+  emptySurface: {backgroundColor: colors.surface, borderRadius: radius.lg},
   emptyIcon: {height: 52, width: 52, borderRadius: 15, backgroundColor: '#1B4C70', justifyContent: 'center', alignItems: 'center'},
   emptyTitle: {color: colors.text, fontSize: 16, fontWeight: '800'},
   emptyBody: {textAlign: 'center', color: colors.muted, fontSize: 12, lineHeight: 19},
