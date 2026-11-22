@@ -35,7 +35,8 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
   }
 
   return (
-    <ScrollView
+    <View style={styles.fill}>
+      <ScrollView
       style={styles.fill}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
@@ -48,33 +49,6 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
           <Text style={styles.caption}>Demo sessiya · {transactions.length} ta yozuv</Text>
         </View>
       </View>
-
-      <View style={styles.summary}>
-        <View style={styles.summaryColumn}>
-          <Text style={styles.summaryLabel}>Xarajatlar · demo</Text>
-          <Text style={styles.summaryExpense} numberOfLines={1} adjustsFontSizeToFit>
-            {formatMoney(expenses)}
-          </Text>
-        </View>
-        <View style={styles.summaryDivider}/>
-        <View style={styles.summaryColumn}>
-          <Text style={styles.summaryLabel}>Daromadlar · demo</Text>
-          <Text style={styles.summaryIncome} numberOfLines={1} adjustsFontSizeToFit>
-            {formatMoney(income)}
-          </Text>
-        </View>
-      </View>
-
-      <Pressable onPress={onAdd} accessibilityRole="button" accessibilityLabel="Yangi operatsiya qo‘shish">
-        <LinearGradient
-          colors={['#A1E9FF','#4DBFEF']}
-          start={{x: 0, y: 0}} end={{x: 1, y: 1}}
-          style={styles.cta}
-        >
-          <AppIcon name="plus" color={colors.ink} size={22} strokeWidth={2.5}/>
-          <Text style={styles.ctaLabel}>Operatsiya qo‘shish</Text>
-        </LinearGradient>
-      </Pressable>
 
       <TextInput
         value={search}
@@ -103,6 +77,30 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
             </Pressable>
           );
         })}
+      </View>
+
+      <View style={styles.totalsWrap}>
+        <Text style={styles.totalsCaption}>BARCHA DEMO YOZUVLAR BO‘YICHA</Text>
+        <View style={styles.summary}>
+          <View style={styles.summaryColumn}>
+            <View style={styles.metricHeading}>
+              <View style={[styles.metricDot, styles.incomeDot]}/>
+              <Text style={styles.summaryLabel}>Jami kirim</Text>
+            </View>
+            <Text style={styles.summaryIncome} numberOfLines={1} adjustsFontSizeToFit>
+              {formatMoney(income)}
+            </Text>
+          </View>
+          <View style={styles.summaryColumn}>
+            <View style={styles.metricHeading}>
+              <View style={[styles.metricDot, styles.expenseDot]}/>
+              <Text style={styles.summaryLabel}>Jami chiqim</Text>
+            </View>
+            <Text style={styles.summaryExpense} numberOfLines={1} adjustsFontSizeToFit>
+              {formatMoney(expenses)}
+            </Text>
+          </View>
+        </View>
       </View>
 
       {filtered.length === 0 ? (
@@ -146,26 +144,57 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
       <Text style={styles.footer}>
         Ma’lumotlar faqat shu sessiya xotirasida. Yangilaganda dastlabki demo yozuvlar qaytadi.
       </Text>
-    </ScrollView>
+      </ScrollView>
+      <Pressable
+        onPress={onAdd}
+        accessibilityRole="button"
+        accessibilityLabel="Yangi operatsiya qo‘shish"
+        style={styles.fab}
+      >
+        <LinearGradient
+          colors={['#A0E9FF', '#44BEEB']}
+          start={{x: 0, y: 0}} end={{x: 1, y: 1}}
+          style={styles.fabContent}
+        >
+          <AppIcon name="plus" color={colors.ink} size={22} strokeWidth={2.5}/>
+          <Text style={styles.fabLabel}>Qo‘shish</Text>
+        </LinearGradient>
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   fill: {flex: 1},
-  content: {padding: 20, paddingTop: 21, paddingBottom: 45, gap: 14},
+  content: {padding: 20, paddingTop: 21, paddingBottom: 112, gap: 14},
   header: {flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 3},
   icon: {width: 48, height: 48, borderRadius: 15, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center'},
   heading: {flex: 1},
   title: {fontSize: 24, fontWeight: '800', color: colors.text, letterSpacing: -0.6},
   caption: {color: colors.muted, fontSize: 11, marginTop: 3},
-  summary: {backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, borderRadius: radius.lg, minHeight: 96, padding: 15, flexDirection: 'row', alignItems: 'center'},
-  summaryColumn: {flex: 1, minWidth: 0, gap: 7},
-  summaryLabel: {fontSize: 10, fontWeight: '600', color: colors.muted},
-  summaryExpense: {fontSize: 16, fontWeight: '800', color: '#FFB2B2'},
-  summaryIncome: {fontSize: 16, fontWeight: '800', color: '#6BE4BE'},
-  summaryDivider: {height: 44, width: 1, backgroundColor: colors.divider, marginHorizontal: 14},
-  cta: {minHeight: 51, borderRadius: 15, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8},
-  ctaLabel: {fontSize: 14, fontWeight: '800', color: colors.ink},
+  totalsWrap: {gap: 8, marginTop: 1, marginBottom: 4},
+  totalsCaption: {fontSize: 9, fontWeight: '700', letterSpacing: 0.9, color: colors.faint, marginLeft: 3},
+  summary: {flexDirection: 'row', gap: 10},
+  summaryColumn: {
+    flex: 1, minWidth: 0, minHeight: 83, paddingHorizontal: 13, paddingVertical: 13,
+    gap: 9, backgroundColor: colors.surface, borderWidth: 1,
+    borderColor: colors.divider, borderRadius: 17, justifyContent: 'center',
+  },
+  metricHeading: {flexDirection: 'row', alignItems: 'center', gap: 7},
+  metricDot: {width: 6, height: 6, borderRadius: 3},
+  incomeDot: {backgroundColor: colors.positive},
+  expenseDot: {backgroundColor: colors.negative},
+  summaryLabel: {fontSize: 11, fontWeight: '600', color: colors.muted},
+  summaryExpense: {fontSize: 17, fontWeight: '800', color: '#FFB2B2'},
+  summaryIncome: {fontSize: 17, fontWeight: '800', color: '#6BE4BE'},
+  fab: {
+    position: 'absolute', right: 20, bottom: 13, zIndex: 5,
+    borderRadius: 999, overflow: 'hidden', shadowColor: '#20B4ED',
+    shadowOpacity: 0.32, shadowRadius: 16, shadowOffset: {width: 0, height: 7},
+    elevation: 8,
+  },
+  fabContent: {minWidth: 135, minHeight: 52, paddingHorizontal: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 9},
+  fabLabel: {fontSize: 14, fontWeight: '800', color: colors.ink},
   search: {minHeight: 49, borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, color: colors.text, fontSize: 12},
   filters: {flexDirection: 'row', padding: 4, gap: 5, backgroundColor: colors.surface, borderRadius: 15},
   filter: {flex: 1, minHeight: 39, borderRadius: 12, alignItems: 'center', justifyContent: 'center'},
