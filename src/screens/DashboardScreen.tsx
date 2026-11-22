@@ -14,6 +14,7 @@ import {colors, layout, radius, shadow, typography} from '../theme/tokens';
 export function DashboardScreen({onOpenTransactions, transactions}: {onOpenTransactions:()=>void; transactions:Transaction[]}) {
   const [visible,setVisible] = useState(true);
   const [period,setPeriod] = useState<'current'|'previous'>('current');
+  const [periodOpen,setPeriodOpen] = useState(false);
   const {width} = useWindowDimensions();
   const narrow = width < 375;
   const month = demo.months[period];
@@ -51,14 +52,37 @@ export function DashboardScreen({onOpenTransactions, transactions}: {onOpenTrans
           <Pressable
             style={styles.periodBtn}
             accessibilityRole="button"
-            accessibilityLabel={`Davr: ${month.label}. Almashtirish`}
-            onPress={() => setPeriod(x => x === 'current' ? 'previous' : 'current')}
+            accessibilityLabel={`Oylik xarajat muddatini tanlash. Hozir: ${month.label}`}
+            accessibilityState={{expanded: periodOpen}}
+            onPress={() => setPeriodOpen(open => !open)}
           >
             <Text style={styles.periodText}>{month.label}</Text>
             <AppIcon name="chevron-down" color={colors.primarySoft} size={13}/>
           </Pressable>
         }
       />
+      {periodOpen && (
+        <View style={styles.periodMenu}>
+          {(['current', 'previous'] as const).map(key => (
+            <Pressable
+              key={key}
+              accessibilityRole="button"
+              accessibilityLabel={'Oylik xarajat: ' + demo.months[key].label}
+              accessibilityState={{selected: period === key}}
+              onPress={() => {
+                setPeriod(key);
+                setPeriodOpen(false);
+              }}
+              style={[styles.periodChoice, period === key && styles.periodChoiceActive]}
+            >
+              <Text style={[styles.periodChoiceText, period === key && styles.periodChoiceTextActive]}>
+                {demo.months[key].label}
+              </Text>
+              {period === key && <AppIcon name="check" size={15} color={colors.primarySoft}/>}
+            </Pressable>
+          ))}
+        </View>
+      )}
       <View style={styles.chartSummary}><View style={styles.chartMain}><Text style={styles.chartEyebrow}>JAMI XARAJAT · DEMO</Text><Text style={styles.chartAmount} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(month.total)}</Text></View><View style={[styles.changePill,improved?styles.changeGood:styles.changeBad]}><Text style={[styles.changeText,improved?styles.changeGoodText:styles.changeBadText]}>{month.change<0?'−':'+'}{Math.abs(month.change)}%</Text></View></View>
       <Text style={styles.chartDetail}>{period==='current'?'O‘tgan oyga nisbatan':'Oldingi davrga nisbatan'}</Text>
       <ExpenseChart values={month.chart} compact/>
@@ -104,7 +128,13 @@ const styles=StyleSheet.create({
   balanceValue:{color:'#FFFFFF',fontWeight:'800',fontSize:typography.size.amount,letterSpacing:-0.65,marginTop:11},balanceValueNarrow:{fontSize:26},balanceBottom:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:8,marginTop:9},balanceFoot:{color:'#B5D5E8',fontSize:typography.size.caption,flexShrink:1},balanceBadge:{flexDirection:'row',alignItems:'center',gap:5,borderRadius:999,paddingHorizontal:9,paddingVertical:5,backgroundColor:'rgba(218,245,255,0.11)'},balanceBadgeDot:{height:5,width:5,borderRadius:3,backgroundColor:colors.primary},balanceBadgeText:{color:'#D2EDFA',fontSize:typography.size.micro,fontWeight:'600'},
   safeCard:{borderRadius:radius.lg,padding:14,minHeight:98,flexDirection:'row',alignItems:'center',gap:10,overflow:'hidden',...shadow.light},safeArrow:{height:36,width:36,borderRadius:18,backgroundColor:'rgba(255,255,255,0.48)',alignItems:'center',justifyContent:'center'},safeIcon:{height:44,width:44,backgroundColor:'#C7EFFF',borderRadius:14,alignItems:'center',justifyContent:'center'},safeTitle:{color:colors.ink,fontWeight:'600',fontSize:typography.size.caption},safeAmount:{color:colors.ink,fontWeight:'800',fontSize:23,letterSpacing:-0.45,marginTop:3},safeAmountNarrow:{fontSize:21},safeSubtitle:{color:'#416985',fontSize:11,marginTop:3},
   chartCard:{borderRadius:radius.lg,backgroundColor:colors.surface,paddingHorizontal:15,paddingTop:13,paddingBottom:12,borderWidth:1,borderColor:'rgba(156,219,250,0.14)'},
-  sectionHeader:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:8},sectionTitleRow:{flexDirection:'row',alignItems:'center',gap:9,flexShrink:1},sectionIcon:{height:31,width:31,borderRadius:10,backgroundColor:'#163C5D',alignItems:'center',justifyContent:'center'},sectionTitle:{color:colors.text,fontWeight:'700',fontSize:15},periodBtn:{backgroundColor:colors.surfaceRaised,borderRadius:radius.pill,minHeight:44,paddingVertical:8,paddingHorizontal:12,flexDirection:'row',alignItems:'center',gap:6},periodText:{color:colors.text,fontSize:typography.size.caption,fontWeight:'600'},chartSummary:{flexDirection:'row',alignItems:'flex-end',gap:8,marginTop:10},chartMain:{flex:1,minWidth:0},chartEyebrow:{color:colors.muted,fontSize:typography.size.micro,letterSpacing:0.7,fontWeight:'700'},chartAmount:{fontWeight:'800',fontSize:22,color:colors.text,marginTop:5},chartDetail:{fontSize:typography.size.caption,color:colors.muted,marginTop:3},changePill:{borderRadius:999,paddingHorizontal:10,paddingVertical:6,marginBottom:1},changeGood:{backgroundColor:'rgba(49,195,150,0.12)'},changeBad:{backgroundColor:'rgba(245,155,155,0.13)'},changeText:{fontSize:11,fontWeight:'800'},changeGoodText:{color:'#6FE4BC'},changeBadText:{color:'#FFACAC'},chartFooter:{borderTopWidth:1,borderColor:colors.divider,flexDirection:'row',alignItems:'center',gap:7,marginTop:6,paddingTop:8},legendDot:{height:6,width:6,borderRadius:3,backgroundColor:colors.primary},legendText:{fontSize:typography.size.caption,color:colors.muted,flexShrink:1,lineHeight:17},
+  sectionHeader:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:8},sectionTitleRow:{flexDirection:'row',alignItems:'center',gap:9,flexShrink:1},sectionIcon:{height:31,width:31,borderRadius:10,backgroundColor:'#163C5D',alignItems:'center',justifyContent:'center'},sectionTitle:{color:colors.text,fontWeight:'700',fontSize:15},periodBtn:{backgroundColor:colors.surfaceRaised,borderRadius:radius.pill,minHeight:44,paddingVertical:8,paddingHorizontal:12,flexDirection:'row',alignItems:'center',gap:6},periodText:{color:colors.text,fontSize:typography.size.caption,fontWeight:'600'},
+  periodMenu:{alignSelf:'flex-end',minWidth:148,padding:5,marginTop:6,borderRadius:radius.md,borderWidth:1,borderColor:colors.divider,backgroundColor:colors.surfaceRaised},
+  periodChoice:{minHeight:44,flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:10,paddingHorizontal:12,borderRadius:radius.sm},
+  periodChoiceActive:{backgroundColor:colors.surface},
+  periodChoiceText:{fontSize:typography.size.caption,fontWeight:'600',color:colors.muted},
+  periodChoiceTextActive:{color:colors.text,fontWeight:'700'},
+  chartSummary:{flexDirection:'row',alignItems:'flex-end',gap:8,marginTop:10},chartMain:{flex:1,minWidth:0},chartEyebrow:{color:colors.muted,fontSize:typography.size.micro,letterSpacing:0.7,fontWeight:'700'},chartAmount:{fontWeight:'800',fontSize:22,color:colors.text,marginTop:5},chartDetail:{fontSize:typography.size.caption,color:colors.muted,marginTop:3},changePill:{borderRadius:999,paddingHorizontal:10,paddingVertical:6,marginBottom:1},changeGood:{backgroundColor:'rgba(49,195,150,0.12)'},changeBad:{backgroundColor:'rgba(245,155,155,0.13)'},changeText:{fontSize:11,fontWeight:'800'},changeGoodText:{color:'#6FE4BC'},changeBadText:{color:'#FFACAC'},chartFooter:{borderTopWidth:1,borderColor:colors.divider,flexDirection:'row',alignItems:'center',gap:7,marginTop:6,paddingTop:8},legendDot:{height:6,width:6,borderRadius:3,backgroundColor:colors.primary},legendText:{fontSize:typography.size.caption,color:colors.muted,flexShrink:1,lineHeight:17},
   transactionsCard:{backgroundColor:colors.cardLight,borderRadius:radius.lg,paddingHorizontal:15,paddingVertical:12},transactionsHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:10},transactionsHeading:{flex:1,minWidth:0},transactionsTitle:{color:colors.ink,fontWeight:'800',fontSize:16,letterSpacing:-0.25},transactionsCaption:{color:'#62839B',fontSize:10,marginTop:4},arrow:{width:44,height:44,borderRadius:22,backgroundColor:'#FFFFFF',justifyContent:'center',alignItems:'center'},separator:{height:1,backgroundColor:'#D1E4F0',marginLeft:57},emptyTransactions:{color:'#68859A',fontSize:12,textAlign:'center',padding:22},
   disclaimer:{color:colors.muted,textAlign:'center',fontSize:typography.size.micro,marginTop:1}
 });
