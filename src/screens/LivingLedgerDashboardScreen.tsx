@@ -28,8 +28,9 @@ export function LivingLedgerDashboardScreen({
   const [explanationOpen, setExplanationOpen] = useState(false);
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [period, setPeriod] = useState<'current' | 'previous'>('current');
-  const {width} = useWindowDimensions();
+  const {width, height} = useWindowDimensions();
   const compact = width < 365;
+  const shortScreen = height < 720;
   const month = demo.months[period];
   const recent = filterAndSortTransactions(transactions, 'all', '').slice(0, 3);
   const amount = formatMoney(demo.safeToSpendToday).replace(/ so‘m$/, '');
@@ -41,7 +42,7 @@ export function LivingLedgerDashboardScreen({
       <ScrollView
         testID="living-ledger-home-scroll"
         style={styles.screen}
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, shortScreen && styles.containerShort]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
@@ -63,12 +64,12 @@ export function LivingLedgerDashboardScreen({
           </Pressable>
         </View>
 
-        <View style={styles.notice} testID="living-ledger-demo-notice">
+        <View style={[styles.notice, shortScreen && styles.noticeShort]} testID="living-ledger-demo-notice">
           <View style={styles.noticeDot}/>
           <Text style={styles.noticeText}>DEMO MUHIT — HAQIQIY HISOB EMAS</Text>
         </View>
 
-        <View style={styles.hero}>
+        <View style={[styles.hero, shortScreen && styles.heroShort]}>
           <Text style={styles.eyebrow}>BUGUN XAVFSIZ SARFLASH</Text>
           <View style={styles.figure} accessible accessibilityLabel={
             'Xavfsiz sarflash, hisoblanmagan namuna: ' +
@@ -86,7 +87,7 @@ export function LivingLedgerDashboardScreen({
             >so‘m</Text>
           </View>
           <SourceTag label="DEMO · hisoblanmagan"/>
-          <Text style={styles.heroHelp}>
+          <Text style={[styles.heroHelp, shortScreen && styles.heroHelpShort]}>
             Bu ko‘rsatkich hozir hisob-kitob emas, faqat dizayn namunasi.
           </Text>
           <Pressable
@@ -94,7 +95,7 @@ export function LivingLedgerDashboardScreen({
             accessibilityRole="button"
             accessibilityLabel="Xavfsiz sarflash namunasi qanday ishlashi haqida"
             onPress={() => setExplanationOpen(true)}
-            style={({pressed}) => [styles.explainButton, pressed && styles.pressed]}
+            style={({pressed}) => [styles.explainButton, shortScreen && styles.explainButtonShort, pressed && styles.pressed]}
           >
             <AppIcon name="shield" color={ledger.dark} size={18}/>
             <Text style={styles.explainText}>Bu raqam haqida</Text>
@@ -102,7 +103,7 @@ export function LivingLedgerDashboardScreen({
           </Pressable>
         </View>
 
-        <View style={styles.rule}/>
+        <View style={[styles.rule, shortScreen && styles.ruleShort]}/>
 
         <View style={styles.balanceBlock}>
           <View style={styles.balanceCopy}>
@@ -135,7 +136,7 @@ export function LivingLedgerDashboardScreen({
           accessibilityRole="button"
           accessibilityLabel="Xarajat qo‘shish, ushbu sessiya uchun"
           onPress={onAdd}
-          style={({pressed}) => [styles.addButton, pressed && styles.addPressed]}
+          style={({pressed}) => [styles.addButton, shortScreen && styles.addButtonShort, pressed && styles.addPressed]}
         >
           <View style={styles.addIcon}><AppIcon name="plus" size={20} color={ledger.ink}/></View>
           <View style={styles.addCopy}>
@@ -268,6 +269,7 @@ export function LivingLedgerDashboardScreen({
 const styles = StyleSheet.create({
   screen: {flex: 1, backgroundColor: ledger.paper},
   container: {paddingHorizontal: 22, paddingTop: 18, paddingBottom: 40},
+  containerShort: {paddingTop: 11},
   header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48},
   brand: {flexDirection: 'row', alignItems: 'center', gap: 10},
   brandMark: {width: 28, height: 28, flexDirection: 'row', alignItems: 'flex-end', gap: 3},
@@ -276,9 +278,11 @@ const styles = StyleSheet.create({
   iconButton: {width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: ledger.rule},
   pressed: {opacity: 0.65},
   notice: {marginTop: 20, backgroundColor: ledger.paleSage, paddingVertical: 12, paddingHorizontal: 13, borderRadius: 10, flexDirection: 'row', alignItems: 'center', gap: 9},
+  noticeShort: {marginTop: 12, paddingVertical: 9},
   noticeDot: {height: 8, width: 8, borderRadius: 4, backgroundColor: ledger.dark},
   noticeText: {fontSize: 12, fontWeight: '800', color: ledger.dark, letterSpacing: 0.2, flexShrink: 1},
   hero: {paddingTop: 30},
+  heroShort: {paddingTop: 20},
   eyebrow: {fontSize: 12, fontWeight: '800', letterSpacing: 1.4, color: ledger.subtext},
   figure: {flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', gap: 7, marginTop: 8, marginBottom: 10},
   amount: {fontSize: 54, fontWeight: '800', color: ledger.ink, letterSpacing: -2.2, includeFontPadding: false},
@@ -286,15 +290,19 @@ const styles = StyleSheet.create({
   unit: {fontSize: 23, fontWeight: '700', color: ledger.ink},
   unitCompact: {fontSize: 20},
   heroHelp: {fontSize: 14, lineHeight: 21, color: ledger.subtext, marginTop: 12},
+  heroHelpShort: {marginTop: 8},
   explainButton: {alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 9, minHeight: 48, marginTop: 10, paddingRight: 7},
+  explainButtonShort: {marginTop: 5},
   explainText: {fontSize: 15, fontWeight: '800', color: ledger.dark},
   rule: {height: 1, backgroundColor: ledger.rule, marginTop: 22, marginBottom: 20},
+  ruleShort: {marginTop: 14, marginBottom: 13},
   balanceBlock: {flexDirection: 'row', alignItems: 'center', gap: 8},
   balanceCopy: {flex: 1, minWidth: 0},
   balanceValue: {fontSize: 30, fontWeight: '800', letterSpacing: -0.9, color: ledger.ink, marginTop: 7},
   balanceCompact: {fontSize: 26},
   eyeButton: {width: 44, height: 44, alignItems: 'center', justifyContent: 'center'},
   addButton: {marginTop: 20, backgroundColor: ledger.coral, borderRadius: 16, minHeight: 66, paddingHorizontal: 16, paddingVertical: 11, flexDirection: 'row', alignItems: 'center', gap: 12},
+  addButtonShort: {marginTop: 14},
   addPressed: {opacity: 0.78},
   addIcon: {height: 38, width: 38, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.55)', alignItems: 'center', justifyContent: 'center'},
   addCopy: {flex: 1, gap: 3},
