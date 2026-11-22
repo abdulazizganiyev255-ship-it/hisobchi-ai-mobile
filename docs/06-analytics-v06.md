@@ -1,5 +1,14 @@
 # Hisobchi AI — Analytics UI v0.6
 
+## v0.6.1 screenshot audit and chart fix
+- Mobile QA observed that income 3 000 000 UZS dwarfed all smaller expense bars on a shared axis. Although mathematically valid, it made the spending trend visually unreadable.
+- The Pul oqimi panel is now Kunlik dinamika, with a Chiqim / Kirim segmented selector. Default is Chiqim.
+- The selected metric gets its own scale; the subtitle explicitly warns that bar heights from different modes are not directly comparable.
+- Tap a day's bar to inspect the **exact UZS amount** and date; graph bars are derived from transaction totals, not mock-up percentages.
+- Empty state is specific to the chosen metric. Categories' track widths now use exact expense proportions rather than an artificial minimum-width floor.
+- Changed only AnalyticsScreen. Other UI branches and live Supabase data remain untouched.
+- Manual test: toggle Chiqim (19.11=120000, 21.11=42000, 22.11=97000) and Kirim (20.11=3000000); check selected-day amount, category cards, and vertical scrolling at 393x852 and 360x800.
+
 ## Maqsad
 Operatsiyalar ekranida kiritilgan demo tranzaksiyalardan foydalanuvchiga tushunarli, chiroyli va hisoblangan tahlil ko‘rsatish. Supabase va haqiqiy bank hisoblari bu iteratsiyaga kirmaydi.
 
