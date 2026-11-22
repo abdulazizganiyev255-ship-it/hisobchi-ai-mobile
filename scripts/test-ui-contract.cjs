@@ -55,4 +55,19 @@ assert.match(app, /onOpenTransactions=\{\(\) => setTab\('transactions'\)\}/, 'Pr
 assert.match(app, /onOpenAnalytics=\{\(\) => setTab\('analytics'\)\}/, 'Profile analytics link must navigate');
 assert.match(app, /setTransactions\(\[...demo.transactions\]\)/, 'Profile reset must restore demo transactions');
 
-console.log('UI, transaction form and profile source contracts passed. Rendered mobile QA remains manual.');
+const onboarding = screen('src/screens/OnboardingScreen.tsx');
+assert.match(onboarding, /const STEPS: readonly Step\[\]/, 'Guide uses a typed static step model');
+assert.match(onboarding, /setIndex\(previous => Math.min/, 'Guide Next must advance within bounds');
+assert.match(onboarding, /setIndex\(previous => Math.max/, 'Guide Back must stay within bounds');
+assert.match(onboarding, /onExit\(\)/, 'Guide completion must return to the app');
+assert.match(onboarding, /accessibilityLabel="Qo‘llanmadan chiqish"/, 'Guide must have an accessible exit');
+assert.match(onboarding, /accessibilityLabel=\{isLast \? 'Qo‘llanmani tugatish' : 'Keyingi qadam'\}/, 'Guide completion CTA must be labeled');
+assert.match(onboarding, /minHeight: 52/, 'Primary guide action has >=44dp tap target');
+assert.match(profile, /onOpenOnboarding/, 'Profile must expose guide open callback');
+assert.match(profile, /Ilova bo‘yicha qo‘llanma/, 'Guide entry has visible label');
+assert.match(app, /<OnboardingScreen onExit=\{\(\) => setShowOnboarding\(false\)\}/, 'App must render dismissible guide');
+assert.match(app, /!showOnboarding/, 'Bottom navigation must be hidden during guide');
+assert.match(app, /onOpenOnboarding=\{\(\) => setShowOnboarding\(true\)\}/, 'Profile guide entry must navigate');
+assert.doesNotMatch(onboarding, /setTransactions\(/, 'Guide must not modify transaction state');
+
+console.log('UI, transaction form, profile and onboarding source contracts passed. Mobile QA remains manual.');
