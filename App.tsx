@@ -62,7 +62,13 @@ function AppContent() {
       />
       <View style={styles.body}>
         {showOnboarding ? (
-          <OnboardingScreen onExit={() => setShowOnboarding(false)}/>
+          <OnboardingScreen
+            onExit={() => setShowOnboarding(false)}
+            onFinish={() => {
+              setTab('home');
+              setShowOnboarding(false);
+            }}
+          />
         ) : editor !== null ? (
           <TransactionEditorScreen
             key={editor === 'new' ? 'new' : editor.id}

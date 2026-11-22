@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useRef, useState, type ElementRef} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon, type IconName} from '../components/AppIcon';
@@ -7,6 +7,7 @@ import {colors, layout, radius, semantic, typography} from '../theme/tokens';
 
 type Props = {
   onExit: () => void;
+  onFinish: () => void;
 };
 
 type Step = {
@@ -53,30 +54,36 @@ const STEPS: readonly Step[] = [
   },
 ];
 
-export function OnboardingScreen({onExit}: Props) {
+export function OnboardingScreen({onExit, onFinish}: Props) {
   const [index, setIndex] = useState(0);
+  const scrollRef = useRef<ElementRef<typeof ScrollView>>(null);
   const step = STEPS[index];
   const isFirst = index === 0;
   const isLast = index === STEPS.length - 1;
 
+  const goToStep = (nextIndex: number) => {
+    setIndex(Math.max(0, Math.min(nextIndex, STEPS.length - 1)));
+    scrollRef.current?.scrollTo({y: 0, animated: false});
+  };
   const forward = () => {
     if (isLast) {
-      onExit();
+      onFinish();
     } else {
-      setIndex(previous => Math.min(previous + 1, STEPS.length - 1));
+      goToStep(index + 1);
     }
   };
 
   return (
     <View style={styles.screen}>
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
         <ScreenHeader
           title="Boshlash"
-          subtitle="Hisobchi AI · qisqa qo‘llanma · UI v1.4"
+          subtitle="Hisobchi AI · qisqa qo‘llanma · UI v1.5"
           icon="wallet"
           trailing={
             <Pressable
@@ -144,7 +151,7 @@ export function OnboardingScreen({onExit}: Props) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Oldingi qadam"
-            onPress={() => setIndex(previous => Math.max(0, previous - 1))}
+            onPress={() => goToStep(index - 1)}
             style={styles.back}
           >
             <AppIcon name="arrow-left" color={colors.primarySoft} size={18}/>
@@ -155,7 +162,7 @@ export function OnboardingScreen({onExit}: Props) {
         )}
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={isLast ? 'Qo‘llanmani tugatish' : 'Keyingi qadam'}
+          accessibilityLabel={isLast ? 'Qo‘llanmani tugatib bosh sahifani ochish' : 'Keyingi qadam'}
           onPress={forward}
           style={styles.next}
         >

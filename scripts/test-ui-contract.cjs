@@ -57,17 +57,25 @@ assert.match(app, /setTransactions\(\[...demo.transactions\]\)/, 'Profile reset 
 
 const onboarding = screen('src/screens/OnboardingScreen.tsx');
 assert.match(onboarding, /const STEPS: readonly Step\[\]/, 'Guide uses a typed static step model');
-assert.match(onboarding, /setIndex\(previous => Math.min/, 'Guide Next must advance within bounds');
-assert.match(onboarding, /setIndex\(previous => Math.max/, 'Guide Back must stay within bounds');
-assert.match(onboarding, /onExit\(\)/, 'Guide completion must return to the app');
+assert.match(onboarding, /setIndex\(Math.max\(0, Math.min\(nextIndex/, 'Guide must clamp all step changes');
+assert.match(onboarding, /goToStep\(index - 1\)/, 'Guide Back must use bounded navigation');
+assert.match(onboarding, /onFinish\(\)/, 'Guide completion must invoke distinct Home action');
+assert.match(onboarding, /onPress=\{onExit\}/, 'Guide close must stay separate from completion');
+assert.match(onboarding, /scrollRef.current\?\.scrollTo/, 'Guide step changes must reset scroll to top');
 assert.match(onboarding, /accessibilityLabel="Qo‘llanmadan chiqish"/, 'Guide must have an accessible exit');
-assert.match(onboarding, /accessibilityLabel=\{isLast \? 'Qo‘llanmani tugatish' : 'Keyingi qadam'\}/, 'Guide completion CTA must be labeled');
+assert.match(onboarding, /accessibilityLabel=\{isLast \? 'Qo‘llanmani tugatib bosh sahifani ochish' : 'Keyingi qadam'\}/, 'Guide completion CTA must describe Home destination');
 assert.match(onboarding, /minHeight: 52/, 'Primary guide action has >=44dp tap target');
 assert.match(profile, /onOpenOnboarding/, 'Profile must expose guide open callback');
 assert.match(profile, /Ilova bo‘yicha qo‘llanma/, 'Guide entry has visible label');
-assert.match(app, /<OnboardingScreen onExit=\{\(\) => setShowOnboarding\(false\)\}/, 'App must render dismissible guide');
+assert.match(app, /<OnboardingScreen\s+onExit=\{\(\) => setShowOnboarding\(false\)\}/, 'App must render dismissible guide');
+assert.match(app, /onFinish=\{\(\) => \{\s*setTab\('home'\);\s*setShowOnboarding\(false\);/, 'Guide finish must open Home');
 assert.match(app, /!showOnboarding/, 'Bottom navigation must be hidden during guide');
 assert.match(app, /onOpenOnboarding=\{\(\) => setShowOnboarding\(true\)\}/, 'Profile guide entry must navigate');
 assert.doesNotMatch(onboarding, /setTransactions\(/, 'Guide must not modify transaction state');
 
-console.log('UI, transaction form, profile and onboarding source contracts passed. Mobile QA remains manual.');
+assert.match(transactions, /periodChip: \{minHeight: layout.touchTarget/, 'Date filter chips need >=44dp');
+assert.match(transactions, /rangeApply: \{[^\n]*minHeight: layout.touchTarget/, 'Date range apply needs >=44dp');
+assert.match(transactions, /resetButton: \{minHeight: layout.touchTarget/, 'Reset filters action needs >=44dp');
+assert.match(transactions, /accessibilityLiveRegion="polite"/, 'Date range errors announced accessibly');
+
+console.log('UI, transaction form, profile, onboarding and tap-target contracts passed. Mobile QA remains manual.');
