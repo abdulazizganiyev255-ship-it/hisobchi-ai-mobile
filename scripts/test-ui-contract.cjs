@@ -34,4 +34,25 @@ assert.match(editor, /onPress=\{onDelete\}/, 'Delete confirmation must preserve 
 assert.match(editor, /onPress=\{\(\) => change\('occurredOn', todayLocal\(\)\)\}/, 'Today shortcut must set local date');
 assert.match(editor, /accessibilityLiveRegion="polite"/, 'Form errors must be announced');
 
-console.log('UI integration + transaction form source contracts passed. Rendered mobile QA remains manual.');
+const profile = screen('src/screens/OtherScreens.tsx');
+const app = screen('App.tsx');
+const actionRow = screen('src/components/ds/ActionRow.tsx');
+
+assert.match(profile, /<ScreenHeader\b/, 'Profile must use shared ScreenHeader');
+assert.ok((profile.match(/<SurfaceCard\b/g) || []).length >= 3, 'Profile must use shared card surfaces');
+assert.ok((profile.match(/<ActionRow\b/g) || []).length >= 2, 'Profile navigation must use shared ActionRow');
+assert.match(profile, /<SectionHeader\b/, 'Profile sections must use DS SectionHeader');
+assert.match(profile, /setConfirmReset\(true\)/, 'Reset must require explicit confirmation');
+assert.match(profile, /onResetDemo\(\)/, 'Confirmed reset must invoke the real app callback');
+assert.match(profile, /accessibilityLabel="Demo yozuvlarini tiklashni tasdiqlash"/, 'Reset confirm must be screen-reader labeled');
+assert.match(profile, /Hisobga kirilmagan/, 'Demo must not pretend auth is available');
+assert.match(profile, /Mavjud emas/, 'Demo must not pretend remote saving exists');
+
+assert.match(actionRow, /accessibilityRole="button"/, 'Profile navigation actions must be interactive');
+assert.match(actionRow, /minHeight: 58/, 'Navigation action touch target must be at least 44dp');
+assert.match(app, /transactionCount=\{transactions.length\}/, 'Profile count must reflect session transactions');
+assert.match(app, /onOpenTransactions=\{\(\) => setTab\('transactions'\)\}/, 'Profile operations link must navigate');
+assert.match(app, /onOpenAnalytics=\{\(\) => setTab\('analytics'\)\}/, 'Profile analytics link must navigate');
+assert.match(app, /setTransactions\(\[...demo.transactions\]\)/, 'Profile reset must restore demo transactions');
+
+console.log('UI, transaction form and profile source contracts passed. Rendered mobile QA remains manual.');
