@@ -82,9 +82,9 @@ async function verify(browser, size) {
     await page.getByRole('button', {name: /Boshlanish sanasi:.*Kalendarni ochish/}).click();
     await page.getByText('Sanani tanlang', {exact: true}).waitFor({state: 'visible'});
     await snap(page, size, 'calendar');
-    await page.getByRole('button', {name: '2026-11-19'}).click();
+    await page.getByTestId('ledger-calendar-sheet').getByRole('button', {name: '2026-11-19', exact: true}).click();
     await page.getByRole('button', {name: /Tugash sanasi:.*Kalendarni ochish/}).click();
-    await page.getByRole('button', {name: '2026-11-19'}).click();
+    await page.getByTestId('ledger-calendar-sheet').getByRole('button', {name: '2026-11-19', exact: true}).click();
     await page.getByTestId('ledger-analytics-apply-period').click();
     assert.equal((await page.getByTestId('ledger-analytics-net').textContent()).trim(), '−120 000 so‘m');
     await page.getByTestId('ledger-metric-income').click();
