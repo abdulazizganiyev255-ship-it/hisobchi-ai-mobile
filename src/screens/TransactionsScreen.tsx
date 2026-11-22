@@ -2,6 +2,8 @@ import {useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
+import {ScreenHeader} from '../components/ds/ScreenHeader';
+import {ChoiceChip} from '../components/ds/ChoiceChip';
 import {TransactionRow} from '../components/TransactionRow';
 import {type Transaction, formatMoney} from '../data/demo';
 import {todayLocal} from '../data/transactions';
@@ -87,13 +89,11 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
   return (
     <View style={styles.fill}>
       <View style={styles.headerBar}>
-        <View style={styles.header}>
-          <View style={styles.icon}><AppIcon name="receipt" color={colors.primary} size={23}/></View>
-          <View style={styles.heading}>
-            <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>Operatsiyalar</Text>
-            <Text style={styles.caption}>Demo sessiya · {transactions.length} ta yozuv · UI v0.4.2</Text>
-          </View>
-        </View>
+        <ScreenHeader
+          title="Operatsiyalar"
+          subtitle={'Demo sessiya · ' + transactions.length + ' ta yozuv · DS v1.1'}
+          icon="receipt"
+        />
       </View>
       <ScrollView
         style={styles.fill}
@@ -189,22 +189,15 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
       )}
 
       <View style={styles.filters}>
-        {FILTERS.map(option => {
-          const selected = filter === option.key;
-          return (
-            <Pressable
-              key={option.key}
-              onPress={() => setFilter(option.key)}
-              accessibilityRole="button"
-              accessibilityState={{selected}}
-              style={[styles.filter, selected && styles.filterActive]}
-            >
-              <Text style={[styles.filterText, selected && styles.filterTextActive]}>
-                {option.label}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {FILTERS.map(option => (
+          <ChoiceChip
+            key={option.key}
+            label={option.label}
+            active={filter === option.key}
+            onPress={() => setFilter(option.key)}
+            flex
+          />
+        ))}
       </View>
 
       <View style={styles.totalsWrap}>
@@ -282,28 +275,30 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         Ma’lumotlar faqat shu sessiya xotirasida. Yangilaganda dastlabki demo yozuvlar qaytadi.
       </Text>
       </ScrollView>
-      <Pressable
-        onPress={onAdd}
-        accessibilityRole="button"
-        accessibilityLabel="Yangi operatsiya qo‘shish"
-        style={styles.fab}
-      >
-        <LinearGradient
-          colors={['#A0E9FF', '#44BEEB']}
-          start={{x: 0, y: 0}} end={{x: 1, y: 1}}
-          style={styles.fabContent}
+      <View style={styles.actionArea}>
+        <Pressable
+          onPress={onAdd}
+          accessibilityRole="button"
+          accessibilityLabel="Yangi operatsiya qo‘shish"
+          style={styles.fab}
         >
-          <AppIcon name="plus" color={colors.ink} size={21} strokeWidth={2.5}/>
-          <Text style={styles.fabLabel}>Qo‘shish</Text>
-        </LinearGradient>
-      </Pressable>
+          <LinearGradient
+            colors={['#A0E9FF', '#44BEEB']}
+            start={{x: 0, y: 0}} end={{x: 1, y: 1}}
+            style={styles.fabContent}
+          >
+            <AppIcon name="plus" color={colors.ink} size={21} strokeWidth={2.5}/>
+            <Text style={styles.fabLabel}>Qo‘shish</Text>
+          </LinearGradient>
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   fill: {flex: 1},
-  content: {paddingHorizontal: 20, paddingTop: 8, paddingBottom: 106, gap: 12},
+  content: {paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32, gap: 12},
   headerBar: {paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12},
   header: {flexDirection: 'row', alignItems: 'center', gap: 10},
   icon: {width: 44, height: 44, borderRadius: 14, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center'},
@@ -350,7 +345,12 @@ const styles = StyleSheet.create({
   summaryLabel: {fontSize: 11, fontWeight: '600', color: colors.muted},
   summaryExpense: {fontSize: 17, fontWeight: '800', color: '#FFB2B2'},
   summaryIncome: {fontSize: 17, fontWeight: '800', color: '#6BE4BE'},
-  fab: {position: 'absolute', right: 20, bottom: 12, zIndex: 10, borderRadius: 999, overflow: 'hidden', shadowColor: '#20B4ED', shadowOpacity: 0.28, shadowRadius: 12, shadowOffset: {width: 0, height: 5}, elevation: 7},
+  actionArea: {
+    flexDirection: 'row', justifyContent: 'flex-end',
+    paddingHorizontal: 20, paddingTop: 5, paddingBottom: 6,
+    backgroundColor: 'transparent',
+  },
+  fab: {borderRadius: 999, overflow: 'hidden', shadowColor: '#20B4ED', shadowOpacity: 0.28, shadowRadius: 12, shadowOffset: {width: 0, height: 5}, elevation: 7},
   fabContent: {minWidth: 134, minHeight: 52, paddingHorizontal: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 9},
   fabLabel: {fontSize: 14, fontWeight: '800', color: colors.ink},
   search: {minHeight: 49, borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, color: colors.text, fontSize: 12},
