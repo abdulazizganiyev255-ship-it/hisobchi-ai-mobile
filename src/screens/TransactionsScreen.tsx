@@ -91,7 +91,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
           <View style={styles.icon}><AppIcon name="receipt" color={colors.primary} size={23}/></View>
           <View style={styles.heading}>
             <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>Operatsiyalar</Text>
-            <Text style={styles.caption}>Demo sessiya · {transactions.length} ta yozuv</Text>
+            <Text style={styles.caption}>Demo sessiya · {transactions.length} ta yozuv · UI v0.4.1</Text>
           </View>
           <Pressable
             onPress={onAdd}
@@ -153,14 +153,16 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
             setDateError(null);
           }}
           accessibilityRole="button"
-          accessibilityLabel={'Muddatni tanlash. Hozir: ' + selectedPeriodLabel}
+          accessibilityLabel={'Muddatni tanlash. Hozir: ' + selectedPeriodLabel + '. ' + rangeLabel}
           accessibilityState={{expanded: periodOpen}}
           style={[styles.periodTrigger, periodOpen && styles.periodTriggerActive]}
         >
-          <Text style={styles.periodTitle}>Muddat: {selectedPeriodLabel}</Text>
-          <AppIcon name="chevron-down" color={colors.primarySoft} size={15}/>
+          <Text style={styles.periodTitle}>Muddat</Text>
+          <Text style={styles.periodChosen} numberOfLines={1}>
+            {selectedPeriodLabel}{range ? ' · ' + rangeLabel : ''}
+          </Text>
+          <AppIcon name="chevron-down" color={colors.primarySoft} size={16}/>
         </Pressable>
-        <Text style={styles.periodDate} numberOfLines={1}>{rangeLabel}</Text>
       </View>
       {periodOpen && (
         <View style={styles.periodPanel}>
@@ -314,11 +316,11 @@ const styles = StyleSheet.create({
   headerAdd: {borderRadius: 14, overflow: 'hidden'},
   headerAddInner: {minHeight: 44, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5},
   headerAddText: {fontSize: 12, fontWeight: '800', color: colors.ink},
-  periodHeading: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 2},
-  periodTrigger: {minHeight: 43, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 13, borderRadius: 13, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface},
+  periodHeading: {marginTop: 2},
+  periodTrigger: {minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 13, borderRadius: 13, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface},
   periodTriggerActive: {borderColor: colors.primary},
   periodTitle: {fontSize: 12, fontWeight: '800', color: colors.text},
-  periodDate: {fontSize: 11, color: colors.muted, flexShrink: 1},
+  periodChosen: {fontSize: 12, fontWeight: '700', color: colors.primarySoft, flex: 1, textAlign: 'right'},
   periodPanel: {borderRadius: 15, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, padding: 12, gap: 12},
   periodChips: {flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 7},
   periodChip: {minHeight: 37, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, justifyContent: 'center'},
