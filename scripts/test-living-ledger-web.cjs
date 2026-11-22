@@ -56,7 +56,8 @@ async function check(browser, size) {
     await page.goto(URL, {waitUntil: 'domcontentloaded', timeout: 90000});
     await page.getByTestId('living-ledger-demo-notice').waitFor({state: 'visible', timeout: 30000});
     await page.getByText('145 000', {exact: true}).waitFor({state: 'visible'});
-    await page.getByTestId('living-ledger-period-total').getByText('3 840 000 so‘m').waitFor({state: 'visible'});
+    await page.getByTestId('living-ledger-period-total').waitFor({state: 'visible'});
+    assert.equal((await page.getByTestId('living-ledger-period-total').textContent()).trim(), '3 840 000 so‘m');
     await assertNoHorizontalOverflow(page, name + ' Home');
 
     // Date selector: exactly the two seeded monthly options.
