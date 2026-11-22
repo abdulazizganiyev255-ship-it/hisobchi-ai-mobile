@@ -73,6 +73,15 @@ async function smoke(browser, size) {
     await visible(nav('Bosh sahifa'), 'Tab bar on Home');
     await visible(page.getByText('Umumiy balans', {exact: true}), 'Dashboard visible');
     await checkWidth(page, size, 'Dashboard');
+    const monthlyPeriod = page.getByRole('button', {name: /Oylik xarajat muddatini tanlash/});
+    await monthlyPeriod.click();
+    await visible(page.getByRole('button', {name: 'Oylik xarajat: Bu oy'}), 'Current month available');
+    await visible(page.getByRole('button', {name: 'Oylik xarajat: O‘tgan oy'}), 'Previous month available');
+    await page.getByRole('button', {name: 'Oylik xarajat: O‘tgan oy'}).click();
+    await visible(page.getByText('4 180 000 so‘m', {exact: true}), 'Previous-month sample loaded');
+    await monthlyPeriod.click();
+    await page.getByRole('button', {name: 'Oylik xarajat: Bu oy'}).click();
+    await visible(page.getByText('3 840 000 so‘m', {exact: true}), 'Current-month sample restored');
     await capture(page, size, 'dashboard');
 
     await nav('Operatsiyalar').click();
@@ -87,8 +96,20 @@ async function smoke(browser, size) {
     const tabBox = await tab.boundingBox();
     const listBox = await page.getByTestId('transactions-scroll').boundingBox();
     assert.ok(addBox && tabBox && listBox, 'Add CTA, list viewport and bottom tab have bounding boxes');
-    assert.ok(listBox.y + listBox.height <= addBox.y + 2, 'Add CTA must not cover the clipped transactions list');
+    assert.ok(listBox.y + listBox.height > addBox.y + 8, 'Operations list must extend behind FAB: no reserved full-width bottom strip');
     assert.ok(addBox.x >= 0 && addBox.x + addBox.width <= size.width + 1, 'Add CTA within width');
+    const list = page.getByTestId('transactions-scroll');
+    const scrolled = await list.evaluate(element => {
+      element.scrollTop = element.scrollHeight;
+      return element.scrollHeight > element.clientHeight;
+    });
+    assert.ok(scrolled, 'Transactions list needs to be scrollable');
+    await page.waitForTimeout(150);
+    const lastRow = await page.getByText('Salomatlik', {exact: true}).boundingBox();
+    assert.ok(lastRow && lastRow.y + lastRow.height < addBox.y - 3,
+      'At bottom of list, last transaction must be fully visible above Add CTA');
+    await capture(page, size, 'transactions-bottom');
+    await list.evaluate(element => {element.scrollTop = 0;});
     assert.ok(addBox.y + addBox.height <= tabBox.y + 2, 'Add CTA must sit above bottom tabs');
 
     const search = page.getByRole('textbox', {name: 'Kategoriya yoki izoh bo‘yicha qidirish'});
