@@ -16,6 +16,7 @@ export type AnalyticsDay = {
   date: string;
   expense: number;
   income: number;
+  turnover: number;
 };
 
 export type AnalyticsReport = {
@@ -24,6 +25,7 @@ export type AnalyticsReport = {
   end: string | null;
   income: number;
   expense: number;
+  turnover: number;
   net: number;
   transactionsCount: number;
   expensesCount: number;
@@ -52,7 +54,8 @@ export function calculateAnalytics(
   let expensesCount = 0;
 
   for (const item of included) {
-    const day = daily.get(item.occurredOn) ?? {date: item.occurredOn, expense: 0, income: 0};
+    const day = daily.get(item.occurredOn) ?? {date: item.occurredOn, expense: 0, income: 0, turnover: 0};
+    day.turnover += Math.abs(item.amount);
     if (item.amount < 0) {
       const amount = -item.amount;
       expensesCount += 1;
@@ -86,6 +89,7 @@ export function calculateAnalytics(
     end: range?.end ?? null,
     income,
     expense,
+    turnover: income + expense,
     net: income - expense,
     transactionsCount: included.length,
     expensesCount,
