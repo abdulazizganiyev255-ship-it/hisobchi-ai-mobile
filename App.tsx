@@ -9,7 +9,7 @@ import {transactionFromDraft, type TransactionDraft} from './src/data/transactio
 import {LivingLedgerDashboardScreen} from './src/screens/LivingLedgerDashboardScreen';
 import {OtherScreen, type Tab} from './src/screens/OtherScreens';
 import {LedgerTransactionsScreen} from './src/screens/LedgerTransactionsScreen';
-import {AnalyticsScreen} from './src/screens/AnalyticsScreen';
+import {LedgerAnalyticsScreen} from './src/screens/LedgerAnalyticsScreen';
 import {LedgerTransactionEditorScreen} from './src/screens/LedgerTransactionEditorScreen';
 import {OnboardingScreen} from './src/screens/OnboardingScreen';
 import {colors, radius} from './src/theme/tokens';
@@ -30,7 +30,7 @@ function AppContent() {
   const [editor, setEditor] = useState<EditorState>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const nextId = useRef(1000);
-  const ledgerShell = !showOnboarding && (editor !== null || tab === 'home' || tab === 'transactions');
+  const ledgerShell = !showOnboarding && (editor !== null || tab === 'home' || tab === 'transactions' || tab === 'analytics');
 
   // Native Android Back should leave overlays before returning to Home.
   // React Native Modal handles its own Back press via onRequestClose.
@@ -114,7 +114,7 @@ function AppContent() {
             onEdit={item => setEditor(item)}
           />
         ) : tab === 'analytics' ? (
-          <AnalyticsScreen
+          <LedgerAnalyticsScreen
             transactions={transactions}
             onOpenTransactions={() => setTab('transactions')}
           />
