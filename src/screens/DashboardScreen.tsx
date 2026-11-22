@@ -38,7 +38,7 @@ export function DashboardScreen({onOpenTransactions, transactions}: {onOpenTrans
     <Pressable accessibilityRole="button" accessibilityLabel="Xavfsiz sarflash haqida" onPress={()=>Alert.alert('Xavfsiz sarflash','Hozir namuna ko‘rsatilgan. Kelajakda haqiqiy limit rejalashtirilgan to‘lovlar va balansdan hisoblanadi.')}>
       <LinearGradient colors={['#F0FAFF','#CDEEFF','#B4E5F7']} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.safeCard}>
         <View style={styles.safeIcon}><AppIcon name="shield" size={26} color="#0874B5"/></View>
-        <View style={{flex:1,minWidth:0}}><Text style={styles.safeTitle}>Bugun xavfsiz sarflash</Text><Text style={[styles.safeAmount,narrow&&styles.safeAmountNarrow]} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(demo.safeToSpendToday)}</Text><Text style={styles.safeSubtitle}>Namuna limit · hali hisoblanmagan</Text></View>
+        <View style={{flex:1,minWidth:0}}><Text style={styles.safeTitle}>Bugun xavfsiz sarflash</Text><Text style={[styles.safeAmount,narrow&&styles.safeAmountNarrow]} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(demo.safeToSpendToday)}</Text><Text style={styles.safeSubtitle}>Namuna · hisoblanmagan</Text></View>
         <View style={styles.safeArrow}><AppIcon name="chevron" color={colors.ink} size={19}/></View>
       </LinearGradient>
     </Pressable>
@@ -46,7 +46,7 @@ export function DashboardScreen({onOpenTransactions, transactions}: {onOpenTrans
     <SurfaceCard style={styles.chartCard}>
       <SectionHeader
         icon="chart"
-        title="Oylik xarajat namunasi"
+        title="Oylik xarajat"
         trailing={
           <Pressable
             style={styles.periodBtn}
