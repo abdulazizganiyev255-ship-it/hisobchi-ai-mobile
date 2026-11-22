@@ -110,9 +110,9 @@ assert.match(analyticsScreen, /validateCustomRange\(customStart, customEnd, toda
   'Custom range must validate before it changes report period');
 assert.match(analyticsScreen, /report\.chartTruncated/,
   'Disclosure required when chart shows only last seven recorded days');
-assert.match(analyticsScreen, /'Kirim − chiqim · hisobdagi mavjud mablag‘ emas'/,
+assert.match(analyticsScreen, /Kirim − chiqim · hisobdagi mavjud mablag‘ emas/,
   'Net session result must not misrepresent bank balance');
-assert.match(analyticsScreen, /'Barcha rejimlar bir xil sanalarni/,
+assert.match(analyticsScreen, /Barcha rejimlar bir xil sanalarni/,
   'Chart modes need truthfully labelled scale caveat');
 assert.match(analyticsScreen, /<LedgerDateCalendar/,
   'Analytics custom period must use genuine selectable calendar');
