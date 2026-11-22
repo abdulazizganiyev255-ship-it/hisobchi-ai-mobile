@@ -1,0 +1,43 @@
+name: Android and iOS JavaScript bundle QA
+
+on:
+  pull_request:
+    branches:
+      - main
+      - test/web-responsive-e2e-v20
+
+jobs:
+  native-bundle:
+    name: Native Metro bundle (${{ matrix.platform }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [android, ios]
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Export production JavaScript bundle
+        run: npx expo export --platform ${{ matrix.platform }} --output-dir "$RUNNER_TEMP/hisobchi-${{ matrix.platform }}" --clear
+      - name: Confirm bundle artifacts
+        shell: bash
+        run: |
+          OUT="$RUNNER_TEMP/hisobchi-${{ matrix.platform }}"
+          test -d "$OUT"
+          FILE_COUNT=$(find "$OUT" -type f | wc -l)
+          echo "Bundled ${{ matrix.platform }} output files: $FILE_COUNT"
+          if [ "$FILE_COUNT" -lt 1 ]; then
+            echo "No ${{ matrix.platform }} export files produced"
+            exit 1
+          fi
