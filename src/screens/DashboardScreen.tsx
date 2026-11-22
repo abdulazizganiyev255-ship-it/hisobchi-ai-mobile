@@ -45,7 +45,7 @@ export function DashboardScreen({onOpenTransactions, transactions}: {onOpenTrans
     <SurfaceCard style={styles.chartCard}>
       <SectionHeader
         icon="chart"
-        title="Xarajatlar tahlili"
+        title="Oylik xarajat namunasi"
         trailing={
           <Pressable
             style={styles.periodBtn}
