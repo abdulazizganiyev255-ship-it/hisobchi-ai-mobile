@@ -29,9 +29,9 @@ Every skill requires a README with trigger, evidence prerequisites, refusal/stop
 | ID | Priority | Card | Responsible | Depends on | Evidence / definition of done | Status |
 |---|---|---|---|---|---|---|
 | D00 | P0 | Audit repo branch, CI, known screen/component inventory | QA Lead | none | source links, matrix; untested items marked | DONE (source only) |
-| D01 | P0 | Freeze product wording / financial truth map | Finance Reviewer | D00 | demo/actual/forecast distinctions and accepted copy | BACKLOG |
-| D02 | P0 | Six-screen IA + critical flow/error states | IA | D01 | clickable flow spec and 6-state matrix | BACKLOG |
-| D03 | P1 | Reference anatomy (not copying) + originality rules | Creative Director | D02 | 3 documented visual concepts | BACKLOG |
+| D01 | P0 | Freeze demo financial-truth/copy contract | Finance Reviewer | D00 | Demo/session/forecast distinctions, exact source-linked copy; real engine blocked | SOURCE-SPEC DONE; production BLOCKED |
+| D02 | P0 | Six-screen IA + critical flow/error states | IA | D01 | Mermaid flow, 6-screen state matrix and 11 acceptance cases; clickable prototype not yet built | UX SPEC DONE; interactive BLOCKED |
+| D03 | P1 | Reference anatomy (not copying) + originality rules | Creative Director | D02 | 3 visual exploration directions rendered in chat + source-fidelity audit; no approved visual target | CONCEPTS DONE; visual QA OPEN |
 | D04 | P0 | Select creative direction and approve Home visual | Product Lead | D03 | human-reviewed target mockup | BLOCKED: target not chosen |
 | D05 | P0 | Semantic design tokens + contrast audit | DS Architect | D04 | tested tokens; 4.5:1 normal text | BACKLOG |
 | D06 | P0 | Components: buttons, typography, fields, cards, nav, overlays | Component Engineer | D05 | state stories and tests | BACKLOG |
