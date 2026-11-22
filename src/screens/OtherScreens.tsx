@@ -12,11 +12,12 @@ type Props = {
   transactionCount: number;
   onOpenTransactions: () => void;
   onOpenAnalytics: () => void;
+  onOpenOnboarding: () => void;
   onResetDemo: () => void;
 };
 
 export function OtherScreen({
-  tab: _tab, transactionCount, onOpenTransactions, onOpenAnalytics, onResetDemo,
+  tab: _tab, transactionCount, onOpenTransactions, onOpenAnalytics, onOpenOnboarding, onResetDemo,
 }: Props) {
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetDone, setResetDone] = useState(false);
@@ -82,6 +83,13 @@ export function OtherScreen({
           title="Tahlil"
           subtitle="Kirim, chiqim va aylanma"
           onPress={onOpenAnalytics}
+        />
+        <View style={styles.separator}/>
+        <ActionRow
+          icon="home"
+          title="Ilova bo‘yicha qo‘llanma"
+          subtitle="3 qadamli tanishtirish · demo"
+          onPress={onOpenOnboarding}
         />
       </SurfaceCard>
 
