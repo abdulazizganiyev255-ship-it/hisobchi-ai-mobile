@@ -77,6 +77,56 @@ const rolling = analytics.calculateAnalytics([...sample, t('old', '2026-10-23', 
 assert.equal(rolling.start, '2026-10-24');
 assert.equal(rolling.expense, 259000, 'Outside-window transaction should not count');
 
+// Custom date range is inclusive at both ends, and reuses the exact aggregation pipeline.
+const custom = analytics.calculateAnalytics(sample, 'custom', '2026-11-22', {
+  start: '2026-11-20', end: '2026-11-21',
+});
+assert.equal(custom.period, 'custom');
+assert.equal(custom.start, '2026-11-20');
+assert.equal(custom.end, '2026-11-21');
+assert.equal(custom.transactionsCount, 2);
+assert.equal(custom.income, 3000000);
+assert.equal(custom.expense, 42000);
+assert.equal(custom.turnover, 3042000);
+assert.equal(custom.net, 2958000);
+assert.equal(custom.days.length, 2);
+assert.equal(custom.categories[0].name, 'Kafe');
+assert.equal(analytics.analyticsRangeLabel(custom), '20.11.26 — 21.11.26');
+
+const customOneDay = analytics.calculateAnalytics(sample, 'custom', '2026-11-22', {
+  start: '2026-11-22', end: '2026-11-22',
+});
+assert.equal(customOneDay.income, 0);
+assert.equal(customOneDay.expense, 97000);
+assert.equal(customOneDay.transactionsCount, 2);
+
+const customEmpty = analytics.calculateAnalytics(sample, 'custom', '2026-11-22', {
+  start: '2026-11-01', end: '2026-11-02',
+});
+assert.equal(customEmpty.expense, 0);
+assert.equal(customEmpty.income, 0);
+assert.equal(customEmpty.days.length, 0);
+assert.equal(customEmpty.categories.length, 0);
+
+assert.throws(
+  () => analytics.calculateAnalytics(sample, 'custom', '2026-11-22'),
+  /Custom analytics range must be validated/,
+  'Custom without a confirmed range cannot silently show all transactions',
+);
+assert.throws(
+  () => analytics.calculateAnalytics(sample, 'custom', '2026-11-22', {
+    start: '2026-11-23', end: '2026-11-23',
+  }),
+  /Custom analytics range must be validated/,
+);
+assert.throws(
+  () => analytics.calculateAnalytics(sample, 'custom', '2026-11-22', {
+    start: '2026-11-22', end: '2026-11-20',
+  }),
+  /Custom analytics range must be validated/,
+);
+assert.ok(analytics.ANALYTICS_PERIODS.some(option => option.key === 'custom'));
+
 const empty = analytics.calculateAnalytics(sample, 'week', '2027-05-12');
 assert.equal(empty.transactionsCount, 0);
 assert.equal(empty.days.length, 0);
