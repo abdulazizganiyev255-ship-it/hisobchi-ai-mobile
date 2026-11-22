@@ -57,7 +57,7 @@ const primitives = read('src/components/living/LedgerPrimitives.tsx');
 
 assert.match(app, /<LivingLedgerDashboardScreen/, 'New Home must be mounted');
 assert.match(app, /onAdd=\{\(\) => setEditor\('new'\)\}/, 'Home Add must open actual editor');
-assert.match(app, /homeTheme \? 'dark' : 'light'/, 'Home statusbar must be correct on light surface');
+assert.match(app, /ledgerShell \? 'dark' : 'light'/, 'Migrated screens need correct light status bar');
 assert.match(screen, /<SourceTag label="DEMO · hisoblanmagan"/, 'SafeSpend must say not calculated');
 assert.match(screen, /DEMO MUHIT — HAQIQIY HISOB EMAS/, 'Home must disclose demo mode');
 assert.match(screen, /const month = demo\.months\[period\]/, 'Monthly display must use fixed demo fixture');
@@ -74,3 +74,27 @@ assert.match(primitives, /item\.occurredOn\.slice\(8, 10\)/, 'Date must be deriv
 assert.doesNotMatch(primitives, /\{item\.date\}/, 'Avoid stale hardcoded Bugun/Kecha fixtures');
 assert.doesNotMatch(screen, /\bSupabase\b|\bbankka ulandi\b/i, 'No simulated backend claim');
 console.log('PASS Living Ledger wiring, truth labels and semantics source contracts');
+
+
+// D08 Ledger Transactions and Editor source contracts (runtime tests remain separate).
+const history = read('src/screens/LedgerTransactionsScreen.tsx');
+const editor = read('src/screens/LedgerTransactionEditorScreen.tsx');
+const calendar = read('src/components/living/LedgerDateCalendar.tsx');
+assert.match(app, /<LedgerTransactionsScreen/, 'Ledger history must be mounted');
+assert.match(app, /<LedgerTransactionEditorScreen/, 'Ledger editor must be mounted');
+assert.match(app, /ledgerShell = !showOnboarding/, 'Home, history and editor use light shell');
+assert.match(history, /sumTransactionTotals\(visible\)/,
+  'Displayed history totals must reflect the complete active filters');
+assert.match(history, /validateCustomRange\(customStart, customEnd, today\)/,
+  'Custom transaction range must validate before applying');
+assert.match(history, /testID="ledger-transactions-add"/, 'Add action must be E2E accessible');
+assert.doesNotMatch(history, /fab:\s*\{/, 'No floating rail or FAB on Ledger history');
+assert.match(history, /<LedgerDateCalendar/, 'History date-range picker uses themed calendar');
+assert.match(editor, /validateDraft\(draft\)/, 'Save uses original finance validation');
+assert.match(editor, /onSave\(draft\)/, 'Editor writes via existing transaction state callback');
+assert.match(editor, /onDelete/, 'Editor retains confirmed delete callback');
+assert.match(editor, /<LedgerDateCalendar/, 'Editor date is selected using calendar');
+assert.match(calendar, /onRequestClose=\{onCancel\}/, 'Calendar Android Back cancel required');
+assert.match(calendar, /!cell\.enabled/, 'Future and invalid day selection stays disabled');
+assert.match(calendar, /minHeight: 44/, 'Calendar day cells must meet 44dp design target');
+console.log('PASS Ledger Transactions/Editor/Calendar component source contracts');
