@@ -100,6 +100,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         />
       </View>
       <ScrollView
+        testID="transactions-scroll"
         style={styles.listViewport}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
