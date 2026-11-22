@@ -4,16 +4,18 @@ import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
 import {ExpenseChart} from '../components/ExpenseChart';
 import {TransactionRow} from '../components/TransactionRow';
-import {demo, formatMoney} from '../data/demo';
+import {demo, formatMoney, type Transaction} from '../data/demo';
+import {filterAndSortTransactions} from '../data/transactions';
 import {colors, radius, shadow, spacing} from '../theme/tokens';
 
-export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>void}) {
+export function DashboardScreen({onOpenTransactions, transactions}: {onOpenTransactions:()=>void; transactions:Transaction[]}) {
   const [visible,setVisible] = useState(true);
   const [period,setPeriod] = useState<'current'|'previous'>('current');
   const {width} = useWindowDimensions();
   const narrow = width < 375;
   const month = demo.months[period];
   const improved = month.change < 0;
+  const recent = filterAndSortTransactions(transactions, 'all', '').slice(0, 3);
 
   return <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
     <View style={styles.header}>
@@ -47,10 +49,10 @@ export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>vo
     </View>
 
     <View style={styles.transactionsCard}>
-      <View style={styles.transactionsHeader}><View style={styles.transactionsHeading}><Text style={styles.transactionsTitle}>So‘nggi operatsiyalar</Text><Text style={styles.transactionsCaption}>Oxirgi 3 ta namuna yozuv</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Barcha operatsiyalar" onPress={onOpenTransactions} style={styles.arrow}><AppIcon name="chevron" color={colors.ink} size={20}/></Pressable></View>
-      {demo.transactions.slice(0,3).map((item,i)=><React.Fragment key={item.id}>{i>0&&<View style={styles.separator}/>}<TransactionRow item={item} light/></React.Fragment>)}
+      <View style={styles.transactionsHeader}><View style={styles.transactionsHeading}><Text style={styles.transactionsTitle}>So‘nggi operatsiyalar</Text><Text style={styles.transactionsCaption}>{recent.length} ta yozuv · demo sessiya</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Barcha operatsiyalar" onPress={onOpenTransactions} style={styles.arrow}><AppIcon name="chevron" color={colors.ink} size={20}/></Pressable></View>
+      {recent.length ? recent.map((item,i)=><React.Fragment key={item.id}>{i>0&&<View style={styles.separator}/>}<TransactionRow item={item} light/></React.Fragment>) : <Text style={styles.emptyTransactions}>Operatsiya mavjud emas</Text>}
     </View>
-    <Text style={styles.disclaimer}>Hisobchi AI · Dizayn prototipi v0.2</Text>
+    <Text style={styles.disclaimer}>Hisobchi AI · Dizayn prototipi v0.3</Text>
   </ScrollView>;
 }
 
@@ -69,6 +71,6 @@ const styles=StyleSheet.create({
   safeCard:{borderRadius:radius.lg,padding:16,minHeight:108,flexDirection:'row',alignItems:'center',gap:12,overflow:'hidden',...shadow.light},safeArrow:{height:32,width:32,borderRadius:16,backgroundColor:'rgba(255,255,255,0.48)',alignItems:'center',justifyContent:'center'},safeIcon:{height:47,width:47,backgroundColor:'#C7EFFF',borderRadius:15,alignItems:'center',justifyContent:'center'},safeTitle:{color:colors.ink,fontWeight:'600',fontSize:12},safeAmount:{color:colors.ink,fontWeight:'800',fontSize:24,letterSpacing:-0.5,marginTop:5},safeSubtitle:{color:'#547C9C',fontSize:10,marginTop:4},
   chartCard:{borderRadius:radius.lg,backgroundColor:colors.surface,paddingHorizontal:17,paddingTop:16,paddingBottom:14,borderWidth:1,borderColor:'rgba(156,219,250,0.14)'},
   sectionHeader:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:8},sectionTitleRow:{flexDirection:'row',alignItems:'center',gap:9,flexShrink:1},sectionIcon:{height:31,width:31,borderRadius:10,backgroundColor:'#163C5D',alignItems:'center',justifyContent:'center'},sectionTitle:{color:colors.text,fontWeight:'700',fontSize:15},periodBtn:{backgroundColor:colors.surfaceRaised,borderRadius:radius.pill,paddingVertical:9,paddingHorizontal:11,flexDirection:'row',alignItems:'center',gap:6},periodText:{color:colors.text,fontSize:11,fontWeight:'600'},chartSummary:{flexDirection:'row',alignItems:'flex-end',gap:8,marginTop:15},chartMain:{flex:1,minWidth:0},chartEyebrow:{color:colors.faint,fontSize:9,letterSpacing:0.7,fontWeight:'700'},chartAmount:{fontWeight:'800',fontSize:22,color:colors.text,marginTop:5},chartDetail:{fontSize:11,color:colors.muted,marginTop:4},changePill:{borderRadius:999,paddingHorizontal:10,paddingVertical:6,marginBottom:1},changeGood:{backgroundColor:'rgba(49,195,150,0.12)'},changeBad:{backgroundColor:'rgba(245,155,155,0.13)'},changeText:{fontSize:11,fontWeight:'800'},changeGoodText:{color:'#6FE4BC'},changeBadText:{color:'#FFACAC'},chartFooter:{borderTopWidth:1,borderColor:colors.divider,flexDirection:'row',alignItems:'center',gap:7,marginTop:8,paddingTop:10},legendDot:{height:6,width:6,borderRadius:3,backgroundColor:colors.primary},legendText:{fontSize:10,color:colors.faint},
-  transactionsCard:{backgroundColor:colors.cardLight,borderRadius:radius.lg,paddingHorizontal:16,paddingVertical:12},transactionsHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:10},transactionsHeading:{flex:1,minWidth:0},transactionsTitle:{color:colors.ink,fontWeight:'800',fontSize:16,letterSpacing:-0.25},transactionsCaption:{color:'#62839B',fontSize:10,marginTop:4},arrow:{width:36,height:36,borderRadius:18,backgroundColor:'#FFFFFF',justifyContent:'center',alignItems:'center'},separator:{height:1,backgroundColor:'#D1E4F0',marginLeft:57},
+  transactionsCard:{backgroundColor:colors.cardLight,borderRadius:radius.lg,paddingHorizontal:16,paddingVertical:12},transactionsHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:10},transactionsHeading:{flex:1,minWidth:0},transactionsTitle:{color:colors.ink,fontWeight:'800',fontSize:16,letterSpacing:-0.25},transactionsCaption:{color:'#62839B',fontSize:10,marginTop:4},arrow:{width:36,height:36,borderRadius:18,backgroundColor:'#FFFFFF',justifyContent:'center',alignItems:'center'},separator:{height:1,backgroundColor:'#D1E4F0',marginLeft:57},emptyTransactions:{color:'#68859A',fontSize:12,textAlign:'center',padding:22},
   disclaimer:{color:colors.faint,textAlign:'center',fontSize:10,marginTop:1}
 });
