@@ -59,6 +59,7 @@ async function check(browser, size) {
     await page.getByTestId('living-ledger-period-total').waitFor({state: 'visible'});
     assert.equal((await page.getByTestId('living-ledger-period-total').textContent()).trim(), '3 840 000 so‘m');
     await assertNoHorizontalOverflow(page, name + ' Home');
+    await snap(page, size, 'initial-home');
 
     // Date selector: exactly the two seeded monthly options.
     await page.getByTestId('living-ledger-period-previous').click();
@@ -74,6 +75,8 @@ async function check(browser, size) {
     await page.getByTestId('living-ledger-explainer-close').click();
     await page.getByText('Bu raqam nimani bildiradi?', {exact: true}).waitFor({state: 'hidden'});
 
+    await page.getByTestId('living-ledger-home-scroll').evaluate(element => {element.scrollTop = 0;});
+    await page.waitForTimeout(120);
     await snap(page, size, 'home');
 
     // Home action must open the existing validated editor, not a dummy click.
@@ -90,6 +93,10 @@ async function check(browser, size) {
     await page.getByText('3 840 000 so‘m', {exact: true}).waitFor({state: 'visible'});
     await assertNoHorizontalOverflow(page, name + ' post-add Home');
     await snap(page, size, 'after-create');
+    await page.getByText('−100 000 so‘m', {exact: true}).waitFor({state: 'visible'});
+    await page.getByTestId('living-ledger-home-scroll').evaluate(element => {element.scrollTop = element.scrollHeight;});
+    await page.waitForTimeout(120);
+    await snap(page, size, 'after-create-activity');
     assert.deepEqual(errors, [], name + ' runtime errors: ' + errors.join('; '));
     console.log('PASS ' + name + ': Home, period, source explanation, Add, Analytics, demo invariants');
   } catch (err) {
