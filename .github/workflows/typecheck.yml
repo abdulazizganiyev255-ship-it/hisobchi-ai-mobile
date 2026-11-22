@@ -2,7 +2,7 @@ name: TypeScript validation
 
 on:
   pull_request:
-    branches: [main, feat/dashboard-premium-v02, feat/transactions-v03, feat/transactions-date-range-v04, feat/analytics-premium-v06, feat/design-system-v1-foundations, feat/design-system-v1-dashboard-operations, feat/design-system-v1-transaction-editor, feat/design-system-v1-profile, feat/design-system-v1-onboarding-demo]
+    branches: [main, feat/dashboard-premium-v02, feat/transactions-v03, feat/transactions-date-range-v04, feat/analytics-premium-v06, feat/design-system-v1-foundations, feat/design-system-v1-dashboard-operations, feat/design-system-v1-transaction-editor, feat/design-system-v1-profile, feat/design-system-v1-onboarding-demo, feat/design-system-v1-final-ui-qa]
   push:
     branches: [main]
 
@@ -25,5 +25,7 @@ jobs:
         run: npm run test:analytics
       - name: Design system and contrast tests
         run: npm run test:design-system
+      - name: Calendar date model tests
+        run: npm run test:calendar
       - name: UI integration contracts
         run: npm run test:ui-contract
