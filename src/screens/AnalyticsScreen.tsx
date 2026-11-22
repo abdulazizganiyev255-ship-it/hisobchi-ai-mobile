@@ -23,6 +23,7 @@ type ChartMetric = 'expense' | 'income' | 'turnover';
 
 export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
   const [period, setPeriod] = useState<AnalyticsPeriod>('all');
+  const [periodOpen, setPeriodOpen] = useState(false);
   const [chartMetric, setChartMetric] = useState<ChartMetric>('expense');
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const report = calculateAnalytics(transactions, period, todayLocal());
@@ -51,31 +52,46 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
           <Text style={styles.pageTitle}>Tahlil</Text>
           <Text style={styles.subheading}>Qayd etilgan operatsiyalar · demo</Text>
         </View>
-        <View style={styles.demoPill}><Text style={styles.demoPillText}>UI v0.6.3</Text></View>
+        <View style={styles.demoPill}><Text style={styles.demoPillText}>UI v0.6.4</Text></View>
       </View>
 
       <View style={styles.periodPanel}>
-        <Text style={styles.periodTitle}>DAVRNI TANLANG</Text>
-        <View style={styles.periodOptions}>
-          {ANALYTICS_PERIODS.map(option => {
-            const active = period === option.key;
-            return (
-              <Pressable
-                key={option.key}
-                accessibilityRole="button"
-                accessibilityLabel={'Tahlil davri: ' + option.label}
-                accessibilityState={{selected: active}}
-                onPress={() => {setPeriod(option.key); setSelectedDay(null);}}
-                style={[styles.periodButton, active && styles.periodButtonActive]}
-              >
-                <Text style={[styles.periodButtonText, active && styles.periodButtonTextActive]}>
-                  {option.label}
-                </Text>
-              </Pressable>
-            );
-          })}
+        <View style={styles.periodLine}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={'Muddatni tanlash. Hozir: ' + (ANALYTICS_PERIODS.find(option => option.key === period)?.label ?? 'Barchasi')}
+            accessibilityState={{expanded: periodOpen}}
+            onPress={() => setPeriodOpen(value => !value)}
+            style={[styles.periodTrigger, periodOpen && styles.periodTriggerActive]}
+          >
+            <Text style={styles.periodTriggerLabel}>
+              {ANALYTICS_PERIODS.find(option => option.key === period)?.label ?? 'Barchasi'}
+            </Text>
+            <AppIcon name="chevron-down" color={colors.primarySoft} size={15}/>
+          </Pressable>
+          <Text style={styles.periodDate} numberOfLines={1}>{analyticsRangeLabel(report)}</Text>
         </View>
-        <Text style={styles.periodDate}>{analyticsRangeLabel(report)}</Text>
+        {periodOpen && (
+          <View style={styles.periodOptions}>
+            {ANALYTICS_PERIODS.map(option => {
+              const active = period === option.key;
+              return (
+                <Pressable
+                  key={option.key}
+                  accessibilityRole="button"
+                  accessibilityLabel={'Tahlil davri: ' + option.label}
+                  accessibilityState={{selected: active}}
+                  onPress={() => {setPeriod(option.key); setPeriodOpen(false); setSelectedDay(null);}}
+                  style={[styles.periodButton, active && styles.periodButtonActive]}
+                >
+                  <Text style={[styles.periodButtonText, active && styles.periodButtonTextActive]}>
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
       </View>
 
       <LinearGradient
@@ -114,6 +130,12 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
             <Text style={styles.metricAmount} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(report.expense)}</Text>
           </View>
         </View>
+        <View style={styles.turnoverRow}>
+          <Text style={styles.turnoverLabel}>Umumiy aylanma</Text>
+          <Text style={styles.turnoverInline} numberOfLines={1} adjustsFontSizeToFit>
+            {formatMoney(report.turnover)}
+          </Text>
+        </View>
       </LinearGradient>
 
       <View style={styles.card}>
@@ -122,17 +144,10 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
             <View style={styles.sectionIcon}><AppIcon name="chart" color={colors.primary} size={17}/></View>
             <View style={styles.sectionCopy}>
               <Text style={styles.sectionTitle}>Kunlik dinamika</Text>
-              <Text style={styles.sectionSub}>Kirim va chiqimni alohida ko‘ring</Text>
+              <Text style={styles.sectionSub}>Sanani bosib summani ko‘ring</Text>
             </View>
           </View>
-        </View>
-
-        <View style={styles.turnoverSummary}>
-          <Text style={styles.turnoverEyebrow}>UMUMIY AYLANMA · TANLANGAN DAVR</Text>
-          <Text style={styles.turnoverValue} numberOfLines={1} adjustsFontSizeToFit>
-            {formatMoney(report.turnover)}
-          </Text>
-          <Text style={styles.turnoverFormula}>Kirim {formatMoney(report.income)} + chiqim {formatMoney(report.expense)}</Text>
+          <Text style={styles.smallCount}>{chartDays.length} kun</Text>
         </View>
 
         <View style={styles.chartControls}>
@@ -157,14 +172,6 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
           })}
         </View>
 
-        <View style={styles.chartTotals}>
-          <View style={styles.chartTotalsCopy}>
-            <Text style={styles.chartEyebrow}>KUNLIK {chartMetricLabel.toLocaleUpperCase()} · DEMO</Text>
-            <Text style={styles.chartTotalValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(metricTotal)}</Text>
-          </View>
-          <Text style={styles.smallCount}>{chartDays.length} faol kun</Text>
-        </View>
-
         {chartDays.length > 0 && hasMetricData ? (
           <>
             <View style={styles.chart}>
@@ -187,7 +194,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
                             styles.bar,
                             chartMetric === 'expense' ? styles.barExpense : chartMetric === 'income' ? styles.barIncome : styles.barTurnover,
                             highlighted && styles.barHighlighted,
-                            {height: Math.max(4, Math.round(value / maxBarValue * 85))},
+                            {height: Math.max(4, Math.round(value / maxBarValue * 98))},
                           ]}
                         />
                       ) : <View style={styles.zeroMarker}/>}
@@ -242,8 +249,10 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
 
         {hasExpense ? (
           <>
-            <Text style={styles.categoryTotal}>{formatMoney(report.expense)}</Text>
-            <Text style={styles.categoryCaption}>{report.expensesCount} ta xarajat operatsiyasi · demo</Text>
+            <View style={styles.categorySummary}>
+              <Text style={styles.categoryCaption}>{report.expensesCount} ta xarajat · demo</Text>
+              <Text style={styles.categoryTotal} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(report.expense)}</Text>
+            </View>
             {report.categories.map(row => (
               <View style={styles.categoryRow} key={row.name}>
                 <View style={[styles.categoryIcon, {backgroundColor: row.iconBg}]}>
@@ -289,7 +298,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
         </View>
       </View>
       <Text style={styles.footer}>
-        Hisobchi AI · UI v0.6.3 demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
+        Hisobchi AI · UI v0.6.4 demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
         serverda saqlanmaydi. Dashboard balansi va Safe-to-Spend hali mustaqil namuna.
       </Text>
     </ScrollView>
@@ -306,14 +315,17 @@ const styles = StyleSheet.create({
   subheading: {fontSize: 11, marginTop: 4, color: colors.muted},
   demoPill: {paddingHorizontal: 9, paddingVertical: 6, borderRadius: 999, backgroundColor: '#163C5C'},
   demoPillText: {fontSize: 10, color: colors.primarySoft, fontWeight: '700'},
-  periodPanel: {gap: 7},
-  periodTitle: {fontSize: 10, color: colors.faint, fontWeight: '800', letterSpacing: 1},
-  periodOptions: {flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 15, padding: 4, gap: 4},
-  periodButton: {minHeight: 38, borderRadius: 11, flex: 1, justifyContent: 'center', alignItems: 'center', minWidth: 0},
+  periodPanel: {gap: 8},
+  periodLine: {flexDirection: 'row', alignItems: 'center', gap: 10},
+  periodTrigger: {minWidth: 108, minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, gap: 8, backgroundColor: colors.surface, borderRadius: 13, borderWidth: 1, borderColor: colors.divider},
+  periodTriggerActive: {borderColor: colors.primary},
+  periodTriggerLabel: {fontSize: 12, fontWeight: '700', color: colors.text},
+  periodOptions: {flexDirection: 'row', flexWrap: 'wrap', backgroundColor: colors.surface, borderRadius: 15, padding: 7, gap: 7},
+  periodButton: {minHeight: 39, borderRadius: 11, flexGrow: 1, paddingHorizontal: 9, justifyContent: 'center', alignItems: 'center'},
   periodButtonActive: {backgroundColor: '#235B81'},
   periodButtonText: {fontSize: 11, fontWeight: '700', color: colors.muted},
   periodButtonTextActive: {color: colors.text},
-  periodDate: {fontSize: 11, color: colors.muted},
+  periodDate: {fontSize: 11, color: colors.muted, textAlign: 'right', flex: 1, minWidth: 0},
   hero: {borderRadius: radius.lg, padding: 16, borderColor: 'rgba(160,224,250,0.17)', borderWidth: 1, overflow: 'hidden'},
   heroTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   heroEyebrow: {fontSize: 10, color: '#A8DBF0', fontWeight: '800', letterSpacing: 0.9},
@@ -340,22 +352,18 @@ const styles = StyleSheet.create({
   sectionTitle: {fontSize: 16, color: colors.text, fontWeight: '800'},
   sectionSub: {fontSize: 10, marginTop: 3, color: colors.muted},
   smallCount: {fontSize: 11, fontWeight: '700', color: colors.primarySoft},
-  turnoverSummary: {marginTop: 12, borderRadius: 14, backgroundColor: '#173A58', paddingHorizontal: 13, paddingVertical: 11, borderWidth: 1, borderColor: 'rgba(160,224,250,0.12)', gap: 3},
-  turnoverEyebrow: {fontSize: 10, letterSpacing: 0.65, fontWeight: '700', color: colors.primarySoft},
-  turnoverValue: {fontSize: 23, fontWeight: '800', color: colors.text},
-  turnoverFormula: {fontSize: 10, lineHeight: 16, color: colors.muted},
-  chartControls: {marginTop: 11, flexDirection: 'row', gap: 5, backgroundColor: '#09213A', borderRadius: 13, padding: 4},
-  chartChoice: {flex: 1, minHeight: 38, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
+  turnoverRow: {marginTop: 12, paddingTop: 11, borderTopWidth: 1, borderTopColor: 'rgba(187,230,255,0.18)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10},
+  turnoverLabel: {fontSize: 11, fontWeight: '700', color: '#B5D7E9'},
+  turnoverInline: {fontSize: 15, fontWeight: '800', color: colors.text, flexShrink: 1, textAlign: 'right'},
+  chartControls: {marginTop: 11, flexDirection: 'row', gap: 7, alignSelf: 'flex-start'},
+  chartChoice: {minWidth: 74, minHeight: 39, paddingHorizontal: 12, borderRadius: 11, backgroundColor: '#0A223A', alignItems: 'center', justifyContent: 'center'},
   chartChoiceActive: {backgroundColor: '#1A567C'},
   chartChoiceText: {fontSize: 12, fontWeight: '700', color: colors.muted},
   chartChoiceTextActive: {color: colors.text},
-  chartTotals: {flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 12, gap: 8},
-  chartTotalsCopy: {flex: 1, minWidth: 0, gap: 5},
-  chartEyebrow: {fontSize: 10, letterSpacing: 0.7, fontWeight: '700', color: colors.faint},
-  chartTotalValue: {fontSize: 21, color: colors.text, fontWeight: '800'},
-  chart: {flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', gap: 7, height: 136, marginTop: 10, borderBottomWidth: 1, borderBottomColor: colors.divider},
-  chartColumn: {flex: 1, minWidth: 0, minHeight: 128, alignItems: 'center', justifyContent: 'flex-end', gap: 9},
-  bars: {height: 88, width: '100%', justifyContent: 'flex-end', alignItems: 'center'},
+
+  chart: {flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', gap: 7, height: 150, marginTop: 12, borderBottomWidth: 1, borderBottomColor: colors.divider},
+  chartColumn: {flex: 1, minWidth: 0, minHeight: 143, alignItems: 'center', justifyContent: 'flex-end', gap: 9},
+  bars: {height: 101, width: '100%', justifyContent: 'flex-end', alignItems: 'center'},
   bar: {width: 21, maxWidth: '62%', borderTopLeftRadius: 7, borderTopRightRadius: 7, opacity: 0.74},
   barHighlighted: {opacity: 1},
   barIncome: {backgroundColor: '#65E2B7'},
@@ -374,8 +382,9 @@ const styles = StyleSheet.create({
   categorySectionIcon: {backgroundColor: '#CAE9F7'},
   categoryHeading: {color: colors.ink},
   categorySubheading: {color: '#55788D'},
-  categoryTotal: {fontSize: 25, color: colors.ink, fontWeight: '800', marginTop: 7},
-  categoryCaption: {fontSize: 11, color: '#52778E', marginBottom: 6},
+  categorySummary: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingTop: 9, paddingBottom: 6},
+  categoryTotal: {fontSize: 15, color: colors.ink, fontWeight: '800', textAlign: 'right', flexShrink: 1},
+  categoryCaption: {fontSize: 11, color: '#52778E'},
   categoryRow: {flexDirection: 'row', gap: 10, paddingVertical: 7, alignItems: 'center'},
   categoryIcon: {height: 36, width: 36, borderRadius: 12, justifyContent: 'center', alignItems: 'center'},
   categoryInfo: {flex: 1, minWidth: 0, gap: 4},
