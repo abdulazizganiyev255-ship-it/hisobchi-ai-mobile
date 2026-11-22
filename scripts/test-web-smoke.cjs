@@ -85,7 +85,9 @@ async function smoke(browser, size) {
     const tab = nav('Operatsiyalar');
     const addBox = await add.boundingBox();
     const tabBox = await tab.boundingBox();
-    assert.ok(addBox && tabBox, 'Add CTA and bottom tab have bounding boxes');
+    const listBox = await page.getByTestId('transactions-scroll').boundingBox();
+    assert.ok(addBox && tabBox && listBox, 'Add CTA, list viewport and bottom tab have bounding boxes');
+    assert.ok(listBox.y + listBox.height <= addBox.y + 2, 'Add CTA must not cover the clipped transactions list');
     assert.ok(addBox.x >= 0 && addBox.x + addBox.width <= size.width + 1, 'Add CTA within width');
     assert.ok(addBox.y + addBox.height <= tabBox.y + 2, 'Add CTA must sit above bottom tabs');
 
