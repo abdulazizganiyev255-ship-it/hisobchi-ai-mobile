@@ -12,6 +12,7 @@ import {PeriodPicker} from '../components/ds/PeriodPicker';
 import {ChoiceChip} from '../components/ds/ChoiceChip';
 import {DateCalendar} from '../components/DateCalendar';
 import {DateRangeFields} from '../components/ds/DateRangeFields';
+import {EmptyState} from '../components/ds/EmptyState';
 import type {Transaction} from '../data/demo';
 import {formatMoney} from '../data/demo';
 import {
@@ -261,16 +262,12 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
             </Text>
           </>
         ) : (
-          <View style={styles.empty}>
-            <AppIcon name="receipt" color={colors.primarySoft} size={26}/>
-            <Text style={styles.emptyTitle}>
-              {chartMetric === 'expense' ? 'Bu davrda chiqim yo‘q' : chartMetric === 'income' ? 'Bu davrda kirim yo‘q' : 'Bu davrda aylanma yo‘q'}
-            </Text>
-            <Text style={styles.emptyCaption}>Boshqa muddatni tanlang yoki yangi operatsiya kiriting.</Text>
-            <Pressable accessibilityRole="button" onPress={onOpenTransactions} style={styles.emptyButton}>
-              <Text style={styles.emptyButtonText}>Operatsiyalarga o‘tish</Text>
-            </Pressable>
-          </View>
+          <EmptyState
+            title={chartMetric === 'expense' ? 'Bu davrda chiqim yo‘q' : chartMetric === 'income' ? 'Bu davrda kirim yo‘q' : 'Bu davrda aylanma yo‘q'}
+            description="Boshqa muddatni tanlang yoki yangi operatsiya kiriting."
+            actionLabel="Operatsiyalarga o‘tish"
+            onAction={onOpenTransactions}
+          />
         )}
       </SurfaceCard>
 
@@ -315,10 +312,12 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
             ))}
           </>
         ) : (
-          <View style={styles.emptyCompact}>
-            <Text style={[styles.emptyTitle, styles.emptyTitleInk]}>Xarajat qayd etilmagan</Text>
-            <Text style={[styles.emptyCaption, styles.emptyCaptionInk]}>Tanlangan davr uchun xarajat kategoriyalari mavjud emas.</Text>
-          </View>
+          <EmptyState
+            tone="light"
+            icon="wallet"
+            title="Xarajat qayd etilmagan"
+            description="Tanlangan davr uchun xarajat kategoriyalari mavjud emas."
+          />
         )}
       </SurfaceCard>
 
