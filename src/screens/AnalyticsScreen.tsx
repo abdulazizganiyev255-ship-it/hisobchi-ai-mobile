@@ -5,6 +5,11 @@ import {
 } from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
+import {ScreenHeader} from '../components/ds/ScreenHeader';
+import {SectionHeader} from '../components/ds/SectionHeader';
+import {SurfaceCard} from '../components/ds/SurfaceCard';
+import {PeriodPicker} from '../components/ds/PeriodPicker';
+import {ChoiceChip} from '../components/ds/ChoiceChip';
 import type {Transaction} from '../data/demo';
 import {formatMoney} from '../data/demo';
 import {
@@ -23,7 +28,6 @@ type ChartMetric = 'expense' | 'income' | 'turnover';
 
 export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
   const [period, setPeriod] = useState<AnalyticsPeriod>('all');
-  const [periodOpen, setPeriodOpen] = useState(false);
   const [chartMetric, setChartMetric] = useState<ChartMetric>('expense');
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const report = calculateAnalytics(transactions, period, todayLocal());
@@ -43,55 +47,19 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.content}
     >
-      <View style={styles.header}>
-        <View style={styles.headerIcon}>
-          <AppIcon name="chart" color={colors.primarySoft} size={24}/>
-        </View>
-        <View style={styles.heading}>
-          <Text style={styles.pageTitle}>Tahlil</Text>
-          <Text style={styles.subheading}>Qayd etilgan operatsiyalar · demo</Text>
-        </View>
-        <View style={styles.demoPill}><Text style={styles.demoPillText}>UI v0.6.4</Text></View>
-      </View>
+      <ScreenHeader
+        title="Tahlil"
+        subtitle="Qayd etilgan operatsiyalar · demo"
+        icon="chart"
+        trailing={<View style={styles.demoPill}><Text style={styles.demoPillText}>DS v1.0</Text></View>}
+      />
 
-      <View style={styles.periodPanel}>
-        <View style={styles.periodLine}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={'Muddatni tanlash. Hozir: ' + (ANALYTICS_PERIODS.find(option => option.key === period)?.label ?? 'Barchasi')}
-            accessibilityState={{expanded: periodOpen}}
-            onPress={() => setPeriodOpen(value => !value)}
-            style={[styles.periodTrigger, periodOpen && styles.periodTriggerActive]}
-          >
-            <Text style={styles.periodTriggerLabel}>
-              {ANALYTICS_PERIODS.find(option => option.key === period)?.label ?? 'Barchasi'}
-            </Text>
-            <AppIcon name="chevron-down" color={colors.primarySoft} size={15}/>
-          </Pressable>
-          <Text style={styles.periodDate} numberOfLines={1}>{analyticsRangeLabel(report)}</Text>
-        </View>
-        {periodOpen && (
-          <View style={styles.periodOptions}>
-            {ANALYTICS_PERIODS.map(option => {
-              const active = period === option.key;
-              return (
-                <Pressable
-                  key={option.key}
-                  accessibilityRole="button"
-                  accessibilityLabel={'Tahlil davri: ' + option.label}
-                  accessibilityState={{selected: active}}
-                  onPress={() => {setPeriod(option.key); setPeriodOpen(false); setSelectedDay(null);}}
-                  style={[styles.periodButton, active && styles.periodButtonActive]}
-                >
-                  <Text style={[styles.periodButtonText, active && styles.periodButtonTextActive]}>
-                    {option.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        )}
-      </View>
+      <PeriodPicker
+        value={period}
+        options={ANALYTICS_PERIODS}
+        description={analyticsRangeLabel(report)}
+        onChange={next => {setPeriod(next); setSelectedDay(null);}}
+      />
 
       <LinearGradient
         colors={['#1B537A', '#0E3454', '#0C2945']}
@@ -137,17 +105,13 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
         </View>
       </LinearGradient>
 
-      <View style={styles.card}>
-        <View style={styles.sectionHeading}>
-          <View style={styles.sectionTitleRow}>
-            <View style={styles.sectionIcon}><AppIcon name="chart" color={colors.primary} size={17}/></View>
-            <View style={styles.sectionCopy}>
-              <Text style={styles.sectionTitle}>Kunlik dinamika</Text>
-              <Text style={styles.sectionSub}>Sanani bosib summani ko‘ring</Text>
-            </View>
-          </View>
-          <Text style={styles.smallCount}>{chartDays.length} kun</Text>
-        </View>
+      <SurfaceCard>
+        <SectionHeader
+          icon="chart"
+          title="Kunlik dinamika"
+          subtitle="Sanani bosib summani ko‘ring"
+          trailing={<Text style={styles.smallCount}>{chartDays.length} kun</Text>}
+        />
 
         <View style={styles.chartControls}>
           {([
@@ -157,16 +121,13 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
           ] as const).map(option => {
             const active = chartMetric === option.key;
             return (
-              <Pressable
+              <ChoiceChip
                 key={option.key}
-                accessibilityRole="button"
-                accessibilityState={{selected: active}}
+                label={option.label}
+                active={active}
                 accessibilityLabel={'Grafik: ' + option.label}
                 onPress={() => {setChartMetric(option.key); setSelectedDay(null);}}
-                style={[styles.chartChoice, active && styles.chartChoiceActive]}
-              >
-                <Text style={[styles.chartChoiceText, active && styles.chartChoiceTextActive]}>{option.label}</Text>
-              </Pressable>
+              />
             );
           })}
         </View>
@@ -233,18 +194,15 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
             </Pressable>
           </View>
         )}
-      </View>
+      </SurfaceCard>
 
-      <View style={styles.categoryCard}>
-        <View style={styles.sectionHeading}>
-          <View style={styles.sectionTitleRow}>
-            <View style={[styles.sectionIcon, styles.categorySectionIcon]}><AppIcon name="wallet" color="#12698C" size={18}/></View>
-            <View style={styles.sectionCopy}>
-              <Text style={[styles.sectionTitle, styles.categoryHeading]}>Xarajatlar tarkibi</Text>
-              <Text style={[styles.sectionSub, styles.categorySubheading]}>Qaysi kategoriyaga ko‘proq pul ketgan?</Text>
-            </View>
-          </View>
-        </View>
+      <SurfaceCard tone="light" style={styles.categoryContent}>
+        <SectionHeader
+          icon="wallet"
+          title="Xarajatlar tarkibi"
+          subtitle="Qaysi kategoriyaga ko‘proq pul ketgan?"
+          tone="light"
+        />
 
         {hasExpense ? (
           <>
@@ -284,7 +242,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
             <Text style={[styles.emptyCaption, styles.emptyCaptionInk]}>Tanlangan davr uchun xarajat kategoriyalari mavjud emas.</Text>
           </View>
         )}
-      </View>
+      </SurfaceCard>
 
       <View style={styles.comparison}>
         <AppIcon name="shield" color={colors.primarySoft} size={20}/>
@@ -297,7 +255,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
         </View>
       </View>
       <Text style={styles.footer}>
-        Hisobchi AI · UI v0.6.4 demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
+        Hisobchi AI · DS v1.0 · demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
         serverda saqlanmaydi. Dashboard balansi va Safe-to-Spend hali mustaqil namuna.
       </Text>
     </ScrollView>
@@ -377,7 +335,7 @@ const styles = StyleSheet.create({
   selectedTurnover: {fontSize: 10, color: colors.primarySoft},
   selectedAmount: {fontSize: 12, fontWeight: '800', color: colors.text, flexShrink: 1, maxWidth: '48%'},
   chartNote: {fontSize: 10, color: colors.faint, lineHeight: 16, marginTop: 8},
-  categoryCard: {backgroundColor: '#E8F6FF', borderRadius: radius.lg, padding: 16, gap: 6},
+  categoryContent: {gap: 6},
   categorySectionIcon: {backgroundColor: '#CAE9F7'},
   categoryHeading: {color: colors.ink},
   categorySubheading: {color: '#55788D'},
