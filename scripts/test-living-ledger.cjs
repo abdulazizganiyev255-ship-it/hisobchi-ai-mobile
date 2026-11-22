@@ -98,3 +98,28 @@ assert.match(calendar, /onRequestClose=\{onCancel\}/, 'Calendar Android Back can
 assert.match(calendar, /!cell\.enabled/, 'Future and invalid day selection stays disabled');
 assert.match(calendar, /minHeight: 44/, 'Calendar day cells must meet 44dp design target');
 console.log('PASS Ledger Transactions/Editor/Calendar component source contracts');
+
+
+// D09 Analytics source contracts (complement real browser and model tests).
+const analyticsScreen = read('src/screens/LedgerAnalyticsScreen.tsx');
+assert.match(app, /<LedgerAnalyticsScreen/, 'Living Ledger Analytics must be mounted');
+assert.match(app, /tab === 'analytics'/, 'Analytics must share Living Ledger light shell');
+assert.match(analyticsScreen, /calculateAnalytics\(transactions, period, todayLocal\(\), appliedRange\)/,
+  'All KPIs and charts must use the tested session calculation engine');
+assert.match(analyticsScreen, /validateCustomRange\(customStart, customEnd, todayLocal\(\)\)/,
+  'Custom range must validate before it changes report period');
+assert.match(analyticsScreen, /report\.chartTruncated/,
+  'Disclosure required when chart shows only last seven recorded days');
+assert.match(analyticsScreen, /'Kirim − chiqim · hisobdagi mavjud mablag‘ emas'/,
+  'Net session result must not misrepresent bank balance');
+assert.match(analyticsScreen, /'Barcha rejimlar bir xil sanalarni/,
+  'Chart modes need truthfully labelled scale caveat');
+assert.match(analyticsScreen, /<LedgerDateCalendar/,
+  'Analytics custom period must use genuine selectable calendar');
+assert.match(analyticsScreen, /accessibilityLabel=\{[\s\S]*row\.name \+ ', ' \+ formatMoney\(row\.amount\)/,
+  'Category bars require spoken amounts and percent');
+assert.match(analyticsScreen, /testID="ledger-analytics-net"/,
+  'KPI is testable in live UI');
+assert.doesNotMatch(analyticsScreen, /bankka ulandi|serverga saqlandi/,
+  'Do not falsely claim a real bank connection or server persistence');
+console.log('PASS Living Ledger Analytics source provenance and accessibility contracts');
