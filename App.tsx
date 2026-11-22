@@ -1,5 +1,5 @@
-import {useRef, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {useEffect, useRef, useState} from 'react';
+import {BackHandler, Platform, Pressable, StyleSheet, Text, View} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {StatusBar} from 'expo-status-bar';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
@@ -29,6 +29,28 @@ function AppContent() {
   const [editor, setEditor] = useState<EditorState>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const nextId = useRef(1000);
+
+  // Native Android Back should leave overlays before returning to Home.
+  // React Native Modal handles its own Back press via onRequestClose.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const listener = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (showOnboarding) {
+        setShowOnboarding(false);
+        return true;
+      }
+      if (editor !== null) {
+        setEditor(null);
+        return true;
+      }
+      if (tab !== 'home') {
+        setTab('home');
+        return true;
+      }
+      return false;
+    });
+    return () => listener.remove();
+  }, [showOnboarding, editor, tab]);
 
   const save = (draft: TransactionDraft) => {
     if (editor === null) return;
