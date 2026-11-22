@@ -38,7 +38,7 @@ export function LedgerDateCalendar({selectedDate, onSelect, onCancel}: Props) {
       accessibilityViewIsModal
       onRequestClose={onCancel}
     >
-      <View style={styles.overlay}>
+      <View style={[styles.overlay, narrow && styles.overlayNarrow]}>
         <View
           testID="ledger-calendar-sheet"
           style={[styles.sheet, narrow && styles.sheetNarrow, short && styles.sheetShort]}
@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     flex: 1, justifyContent: 'center', alignItems: 'center',
     backgroundColor: 'rgba(8,24,18,0.68)', paddingHorizontal: 8,
   },
+  overlayNarrow: {paddingHorizontal: 0},
   sheet: {
     backgroundColor: ledger.paper, borderRadius: 23, padding: 12,
     width: '100%', maxWidth: 418, gap: 13,
