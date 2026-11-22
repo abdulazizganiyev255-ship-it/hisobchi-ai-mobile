@@ -44,6 +44,9 @@ export function LedgerMiniBars({
 
 /** Responsive two-part ledger row. No color-only positive/negative signal. */
 export function LedgerTransactionRow({item}: {item: Transaction}) {
+  // Always use the immutable ISO date; seeded "Bugun/Kecha" labels go stale.
+  const stableDate = item.occurredOn.slice(8, 10) + '.' +
+    item.occurredOn.slice(5, 7) + '.' + item.occurredOn.slice(0, 4);
   return (
     <View style={styles.transactionRow}>
       <View style={styles.transactionIcon}>
@@ -51,7 +54,7 @@ export function LedgerTransactionRow({item}: {item: Transaction}) {
       </View>
       <View style={styles.transactionInfo}>
         <Text style={styles.transactionTitle}>{item.title}</Text>
-        <Text style={styles.transactionDate}>{item.date}</Text>
+        <Text style={styles.transactionDate}>{stableDate}</Text>
       </View>
       <Text
         style={styles.transactionAmount}
