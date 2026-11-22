@@ -157,7 +157,11 @@ function AppContent() {
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
-                    {item.label}
+                    {homeTheme && item.key === 'transactions'
+                      ? 'Tarix'
+                      : homeTheme && item.key === 'home'
+                        ? 'Bosh'
+                        : item.label}
                   </Text>
                 </Pressable>
               );
