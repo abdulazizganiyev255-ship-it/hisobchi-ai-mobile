@@ -2,7 +2,7 @@ name: TypeScript validation
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feat/dashboard-premium-v02]
   push:
     branches: [main]
 
