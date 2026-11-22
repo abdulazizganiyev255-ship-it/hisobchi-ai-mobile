@@ -84,7 +84,16 @@ function AppContent() {
             onOpenTransactions={() => setTab('transactions')}
           />
         ) : (
-          <OtherScreen tab={tab}/>
+          <OtherScreen
+            tab={tab}
+            transactionCount={transactions.length}
+            onOpenTransactions={() => setTab('transactions')}
+            onOpenAnalytics={() => setTab('analytics')}
+            onResetDemo={() => {
+              setTransactions([...demo.transactions]);
+              nextId.current = 1000;
+            }}
+          />
         )}
       </View>
       {editor === null && (
