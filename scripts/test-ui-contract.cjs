@@ -16,7 +16,9 @@ assert.match(transactions, /<ChoiceChip\b/, 'Transaction filters should use DS C
 assert.doesNotMatch(transactions, /styles\.actionArea|actionDock:/, 'No full-width background dock behind Add CTA');
 assert.match(transactions, /fab:\s*\{\s*position:\s*'absolute'/, 'Add CTA should float without an action rail');
 assert.match(transactions, /accessibilityLabel="Yangi operatsiya qo‘shish"/, 'Add CTA must have a screen-reader label');
-assert.match(transactions, /paddingBottom: 118/, 'Scroll requires enough bottom inset to expose the last transaction');
+assert.match(transactions, /listViewport: \{flex: 1, marginBottom: 64\}/, 'Scroll viewport must end above the floating Add CTA');
+assert.match(transactions, /paddingBottom: 28/, 'Scrolled last transaction should remain reachable');
+assert.match(transactions, /testID="transactions-scroll"/, 'E2E must be able to check the actual list viewport');
 
 assert.match(dashboard, /<SurfaceCard\b/g, 'Dashboard must use shared surface cards');
 assert.ok((dashboard.match(/<SectionHeader\b/g) || []).length >= 2, 'Dashboard sections need shared headers');
