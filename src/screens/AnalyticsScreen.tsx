@@ -10,6 +10,7 @@ import {SectionHeader} from '../components/ds/SectionHeader';
 import {SurfaceCard} from '../components/ds/SurfaceCard';
 import {PeriodPicker} from '../components/ds/PeriodPicker';
 import {ChoiceChip} from '../components/ds/ChoiceChip';
+import {DateCalendar} from '../components/DateCalendar';
 import type {Transaction} from '../data/demo';
 import {formatMoney} from '../data/demo';
 import {
@@ -17,6 +18,7 @@ import {
   formatDayCompact, type AnalyticsPeriod,
 } from '../data/analytics';
 import {todayLocal} from '../data/transactions';
+import {shiftCalendarDate, validateCustomRange, type DateRange} from '../data/periods';
 import {colors, radius} from '../theme/tokens';
 
 type Props = {
@@ -30,7 +32,38 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
   const [period, setPeriod] = useState<AnalyticsPeriod>('all');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('expense');
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const report = calculateAnalytics(transactions, period, todayLocal());
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customStart, setCustomStart] = useState(() => shiftCalendarDate(todayLocal(), -6));
+  const [customEnd, setCustomEnd] = useState(() => todayLocal());
+  const [appliedRange, setAppliedRange] = useState<DateRange | null>(null);
+  const [calendarTarget, setCalendarTarget] = useState<'start' | 'end' | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null);
+  const report = calculateAnalytics(transactions, period, todayLocal(), appliedRange);
+
+  const selectPeriod = (next: AnalyticsPeriod) => {
+    if (next === 'custom') {
+      // Do not change the currently applied period until a valid range is confirmed.
+      setCustomStart(appliedRange?.start ?? shiftCalendarDate(todayLocal(), -6));
+      setCustomEnd(appliedRange?.end ?? todayLocal());
+      setCustomOpen(true);
+      setDateError(null);
+      return;
+    }
+    setPeriod(next);
+    setCustomOpen(false);
+    setDateError(null);
+    setSelectedDay(null);
+  };
+
+  const applyCustomRange = () => {
+    const error = validateCustomRange(customStart, customEnd, todayLocal());
+    setDateError(error);
+    if (error) return;
+    setAppliedRange({start: customStart, end: customEnd});
+    setPeriod('custom');
+    setCustomOpen(false);
+    setSelectedDay(null);
+  };
   const metricAmount = (day: {income: number; expense: number; turnover: number}) =>
     chartMetric === 'expense' ? day.expense : chartMetric === 'income' ? day.income : day.turnover;
   // Keep the x-axis consistent when switching metrics: recorded days do not disappear.
@@ -51,15 +84,79 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
         title="Tahlil"
         subtitle="Qayd etilgan operatsiyalar · demo"
         icon="chart"
-        trailing={<View style={styles.demoPill}><Text style={styles.demoPillText}>DS v1.0</Text></View>}
+        trailing={<View style={styles.demoPill}><Text style={styles.demoPillText}>UI v1.7</Text></View>}
       />
 
       <PeriodPicker
         value={period}
         options={ANALYTICS_PERIODS}
         description={analyticsRangeLabel(report)}
-        onChange={next => {setPeriod(next); setSelectedDay(null);}}
+        onChange={selectPeriod}
       />
+
+      {customOpen && (
+        <View style={styles.customPanel}>
+          <View style={styles.customHeading}>
+            <Text style={styles.customTitle}>Ixtiyoriy muddat</Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Sana oralig‘ini tanlashni bekor qilish"
+              onPress={() => {setCustomOpen(false); setDateError(null);}}
+              style={styles.customCancel}
+            >
+              <Text style={styles.customCancelText}>Bekor qilish</Text>
+            </Pressable>
+          </View>
+          <View style={styles.customDateRow}>
+            <View style={styles.customDateColumn}>
+              <Text style={styles.customLabel}>Boshlanish</Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={'Boshlanish sanasi: ' + customStart + '. Kalendarni ochish'}
+                onPress={() => setCalendarTarget('start')}
+                style={styles.customDateButton}
+              >
+                <AppIcon name="calendar" size={17} color={colors.primarySoft}/>
+                <Text style={styles.customDateText} numberOfLines={1} adjustsFontSizeToFit>{customStart}</Text>
+              </Pressable>
+            </View>
+            <View style={styles.customDateColumn}>
+              <Text style={styles.customLabel}>Tugash</Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={'Tugash sanasi: ' + customEnd + '. Kalendarni ochish'}
+                onPress={() => setCalendarTarget('end')}
+                style={styles.customDateButton}
+              >
+                <AppIcon name="calendar" size={17} color={colors.primarySoft}/>
+                <Text style={styles.customDateText} numberOfLines={1} adjustsFontSizeToFit>{customEnd}</Text>
+              </Pressable>
+            </View>
+          </View>
+          {dateError ? <Text accessibilityLiveRegion="polite" style={styles.customError}>{dateError}</Text> : null}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Tanlangan sana oralig‘ini tahlilga qo‘llash"
+            onPress={applyCustomRange}
+            style={styles.applyCustom}
+          >
+            <Text style={styles.applyText}>Oraliqni qo‘llash</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {calendarTarget !== null && (
+        <DateCalendar
+          selectedDate={calendarTarget === 'start' ? customStart : customEnd}
+          onSelect={date => {
+            if (calendarTarget === 'start') setCustomStart(date);
+            else setCustomEnd(date);
+            setCalendarTarget(null);
+            setDateError(null);
+          }}
+          onCancel={() => setCalendarTarget(null)}
+        />
+      )}
 
       <LinearGradient
         colors={['#1B537A', '#0E3454', '#0C2945']}
@@ -255,7 +352,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
         </View>
       </View>
       <Text style={styles.footer}>
-        Hisobchi AI · DS v1.0 · demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
+        Hisobchi AI · UI v1.7 · demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
         serverda saqlanmaydi. Dashboard balansi va Safe-to-Spend hali mustaqil namuna.
       </Text>
     </ScrollView>
@@ -272,6 +369,30 @@ const styles = StyleSheet.create({
   subheading: {fontSize: 11, marginTop: 4, color: colors.muted},
   demoPill: {paddingHorizontal: 9, paddingVertical: 6, borderRadius: 999, backgroundColor: '#163C5C'},
   demoPillText: {fontSize: 10, color: colors.primarySoft, fontWeight: '700'},
+  customPanel: {
+    backgroundColor: colors.surface, borderColor: colors.divider,
+    borderWidth: 1, borderRadius: radius.md, padding: 13, gap: 11,
+  },
+  customHeading: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 9},
+  customTitle: {fontSize: 13, fontWeight: '800', color: colors.text},
+  customCancel: {minHeight: 44, paddingHorizontal: 10, justifyContent: 'center', borderRadius: 9},
+  customCancelText: {color: colors.primarySoft, fontSize: 12, fontWeight: '700'},
+  customDateRow: {flexDirection: 'row', gap: 8},
+  customDateColumn: {flex: 1, minWidth: 0, gap: 7},
+  customLabel: {fontSize: 12, color: colors.muted, fontWeight: '600'},
+  customDateButton: {
+    minHeight: 46, borderWidth: 1, borderColor: colors.divider,
+    borderRadius: 11, paddingHorizontal: 9, flexDirection: 'row',
+    alignItems: 'center', justifyContent: 'center', gap: 6,
+    backgroundColor: colors.surfaceRaised,
+  },
+  customDateText: {fontSize: 12, color: colors.text, fontWeight: '700', flexShrink: 1},
+  customError: {fontSize: 12, color: '#FFB2B2', lineHeight: 18},
+  applyCustom: {
+    minHeight: 46, borderRadius: 11, backgroundColor: colors.primarySoft,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  applyText: {color: colors.ink, fontSize: 13, fontWeight: '800'},
   periodPanel: {gap: 8},
   periodLine: {flexDirection: 'row', alignItems: 'center', gap: 10},
   periodTrigger: {minWidth: 108, minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, gap: 8, backgroundColor: colors.surface, borderRadius: 13, borderWidth: 1, borderColor: colors.divider},
