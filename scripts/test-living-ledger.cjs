@@ -69,6 +69,8 @@ assert.match(screen, /setExplanationOpen\(true\)/, 'Explanation action must be r
 assert.match(screen, /onRequestClose=\{closeExplainer\}/, 'Native Back must close explanation');
 assert.match(screen, /testID="living-ledger-add-expense"/, 'Add is E2E testable');
 assert.match(screen, /testID="living-ledger-period-total"/, 'Month total is E2E testable');
-assert.match(screen, /Sessiya yozuvlari ilova qayta ishga tushirilganda tiklanishi mumkin/, 'Persistence disclosure required');
+assert.match(screen, /Sessiya tugasa yoki ilova qayta ishga tushsa/, 'Persistence disclosure required');
+assert.match(primitives, /item\.occurredOn\.slice\(8, 10\)/, 'Date must be derived from immutable ISO date');
+assert.doesNotMatch(primitives, /\{item\.date\}/, 'Avoid stale hardcoded Bugun/Kecha fixtures');
 assert.doesNotMatch(screen, /\bSupabase\b|\bbankka ulandi\b/i, 'No simulated backend claim');
 console.log('PASS Living Ledger wiring, truth labels and semantics source contracts');
