@@ -30,6 +30,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [search, setSearch] = useState('');
   const [period, setPeriod] = useState<PeriodKey>('all');
+  const [periodOpen, setPeriodOpen] = useState(false);
   const [customOpen, setCustomOpen] = useState(false);
   const [customStart, setCustomStart] = useState(() => shiftCalendarDate(todayLocal(), -6));
   const [customEnd, setCustomEnd] = useState(() => todayLocal());
@@ -37,6 +38,9 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
   const [dateError, setDateError] = useState<string | null>(null);
   const today = todayLocal();
   const range = getPeriodRange(period, today, customApplied);
+  const selectedPeriodLabel = PERIOD_OPTIONS.find(option => option.key === period)?.label ?? 'Barchasi';
+  const compactDate = (iso: string) => iso.slice(8, 10) + '.' + iso.slice(5, 7);
+  const rangeLabel = range ? compactDate(range.start) + '–' + compactDate(range.end) : 'Barcha sanalar';
   const periodItems = transactionsInPeriod(transactions, range);
   const filtered = filterAndSortTransactions(periodItems, filter, search);
   const {income, expense: expenses} = sumTransactionTotals(periodItems);
@@ -44,11 +48,13 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
 
   const selectPeriod = (key: PeriodKey) => {
     if (key === 'custom') {
-      setCustomOpen(value => !value);
+      setCustomOpen(true);
+      setPeriodOpen(true);
       setDateError(null);
       return;
     }
     setPeriod(key);
+    setPeriodOpen(false);
     setCustomOpen(false);
     setDateError(null);
   };
@@ -61,11 +67,13 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
     setCustomApplied({start, end});
     setPeriod('custom');
     setCustomOpen(false);
+    setPeriodOpen(false);
   };
   const resetFilters = () => {
     setPeriod('all');
     setFilter('all');
     setSearch('');
+    setPeriodOpen(false);
     setCustomOpen(false);
     setDateError(null);
   };
@@ -78,20 +86,36 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
 
   return (
     <View style={styles.fill}>
-      <ScrollView
-      style={styles.fill}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-      contentContainerStyle={styles.content}
-    >
-      <View style={styles.header}>
-        <View style={styles.icon}><AppIcon name="receipt" color={colors.primary} size={24}/></View>
-        <View style={styles.heading}>
-          <Text style={styles.title}>Operatsiyalar</Text>
-          <Text style={styles.caption}>Demo sessiya · {transactions.length} ta yozuv</Text>
+      <View style={styles.headerBar}>
+        <View style={styles.header}>
+          <View style={styles.icon}><AppIcon name="receipt" color={colors.primary} size={23}/></View>
+          <View style={styles.heading}>
+            <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>Operatsiyalar</Text>
+            <Text style={styles.caption}>Demo sessiya · {transactions.length} ta yozuv</Text>
+          </View>
+          <Pressable
+            onPress={onAdd}
+            accessibilityRole="button"
+            accessibilityLabel="Yangi operatsiya qo‘shish"
+            style={styles.headerAdd}
+          >
+            <LinearGradient
+              colors={['#A0E9FF', '#44BEEB']}
+              start={{x: 0, y: 0}} end={{x: 1, y: 1}}
+              style={styles.headerAddInner}
+            >
+              <AppIcon name="plus" color={colors.ink} size={19} strokeWidth={2.5}/>
+              <Text style={styles.headerAddText}>Qo‘shish</Text>
+            </LinearGradient>
+          </Pressable>
         </View>
       </View>
-
+      <ScrollView
+        style={styles.fill}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.content}
+      >
       <TextInput
         value={search}
         onChangeText={setSearch}
@@ -122,36 +146,44 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
       </View>
 
       <View style={styles.periodHeading}>
-        <Text style={styles.periodTitle}>Muddat</Text>
-        <Text style={styles.periodDate} numberOfLines={1}>
-          {range ? range.start + ' — ' + range.end : 'Barcha sanalar'}
-        </Text>
+        <Pressable
+          onPress={() => {
+            setPeriodOpen(previous => !previous);
+            setCustomOpen(false);
+            setDateError(null);
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={'Muddatni tanlash. Hozir: ' + selectedPeriodLabel}
+          accessibilityState={{expanded: periodOpen}}
+          style={[styles.periodTrigger, periodOpen && styles.periodTriggerActive]}
+        >
+          <Text style={styles.periodTitle}>Muddat: {selectedPeriodLabel}</Text>
+          <AppIcon name="chevron-down" color={colors.primarySoft} size={15}/>
+        </Pressable>
+        <Text style={styles.periodDate} numberOfLines={1}>{rangeLabel}</Text>
       </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.periodChips}
-        accessibilityLabel="Operatsiyalar muddati"
-      >
-        {PERIOD_OPTIONS.map(option => {
-          const active = customOpen ? option.key === 'custom' : period === option.key;
-          return (
-            <Pressable
-              key={option.key}
-              accessibilityRole="button"
-              accessibilityState={{selected: active}}
-              accessibilityLabel={'Muddat: ' + option.label}
-              onPress={() => selectPeriod(option.key)}
-              style={[styles.periodChip, active && styles.periodChipActive]}
-            >
-              <Text style={[styles.periodChipText, active && styles.periodChipActiveText]}>
-                {option.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-      {customOpen && (
+      {periodOpen && (
+        <View style={styles.periodPanel}>
+          <View style={styles.periodChips}>
+            {PERIOD_OPTIONS.map(option => {
+              const active = customOpen ? option.key === 'custom' : period === option.key;
+              return (
+                <Pressable
+                  key={option.key}
+                  accessibilityRole="button"
+                  accessibilityState={{selected: active}}
+                  accessibilityLabel={'Muddat: ' + option.label}
+                  onPress={() => selectPeriod(option.key)}
+                  style={[styles.periodChip, active && styles.periodChipActive]}
+                >
+                  <Text style={[styles.periodChipText, active && styles.periodChipActiveText]}>
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          {customOpen && (
         <View style={styles.rangePanel}>
           <Text style={styles.rangeTitle}>Sana oralig‘ini tanlash</Text>
           <View style={styles.rangeInputs}>
@@ -186,6 +218,8 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
           <Pressable onPress={applyCustom} accessibilityRole="button" style={styles.rangeApply}>
             <Text style={styles.rangeApplyText}>Oraliqni qo‘llash</Text>
           </Pressable>
+          </View>
+          )}
         </View>
       )}
 
@@ -216,8 +250,8 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
       <View style={styles.resultsBar}>
         <Text style={styles.resultsText}>{filtered.length} ta operatsiya topildi</Text>
         {hasFilters && (
-          <Pressable onPress={resetFilters} accessibilityRole="button" style={styles.resetButton}>
-            <Text style={styles.resetText}>Tozalash</Text>
+          <Pressable onPress={resetFilters} accessibilityRole="button" accessibilityLabel="Filtrni bekor qilish, barcha operatsiyalarni ko‘rsatish" style={styles.resetButton}>
+            <Text style={styles.resetText}>Filtrni bekor qilish</Text>
           </Pressable>
         )}
       </View>
@@ -232,8 +266,8 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
               : 'Birinchi demo operatsiyani qo‘shishdan boshlang.'}
           </Text>
           {hasFilters && (
-            <Pressable onPress={resetFilters} style={styles.clear}>
-              <Text style={styles.clearText}>Filtrni tozalash</Text>
+            <Pressable onPress={resetFilters} accessibilityRole="button" style={styles.clear}>
+              <Text style={styles.clearText}>Filtrni bekor qilish</Text>
             </Pressable>
           )}
         </View>
@@ -264,39 +298,29 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         Ma’lumotlar faqat shu sessiya xotirasida. Yangilaganda dastlabki demo yozuvlar qaytadi.
       </Text>
       </ScrollView>
-      <View style={styles.actionDock}>
-      <Pressable
-        onPress={onAdd}
-        accessibilityRole="button"
-        accessibilityLabel="Yangi operatsiya qo‘shish"
-        style={styles.fab}
-      >
-        <LinearGradient
-          colors={['#A0E9FF', '#44BEEB']}
-          start={{x: 0, y: 0}} end={{x: 1, y: 1}}
-          style={styles.fabContent}
-        >
-          <AppIcon name="plus" color={colors.ink} size={22} strokeWidth={2.5}/>
-          <Text style={styles.fabLabel}>Qo‘shish</Text>
-        </LinearGradient>
-      </Pressable>
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   fill: {flex: 1},
-  content: {padding: 20, paddingTop: 21, paddingBottom: 38, gap: 12},
-  header: {flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 3},
-  icon: {width: 48, height: 48, borderRadius: 15, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center'},
-  heading: {flex: 1},
-  title: {fontSize: 24, fontWeight: '800', color: colors.text, letterSpacing: -0.6},
-  caption: {color: colors.muted, fontSize: 11, marginTop: 3},
-  periodHeading: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 9, marginTop: 1},
-  periodTitle: {fontSize: 13, fontWeight: '800', color: colors.text},
-  periodDate: {fontSize: 10, color: colors.muted, flexShrink: 1},
-  periodChips: {flexDirection: 'row', alignItems: 'center', gap: 7, paddingRight: 5},
+  content: {paddingHorizontal: 20, paddingTop: 8, paddingBottom: 36, gap: 12},
+  headerBar: {paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12},
+  header: {flexDirection: 'row', alignItems: 'center', gap: 10},
+  icon: {width: 44, height: 44, borderRadius: 14, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center'},
+  heading: {flex: 1, minWidth: 0},
+  title: {fontSize: 22, fontWeight: '800', color: colors.text, letterSpacing: -0.6},
+  caption: {color: colors.muted, fontSize: 10, marginTop: 3},
+  headerAdd: {borderRadius: 14, overflow: 'hidden'},
+  headerAddInner: {minHeight: 44, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5},
+  headerAddText: {fontSize: 12, fontWeight: '800', color: colors.ink},
+  periodHeading: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 2},
+  periodTrigger: {minHeight: 43, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 13, borderRadius: 13, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface},
+  periodTriggerActive: {borderColor: colors.primary},
+  periodTitle: {fontSize: 12, fontWeight: '800', color: colors.text},
+  periodDate: {fontSize: 11, color: colors.muted, flexShrink: 1},
+  periodPanel: {borderRadius: 15, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, padding: 12, gap: 12},
+  periodChips: {flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 7},
   periodChip: {minHeight: 37, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, justifyContent: 'center'},
   periodChipActive: {backgroundColor: '#1D5679', borderColor: 'rgba(126,224,255,0.55)'},
   periodChipText: {fontSize: 11, color: colors.muted, fontWeight: '700'},
@@ -329,19 +353,6 @@ const styles = StyleSheet.create({
   summaryLabel: {fontSize: 11, fontWeight: '600', color: colors.muted},
   summaryExpense: {fontSize: 17, fontWeight: '800', color: '#FFB2B2'},
   summaryIncome: {fontSize: 17, fontWeight: '800', color: '#6BE4BE'},
-  actionDock: {
-    minHeight: 64, flexDirection: 'row', justifyContent: 'flex-end',
-    paddingHorizontal: 20, paddingTop: 6, paddingBottom: 7,
-    borderTopWidth: 1, borderColor: colors.divider,
-    backgroundColor: 'rgba(7, 24, 44, 0.96)',
-  },
-  fab: {
-    borderRadius: 999, overflow: 'hidden', shadowColor: '#20B4ED',
-    shadowOpacity: 0.24, shadowRadius: 14, shadowOffset: {width: 0, height: 5},
-    elevation: 4,
-  },
-  fabContent: {minWidth: 135, minHeight: 52, paddingHorizontal: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 9},
-  fabLabel: {fontSize: 14, fontWeight: '800', color: colors.ink},
   search: {minHeight: 49, borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, color: colors.text, fontSize: 12},
   filters: {flexDirection: 'row', padding: 4, gap: 5, backgroundColor: colors.surface, borderRadius: 15},
   filter: {flex: 1, minHeight: 39, borderRadius: 12, alignItems: 'center', justifyContent: 'center'},
