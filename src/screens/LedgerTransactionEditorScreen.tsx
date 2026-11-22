@@ -47,11 +47,14 @@ export function LedgerTransactionEditorScreen({initial, onCancel, onSave, onDele
       scrollRef.current?.scrollTo({y: 0, animated: true});
       return;
     }
+    // Keep the guard set until the parent navigates/unmounts this editor.
+    // Reset it only if a synchronous save callback fails.
     saving.current = true;
     try {
       onSave(draft);
-    } finally {
+    } catch (error) {
       saving.current = false;
+      throw error;
     }
   };
 
