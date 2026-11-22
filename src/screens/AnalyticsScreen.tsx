@@ -19,18 +19,22 @@ type Props = {
   onOpenTransactions: () => void;
 };
 
-type ChartMetric = 'expense' | 'income';
+type ChartMetric = 'expense' | 'income' | 'turnover';
 
 export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
   const [period, setPeriod] = useState<AnalyticsPeriod>('all');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('expense');
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const report = calculateAnalytics(transactions, period, todayLocal());
-  const metricAmount = (day: {income: number; expense: number}) =>
-    chartMetric === 'expense' ? day.expense : day.income;
-  const chartDays = report.days.filter(day => metricAmount(day) > 0);
+  const metricAmount = (day: {income: number; expense: number; turnover: number}) =>
+    chartMetric === 'expense' ? day.expense : chartMetric === 'income' ? day.income : day.turnover;
+  // Keep the x-axis consistent when switching metrics: recorded days do not disappear.
+  const chartDays = report.days;
   const maxBarValue = Math.max(1, ...chartDays.map(metricAmount));
   const highlightedDay = chartDays.find(day => day.date === selectedDay) ?? chartDays[chartDays.length - 1];
+  const chartMetricLabel = chartMetric === 'expense' ? 'Chiqim' : chartMetric === 'income' ? 'Kirim' : 'Aylanma';
+  const metricTotal = chartMetric === 'expense' ? report.expense : chartMetric === 'income' ? report.income : report.turnover;
+  const hasMetricData = chartDays.some(day => metricAmount(day) > 0);
   const hasExpense = report.expense > 0;
 
   return (
@@ -47,7 +51,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
           <Text style={styles.pageTitle}>Tahlil</Text>
           <Text style={styles.subheading}>Qayd etilgan operatsiyalar · demo</Text>
         </View>
-        <View style={styles.demoPill}><Text style={styles.demoPillText}>UI v0.6.1</Text></View>
+        <View style={styles.demoPill}><Text style={styles.demoPillText}>UI v0.6.2</Text></View>
       </View>
 
       <View style={styles.periodPanel}>
@@ -61,7 +65,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
                 accessibilityRole="button"
                 accessibilityLabel={'Tahlil davri: ' + option.label}
                 accessibilityState={{selected: active}}
-                onPress={() => setPeriod(option.key)}
+                onPress={() => {setPeriod(option.key); setSelectedDay(null);}}
                 style={[styles.periodButton, active && styles.periodButtonActive]}
               >
                 <Text style={[styles.periodButtonText, active && styles.periodButtonTextActive]}>
@@ -123,10 +127,19 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
           </View>
         </View>
 
+        <View style={styles.turnoverSummary}>
+          <Text style={styles.turnoverEyebrow}>UMUMIY AYLANMA · TANLANGAN DAVR</Text>
+          <Text style={styles.turnoverValue} numberOfLines={1} adjustsFontSizeToFit>
+            {formatMoney(report.turnover)}
+          </Text>
+          <Text style={styles.turnoverFormula}>Kirim {formatMoney(report.income)} + chiqim {formatMoney(report.expense)}</Text>
+        </View>
+
         <View style={styles.chartControls}>
           {([
             {key: 'expense', label: 'Chiqim'},
             {key: 'income', label: 'Kirim'},
+            {key: 'turnover', label: 'Aylanma'},
           ] as const).map(option => {
             const active = chartMetric === option.key;
             return (
@@ -146,15 +159,13 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
 
         <View style={styles.chartTotals}>
           <View style={styles.chartTotalsCopy}>
-            <Text style={styles.chartEyebrow}>{chartMetric === 'expense' ? 'JAMI CHIQIM' : 'JAMI KIRIM'} · DEMO</Text>
-            <Text style={styles.chartTotalValue} numberOfLines={1} adjustsFontSizeToFit>
-              {formatMoney(chartMetric === 'expense' ? report.expense : report.income)}
-            </Text>
+            <Text style={styles.chartEyebrow}>KUNLIK {chartMetricLabel.toLocaleUpperCase()} · DEMO</Text>
+            <Text style={styles.chartTotalValue} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(metricTotal)}</Text>
           </View>
-          <Text style={styles.smallCount}>{chartDays.length} kun</Text>
+          <Text style={styles.smallCount}>{chartDays.length} faol kun</Text>
         </View>
 
-        {chartDays.length > 0 ? (
+        {chartDays.length > 0 && hasMetricData ? (
           <>
             <View style={styles.chart}>
               {chartDays.map(day => {
@@ -165,19 +176,21 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
                     key={day.date}
                     accessibilityRole="button"
                     accessibilityState={{selected: highlighted}}
-                    accessibilityLabel={formatDayCompact(day.date) + ': ' + formatMoney(value)}
+                    accessibilityLabel={formatDayCompact(day.date) + ', ' + chartMetricLabel + ': ' + formatMoney(value) + ', aylanma: ' + formatMoney(day.turnover)}
                     onPress={() => setSelectedDay(day.date)}
                     style={styles.chartColumn}
                   >
                     <View style={styles.bars}>
-                      <View
-                        style={[
-                          styles.bar,
-                          chartMetric === 'expense' ? styles.barExpense : styles.barIncome,
-                          highlighted && styles.barHighlighted,
-                          {height: Math.max(4, Math.round(value / maxBarValue * 104))},
-                        ]}
-                      />
+                      {value > 0 ? (
+                        <View
+                          style={[
+                            styles.bar,
+                            chartMetric === 'expense' ? styles.barExpense : chartMetric === 'income' ? styles.barIncome : styles.barTurnover,
+                            highlighted && styles.barHighlighted,
+                            {height: Math.max(4, Math.round(value / maxBarValue * 104))},
+                          ]}
+                        />
+                      ) : <View style={styles.zeroMarker}/>}
                     </View>
                     <Text style={[styles.chartDate, highlighted && styles.chartDateActive]} numberOfLines={1}>
                       {formatDayCompact(day.date)}
@@ -187,21 +200,26 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
               })}
             </View>
             <View style={styles.selectedRow}>
-              <Text style={styles.selectedDate}>{highlightedDay ? formatDayCompact(highlightedDay.date) : ''} sanasi</Text>
-              <Text style={styles.selectedAmount}>
+              <View style={styles.selectedInfo}>
+                <Text style={styles.selectedDate}>{highlightedDay ? formatDayCompact(highlightedDay.date) : ''} · {chartMetricLabel}</Text>
+                <Text style={styles.selectedTurnover}>
+                  Kunlik aylanma: {highlightedDay ? formatMoney(highlightedDay.turnover) : ''}
+                </Text>
+              </View>
+              <Text style={styles.selectedAmount} numberOfLines={1} adjustsFontSizeToFit>
                 {highlightedDay ? formatMoney(metricAmount(highlightedDay)) : ''}
               </Text>
             </View>
             <Text style={styles.chartNote}>
-              {report.chartTruncated ? 'Oxirgi 7 ta faol kun ichidagi yozuvlar. ' : ''}
-              Har bir rejim alohida qiymat shkalasida chiziladi; kirim va chiqim balandligini bevosita solishtirmang.
+              {report.chartTruncated ? 'Oxirgi 7 ta qayd etilgan kun ko‘rsatildi. ' : ''}
+              Sanalar barcha rejimda bir xil. Har bir rejim o‘z shkalasida chiziladi; rejimlar balandligini bevosita taqqoslamang.
             </Text>
           </>
         ) : (
           <View style={styles.empty}>
             <AppIcon name="receipt" color={colors.primarySoft} size={26}/>
             <Text style={styles.emptyTitle}>
-              {chartMetric === 'expense' ? 'Bu davrda chiqim yo‘q' : 'Bu davrda kirim yo‘q'}
+              {chartMetric === 'expense' ? 'Bu davrda chiqim yo‘q' : chartMetric === 'income' ? 'Bu davrda kirim yo‘q' : 'Bu davrda aylanma yo‘q'}
             </Text>
             <Text style={styles.emptyCaption}>Boshqa muddatni tanlang yoki yangi operatsiya kiriting.</Text>
             <Pressable accessibilityRole="button" onPress={onOpenTransactions} style={styles.emptyButton}>
@@ -271,7 +289,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
         </View>
       </View>
       <Text style={styles.footer}>
-        Hisobchi AI · UI v0.6.1 demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
+        Hisobchi AI · UI v0.6.2 demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
         serverda saqlanmaydi. Dashboard balansi va Safe-to-Spend hali mustaqil namuna.
       </Text>
     </ScrollView>
@@ -322,7 +340,11 @@ const styles = StyleSheet.create({
   sectionTitle: {fontSize: 16, color: colors.text, fontWeight: '800'},
   sectionSub: {fontSize: 10, marginTop: 3, color: colors.muted},
   smallCount: {fontSize: 11, fontWeight: '700', color: colors.primarySoft},
-  chartControls: {marginTop: 16, flexDirection: 'row', gap: 5, backgroundColor: '#09213A', borderRadius: 13, padding: 4},
+  turnoverSummary: {marginTop: 15, borderRadius: 15, backgroundColor: '#173A58', paddingHorizontal: 15, paddingVertical: 14, borderWidth: 1, borderColor: 'rgba(160,224,250,0.12)', gap: 5},
+  turnoverEyebrow: {fontSize: 10, letterSpacing: 0.65, fontWeight: '700', color: colors.primarySoft},
+  turnoverValue: {fontSize: 24, fontWeight: '800', color: colors.text},
+  turnoverFormula: {fontSize: 10, lineHeight: 16, color: colors.muted},
+  chartControls: {marginTop: 14, flexDirection: 'row', gap: 5, backgroundColor: '#09213A', borderRadius: 13, padding: 4},
   chartChoice: {flex: 1, minHeight: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
   chartChoiceActive: {backgroundColor: '#1A567C'},
   chartChoiceText: {fontSize: 12, fontWeight: '700', color: colors.muted},
@@ -338,11 +360,15 @@ const styles = StyleSheet.create({
   barHighlighted: {opacity: 1},
   barIncome: {backgroundColor: '#65E2B7'},
   barExpense: {backgroundColor: '#56C9FC'},
+  barTurnover: {backgroundColor: '#9DBBFF'},
+  zeroMarker: {height: 2, width: 18, backgroundColor: 'rgba(166,206,230,0.27)', borderRadius: 2},
   chartDate: {fontSize: 10, color: colors.muted, textAlign: 'center', marginBottom: 9},
   chartDateActive: {color: colors.text, fontWeight: '800'},
   selectedRow: {marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, backgroundColor: '#173956', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12},
-  selectedDate: {fontSize: 11, fontWeight: '600', color: colors.muted},
-  selectedAmount: {fontSize: 12, fontWeight: '800', color: colors.text},
+  selectedInfo: {flex: 1, minWidth: 0, gap: 4},
+  selectedDate: {fontSize: 11, fontWeight: '700', color: colors.muted},
+  selectedTurnover: {fontSize: 10, color: colors.primarySoft},
+  selectedAmount: {fontSize: 12, fontWeight: '800', color: colors.text, flexShrink: 1, maxWidth: '48%'},
   chartNote: {fontSize: 10, color: colors.faint, lineHeight: 16, marginTop: 10},
   categoryCard: {backgroundColor: '#E8F6FF', borderRadius: radius.lg, padding: 18, gap: 8},
   categorySectionIcon: {backgroundColor: '#CAE9F7'},
