@@ -64,6 +64,13 @@ async function verifySize(browser, size) {
     await page.getByTestId('ledger-transactions-add').waitFor({state: 'visible'});
     await page.getByText('259 000 so‘m', {exact: true}).waitFor({state: 'visible'});
     await assertFits(page, label + ' history');
+    if (size.width === 320) {
+      const firstRow = await page.getByRole('button', {name: /Transport, xarajat 12 000 so‘m. Tahrirlash/}).boundingBox();
+      const bottomNav = await tab('Operatsiyalar').boundingBox();
+      assert.ok(firstRow && bottomNav, '320px first ledger row and bottom navigation must be measurable');
+      assert.ok(firstRow.y + firstRow.height <= bottomNav.y - 3,
+        '320px first ledger row should be entirely readable above the bottom navigation without scrolling');
+    }
     await screenshot(page, size, 'transactions');
 
     // Search, empty state and reset must match the totals shown for visible rows.
