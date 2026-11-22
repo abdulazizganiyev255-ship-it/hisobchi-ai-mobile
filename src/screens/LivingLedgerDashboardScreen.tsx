@@ -220,7 +220,7 @@ export function LivingLedgerDashboardScreen({
           </View>
         )}
         <Text style={styles.footer}>
-          Namuna balans va xavfsiz sarflash hisoblanmaydi. Sessiya yozuvlari ilova qayta ishga tushirilganda tiklanishi mumkin.
+          Namuna balans va xavfsiz sarflash hisoblanmaydi. Sessiya tugasa yoki ilova qayta ishga tushsa, yozuvlar boshlang‘ich namunaga qaytadi.
         </Text>
       </ScrollView>
 
