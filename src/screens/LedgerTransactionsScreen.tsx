@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions} from 'react-native';
 import {AppIcon} from '../components/AppIcon';
 import {LedgerDateCalendar} from '../components/living/LedgerDateCalendar';
 import {LedgerTransactionRow} from '../components/living/LedgerPrimitives';
@@ -27,6 +27,8 @@ const TYPES: {key: TransactionFilter; label: string}[] = [
 
 /** Ledger history: totals explicitly correspond to *visible filtered rows*. */
 export function LedgerTransactionsScreen({transactions, onAdd, onEdit}: Props) {
+  const {width, height} = useWindowDimensions();
+  const compact = width <= 330 || height < 700;
   const [type, setType] = useState<TransactionFilter>('all');
   const [search, setSearch] = useState('');
   const [period, setPeriod] = useState<PeriodKey>('all');
@@ -88,15 +90,15 @@ export function LedgerTransactionsScreen({transactions, onAdd, onEdit}: Props) {
       <ScrollView
         testID="ledger-transactions-scroll"
         style={styles.scroll}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, compact && styles.compactContent]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topLine}>
           <View style={styles.headingCopy}>
             <Text style={styles.eyebrow}>HISOBCHI · DEMO SESSIYA</Text>
-            <Text accessibilityRole="header" style={styles.title}>Operatsiyalar</Text>
-            <Text style={styles.description}>Kirim va chiqimlar · faqat ushbu sessiya</Text>
+            <Text accessibilityRole="header" style={[styles.title, compact && styles.compactTitle]}>Operatsiyalar</Text>
+            <Text style={styles.description}>{compact ? 'Kirim va chiqimlar · demo' : 'Kirim va chiqimlar · faqat ushbu sessiya'}</Text>
           </View>
           <View style={styles.countPill}>
             <Text style={styles.countText}>{transactions.length} ta</Text>
@@ -108,7 +110,7 @@ export function LedgerTransactionsScreen({transactions, onAdd, onEdit}: Props) {
           onPress={onAdd}
           accessibilityRole="button"
           accessibilityLabel="Yangi operatsiya qo‘shish"
-          style={({pressed}) => [styles.primaryButton, pressed && styles.pressed]}
+          style={({pressed}) => [styles.primaryButton, compact && styles.primaryCompact, pressed && styles.pressed]}
         >
           <View style={styles.primaryIcon}>
             <AppIcon name="plus" color={ledger.ink} size={21}/>
@@ -230,7 +232,7 @@ export function LedgerTransactionsScreen({transactions, onAdd, onEdit}: Props) {
           })}
         </View>
 
-        <View style={styles.summary}>
+        <View style={[styles.summary, compact && styles.summaryCompact]}>
           <Text style={styles.summaryOverline}>KO‘RINAYOTGAN YOZUVLAR BO‘YICHA</Text>
           <View style={styles.summaryRow}>
             <View style={styles.summaryColumn}>
@@ -336,14 +338,17 @@ const styles = StyleSheet.create({
   screen: {flex: 1, backgroundColor: ledger.paper},
   scroll: {flex: 1},
   content: {paddingHorizontal: 20, paddingTop: 15, paddingBottom: 34, gap: 16},
+  compactContent: {paddingTop: 10, gap: 11},
   topLine: {flexDirection: 'row', alignItems: 'center', gap: 8},
   headingCopy: {flex: 1, gap: 6},
   eyebrow: {color: ledger.dark, letterSpacing: 1.15, fontSize: 11, fontWeight: '800'},
   title: {color: ledger.ink, fontSize: 30, fontWeight: '800', letterSpacing: -0.8},
+  compactTitle: {fontSize: 28},
   description: {color: ledger.subtext, fontSize: 13},
   countPill: {paddingHorizontal: 11, paddingVertical: 7, borderRadius: 999, backgroundColor: ledger.paleSage},
   countText: {color: ledger.dark, fontSize: 13, fontWeight: '700'},
   primaryButton: {backgroundColor: ledger.coral, minHeight: 63, borderRadius: 16, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 11},
+  primaryCompact: {minHeight: 58},
   pressed: {opacity: 0.74},
   primaryIcon: {width: 38, height: 38, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.53)', alignItems: 'center', justifyContent: 'center'},
   primaryCopy: {flex: 1, gap: 3},
@@ -391,6 +396,7 @@ const styles = StyleSheet.create({
   typeTextSelected: {color: '#FFFFFF'},
   summary: {borderTopWidth: 1, borderBottomWidth: 1, borderColor: ledger.rule, paddingVertical: 17, gap: 12},
   summaryOverline: {color: ledger.subtext, fontSize: 11, fontWeight: '800', letterSpacing: 0.8},
+  summaryCompact: {paddingVertical: 12, gap: 10},
   summaryRow: {flexDirection: 'row', alignItems: 'stretch', gap: 10},
   summaryColumn: {flex: 1, minWidth: 0, gap: 8},
   summaryDivider: {width: 1, backgroundColor: ledger.rule},
