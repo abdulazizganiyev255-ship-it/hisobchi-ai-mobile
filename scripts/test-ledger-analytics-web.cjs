@@ -66,6 +66,7 @@ async function verify(browser, size) {
     await page.getByTestId('ledger-chart-day-2026-11-20').click();
     await page.getByText('20.11 · Kirim', {exact: true}).waitFor({state: 'visible'});
     await page.getByTestId('ledger-metric-turnover').click();
+    await page.getByTestId('ledger-chart-day-2026-11-20').click();
     await page.getByText('20.11 · Aylanma', {exact: true}).waitFor({state: 'visible'});
     await page.getByTestId('ledger-metric-expense').click();
     await page.getByText('22.11 · Chiqim', {exact: true}).waitFor({state: 'visible'});
