@@ -1,7 +1,10 @@
 import type {Transaction} from './demo';
-import {getPeriodRange, sumTransactionTotals, transactionsInPeriod} from './periods';
+import {
+  PERIOD_OPTIONS, getPeriodRange, sumTransactionTotals, transactionsInPeriod,
+  validateCustomRange, type PeriodKey, type DateRange,
+} from './periods';
 
-export type AnalyticsPeriod = 'all' | 'week' | 'month' | 'last30';
+export type AnalyticsPeriod = PeriodKey;
 
 export type AnalyticsCategory = {
   name: string;
@@ -34,19 +37,21 @@ export type AnalyticsReport = {
   chartTruncated: boolean;
 };
 
-export const ANALYTICS_PERIODS: ReadonlyArray<{key: AnalyticsPeriod; label: string}> = [
-  {key: 'all', label: 'Barchasi'},
-  {key: 'week', label: 'Hafta'},
-  {key: 'month', label: 'Oy'},
-  {key: 'last30', label: '30 kun'},
-];
+export const ANALYTICS_PERIODS: ReadonlyArray<{key: AnalyticsPeriod; label: string}> = PERIOD_OPTIONS;
 
 export function calculateAnalytics(
   transactions: readonly Transaction[],
   period: AnalyticsPeriod,
   today: string,
+  customRange: DateRange | null = null,
 ): AnalyticsReport {
-  const range = getPeriodRange(period, today);
+  if (period === 'custom' && (
+    customRange === null ||
+    validateCustomRange(customRange.start, customRange.end, today) !== null
+  )) {
+    throw new Error('Custom analytics range must be validated before calculation');
+  }
+  const range = getPeriodRange(period, today, customRange);
   const included = transactionsInPeriod(transactions, range);
   const {income, expense} = sumTransactionTotals(included);
   const grouped = new Map<string, Omit<AnalyticsCategory, 'percent'>>();
@@ -105,5 +110,9 @@ export function formatDayCompact(iso: string): string {
 
 export function analyticsRangeLabel(report: AnalyticsReport): string {
   if (!report.start || !report.end) return 'Barcha qayd etilgan sanalar';
+  if (report.period === 'custom') {
+    const display = (date: string) => formatDayCompact(date) + '.' + date.slice(2, 4);
+    return display(report.start) + ' — ' + display(report.end);
+  }
   return formatDayCompact(report.start) + ' — ' + formatDayCompact(report.end);
 }
