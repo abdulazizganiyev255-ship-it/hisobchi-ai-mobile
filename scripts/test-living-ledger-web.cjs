@@ -59,6 +59,11 @@ async function check(browser, size) {
     await page.getByTestId('living-ledger-period-total').waitFor({state: 'visible'});
     assert.equal((await page.getByTestId('living-ledger-period-total').textContent()).trim(), '3 840 000 so‘m');
     await assertNoHorizontalOverflow(page, name + ' Home');
+    const homeAdd = await page.getByTestId('living-ledger-add-expense').boundingBox();
+    const homeNav = await page.getByRole('tab', {name: 'Bosh sahifa'}).boundingBox();
+    assert.ok(homeAdd && homeNav, 'Home Add and bottom navigation must have geometry');
+    assert.ok(homeAdd.y + homeAdd.height <= homeNav.y - 12,
+      name + ' Home CTA must be fully visible with >=12px breathing room above navigation');
     await snap(page, size, 'initial-home');
 
     // Date selector: exactly the two seeded monthly options.
