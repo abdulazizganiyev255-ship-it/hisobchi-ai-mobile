@@ -7,6 +7,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
 import {ChoiceChip, SurfaceCard} from '../components/ds';
 import {FormHeader} from '../components/ds/FormHeader';
+import {DateCalendar} from '../components/DateCalendar';
 import {Transaction} from '../data/demo';
 import {
   CATEGORY_OPTIONS, FormErrors, TransactionDraft, TransactionKind,
@@ -25,6 +26,7 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
   const [draft, setDraft] = useState<TransactionDraft>(() => toDraft(initial));
   const [errors, setErrors] = useState<FormErrors>({});
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const change = <K extends keyof TransactionDraft>(key: K, value: TransactionDraft[K]) => {
     setDraft(previous => ({...previous, [key]: value}));
@@ -54,7 +56,7 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
       >
         <FormHeader
           title={initial ? 'Operatsiyani tahrirlash' : 'Yangi operatsiya'}
-          subtitle="Demo · serverga yuborilmaydi · DS v1.2"
+          subtitle="Demo · serverga yuborilmaydi · UI v1.6"
           onBack={onCancel}
           backLabel="Operatsiyalar ro‘yxatiga qaytish"
         />
@@ -118,16 +120,17 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
 
         <Text style={styles.fieldHeading}>Sana</Text>
         <View style={styles.dateRow}>
-          <TextInput
-            value={draft.occurredOn}
-            onChangeText={value => change('occurredOn', value)}
-            accessibilityLabel="Operatsiya sanasi, yil-oy-kun"
-            placeholder="YYYY-MM-DD"
-            placeholderTextColor={colors.faint}
-            autoCapitalize="none"
-            maxLength={10}
-            style={[styles.field, styles.dateField, Boolean(errors.occurredOn) && styles.fieldInvalid]}
-          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={'Operatsiya sanasi: ' + draft.occurredOn + '. Kalendarni ochish'}
+            accessibilityHint="Sanani taqvimdan tanlash"
+            onPress={() => setCalendarOpen(true)}
+            style={[styles.datePickerTrigger, styles.dateField, Boolean(errors.occurredOn) && styles.fieldInvalid]}
+          >
+            <AppIcon name="calendar" color={colors.primarySoft} size={18}/>
+            <Text style={styles.dateText}>{draft.occurredOn}</Text>
+            <AppIcon name="chevron-down" color={colors.primarySoft} size={15}/>
+          </Pressable>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Sanani bugungi kunga o‘rnatish"
@@ -137,7 +140,7 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
             <Text style={styles.todayText}>Bugun</Text>
           </Pressable>
         </View>
-        <Text style={styles.hint}>YYYY-MM-DD · Kelajak sanasi qabul qilinmaydi.</Text>
+        <Text style={styles.hint}>Sanani bosib taqvimdan tanlang. Kelajak sanasi mumkin emas.</Text>
         {errors.occurredOn && <Text accessibilityLiveRegion="polite" style={styles.error}>{errors.occurredOn}</Text>}
 
         <Text style={styles.fieldHeading}>Izoh (ixtiyoriy)</Text>
@@ -202,6 +205,16 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
           Namoyish rejimi: sahifani yangilasangiz yoki ilovani yopib qayta ochsangiz o‘zgarishlar saqlanmaydi.
         </Text>
       </ScrollView>
+      {calendarOpen && (
+        <DateCalendar
+          selectedDate={draft.occurredOn}
+          onSelect={iso => {
+            change('occurredOn', iso);
+            setCalendarOpen(false);
+          }}
+          onCancel={() => setCalendarOpen(false)}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -239,6 +252,15 @@ const styles = StyleSheet.create({
   fieldInvalid: {borderColor: colors.negative},
   dateRow: {flexDirection: 'row', alignItems: 'center', gap: 8},
   dateField: {flex: 1, minWidth: 0},
+  datePickerTrigger: {
+    minHeight: 48, backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.divider,
+    borderRadius: radius.sm, paddingHorizontal: 12,
+    flexDirection: 'row', alignItems: 'center', gap: 9,
+  },
+  dateText: {
+    flex: 1, color: colors.text, fontSize: 15, fontWeight: '600',
+  },
   todayAction: {
     minHeight: layout.touchTarget, minWidth: 72, borderRadius: radius.sm,
     justifyContent: 'center', alignItems: 'center',

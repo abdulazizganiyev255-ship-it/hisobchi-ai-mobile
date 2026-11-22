@@ -13,11 +13,10 @@ const dashboard = screen('src/screens/DashboardScreen.tsx');
 // React Native Web/mobile screenshot and interaction smoke testing.
 assert.match(transactions, /<ScreenHeader\b/, 'Transactions should use DS ScreenHeader');
 assert.match(transactions, /<ChoiceChip\b/, 'Transaction filters should use DS ChoiceChip');
-assert.match(transactions, /<View style=\{styles\.actionArea\}>/, 'Transactions CTA requires reserved bottom layout');
-assert.doesNotMatch(transactions, /fab:\s*\{position:\s*'absolute'/, 'Add CTA cannot overlay transaction rows');
-assert.match(transactions, /backgroundColor:\s*'transparent'/, 'CTA rail must remain transparent');
+assert.doesNotMatch(transactions, /styles\.actionArea|actionDock:/, 'No full-width background dock behind Add CTA');
+assert.match(transactions, /fab:\s*\{\s*position:\s*'absolute'/, 'Add CTA should float without an action rail');
 assert.match(transactions, /accessibilityLabel="Yangi operatsiya qo‘shish"/, 'Add CTA must have a screen-reader label');
-assert.match(transactions, /paddingBottom: 32/, 'ScrollView should not retain large fake FAB padding');
+assert.match(transactions, /paddingBottom: 118/, 'Scroll requires enough bottom inset to expose the last transaction');
 
 assert.match(dashboard, /<SurfaceCard\b/g, 'Dashboard must use shared surface cards');
 assert.ok((dashboard.match(/<SectionHeader\b/g) || []).length >= 2, 'Dashboard sections need shared headers');
@@ -26,6 +25,12 @@ assert.match(dashboard, /Balans va oylik grafik mustaqil demo qiymatlar/, 'Dashb
 
 const editor = screen('src/screens/TransactionEditorScreen.tsx');
 assert.match(editor, /<FormHeader\b/, 'Form must use shared FormHeader');
+assert.match(editor, /<DateCalendar\b/, 'Editor must render a calendar date picker');
+assert.match(editor, /setCalendarOpen\(true\)/, 'Date field must open the calendar');
+assert.match(editor, /change\('occurredOn', iso\)/, 'Chosen date must update the transaction draft');
+assert.match(editor, /setCalendarOpen\(false\)/, 'Calendar can be dismissed');
+assert.doesNotMatch(editor, /onChangeText=\{value => change\('occurredOn', value\)\}/, 'Date should no longer require typing');
+
 assert.match(editor, /<ChoiceChip\b/, 'Income/expense selector must use DS ChoiceChip');
 assert.match(editor, /<SurfaceCard tone="light"/, 'Amount must use shared light card');
 assert.match(editor, /validateDraft\(draft\)/, 'Save must retain model validation');
