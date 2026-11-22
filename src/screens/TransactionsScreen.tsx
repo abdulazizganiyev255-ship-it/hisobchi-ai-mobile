@@ -134,7 +134,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         accessibilityLabel="Operatsiyalar muddati"
       >
         {PERIOD_OPTIONS.map(option => {
-          const active = period === option.key || (option.key === 'custom' && customOpen);
+          const active = customOpen ? option.key === 'custom' : period === option.key;
           return (
             <Pressable
               key={option.key}
