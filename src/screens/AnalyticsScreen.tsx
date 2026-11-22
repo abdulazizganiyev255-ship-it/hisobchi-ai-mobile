@@ -156,10 +156,10 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
       <View style={styles.categoryCard}>
         <View style={styles.sectionHeading}>
           <View style={styles.sectionTitleRow}>
-            <View style={styles.sectionIcon}><AppIcon name="wallet" color={colors.primary} size={18}/></View>
+            <View style={[styles.sectionIcon, styles.categorySectionIcon]}><AppIcon name="wallet" color="#12698C" size={18}/></View>
             <View style={styles.sectionCopy}>
-              <Text style={styles.sectionTitle}>Xarajatlar tarkibi</Text>
-              <Text style={styles.sectionSub}>Qaysi kategoriyaga ko‘proq pul ketgan?</Text>
+              <Text style={[styles.sectionTitle, styles.categoryHeading]}>Xarajatlar tarkibi</Text>
+              <Text style={[styles.sectionSub, styles.categorySubheading]}>Qaysi kategoriyaga ko‘proq pul ketgan?</Text>
             </View>
           </View>
         </View>
@@ -196,8 +196,8 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
           </>
         ) : (
           <View style={styles.emptyCompact}>
-            <Text style={styles.emptyTitle}>Xarajat qayd etilmagan</Text>
-            <Text style={styles.emptyCaption}>Tanlangan davr uchun xarajat kategoriyalari mavjud emas.</Text>
+            <Text style={[styles.emptyTitle, styles.emptyTitleInk]}>Xarajat qayd etilmagan</Text>
+            <Text style={[styles.emptyCaption, styles.emptyCaptionInk]}>Tanlangan davr uchun xarajat kategoriyalari mavjud emas.</Text>
           </View>
         )}
       </View>
@@ -280,6 +280,9 @@ const styles = StyleSheet.create({
   chartDate: {fontSize: 10, color: colors.muted, textAlign: 'center'},
   chartNote: {fontSize: 10, color: colors.faint, lineHeight: 16, marginTop: 10},
   categoryCard: {backgroundColor: '#E8F6FF', borderRadius: radius.lg, padding: 18, gap: 8},
+  categorySectionIcon: {backgroundColor: '#CAE9F7'},
+  categoryHeading: {color: colors.ink},
+  categorySubheading: {color: '#55788D'},
   categoryTotal: {fontSize: 26, color: colors.ink, fontWeight: '800', marginTop: 10},
   categoryCaption: {fontSize: 11, color: '#52778E', marginBottom: 11},
   categoryRow: {flexDirection: 'row', gap: 10, paddingVertical: 10, alignItems: 'center'},
@@ -293,6 +296,8 @@ const styles = StyleSheet.create({
   progress: {height: 5, borderRadius: 5},
   empty: {alignItems: 'center', paddingVertical: 25, paddingHorizontal: 10, gap: 9},
   emptyCompact: {paddingVertical: 20, gap: 8},
+  emptyTitleInk: {color: colors.ink},
+  emptyCaptionInk: {color: '#587A90'},
   emptyTitle: {fontSize: 14, color: colors.text, fontWeight: '800'},
   emptyCaption: {fontSize: 11, lineHeight: 18, color: colors.muted},
   emptyButton: {paddingVertical: 11, paddingHorizontal: 15, backgroundColor: '#235B81', borderRadius: 12, marginTop: 7},
