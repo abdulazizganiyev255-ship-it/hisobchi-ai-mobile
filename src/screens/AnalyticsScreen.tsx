@@ -34,7 +34,6 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
   const maxBarValue = Math.max(1, ...chartDays.map(metricAmount));
   const highlightedDay = chartDays.find(day => day.date === selectedDay) ?? chartDays[chartDays.length - 1];
   const chartMetricLabel = chartMetric === 'expense' ? 'Chiqim' : chartMetric === 'income' ? 'Kirim' : 'Aylanma';
-  const metricTotal = chartMetric === 'expense' ? report.expense : chartMetric === 'income' ? report.income : report.turnover;
   const hasMetricData = chartDays.some(day => metricAmount(day) > 0);
   const hasExpense = report.expense > 0;
 
