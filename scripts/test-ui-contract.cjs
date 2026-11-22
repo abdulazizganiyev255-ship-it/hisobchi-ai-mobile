@@ -24,4 +24,14 @@ assert.ok((dashboard.match(/<SectionHeader\b/g) || []).length >= 2, 'Dashboard s
 assert.match(dashboard, /Mustaqil demo grafik/, 'Dashboard static graph must be clearly labeled as separate demo data');
 assert.match(dashboard, /Balans va oylik grafik mustaqil demo qiymatlar/, 'Dashboard disclaimers should distinguish static demo figures');
 
-console.log('UI integration source contracts passed. Rendered mobile QA remains manual.');
+const editor = screen('src/screens/TransactionEditorScreen.tsx');
+assert.match(editor, /<FormHeader\b/, 'Form must use shared FormHeader');
+assert.match(editor, /<ChoiceChip\b/, 'Income/expense selector must use DS ChoiceChip');
+assert.match(editor, /<SurfaceCard tone="light"/, 'Amount must use shared light card');
+assert.match(editor, /validateDraft\(draft\)/, 'Save must retain model validation');
+assert.match(editor, /onSave\(draft\)/, 'Valid saves must preserve callback');
+assert.match(editor, /onPress=\{onDelete\}/, 'Delete confirmation must preserve deletion callback');
+assert.match(editor, /onPress=\{\(\) => change\('occurredOn', todayLocal\(\)\)\}/, 'Today shortcut must set local date');
+assert.match(editor, /accessibilityLiveRegion="polite"/, 'Form errors must be announced');
+
+console.log('UI integration + transaction form source contracts passed. Rendered mobile QA remains manual.');

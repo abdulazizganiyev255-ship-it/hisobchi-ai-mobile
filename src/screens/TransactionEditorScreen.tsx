@@ -5,12 +5,14 @@ import {
 } from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
+import {ChoiceChip, SurfaceCard} from '../components/ds';
+import {FormHeader} from '../components/ds/FormHeader';
 import {Transaction} from '../data/demo';
 import {
   CATEGORY_OPTIONS, FormErrors, TransactionDraft, TransactionKind,
-  toDraft, validateDraft,
+  toDraft, validateDraft, todayLocal,
 } from '../data/transactions';
-import {colors, radius} from '../theme/tokens';
+import {colors, layout, radius, semantic, typography} from '../theme/tokens';
 
 type Props = {
   initial?: Transaction;
@@ -50,41 +52,27 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <View style={styles.header}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Operatsiyalar ro‘yxatiga qaytish"
-            style={styles.back}
-            onPress={onCancel}
-          >
-            <AppIcon name="arrow-left" color={colors.primarySoft} size={22}/>
-          </Pressable>
-          <View style={styles.headerCopy}>
-            <Text style={styles.title}>{initial ? 'Operatsiyani tahrirlash' : 'Yangi operatsiya'}</Text>
-            <Text style={styles.caption}>Demo sessiya · ma’lumotlar serverga yuborilmaydi</Text>
-          </View>
+        <FormHeader
+          title={initial ? 'Operatsiyani tahrirlash' : 'Yangi operatsiya'}
+          subtitle="Demo · serverga yuborilmaydi · DS v1.2"
+          onBack={onCancel}
+          backLabel="Operatsiyalar ro‘yxatiga qaytish"
+        />
+
+        <View style={styles.kindRow}>
+          {(['expense', 'income'] as const).map(kind => (
+            <ChoiceChip
+              key={kind}
+              label={kind === 'expense' ? '− Xarajat' : '+ Daromad'}
+              accessibilityLabel={kind === 'expense' ? 'Xarajat operatsiyasi' : 'Daromad operatsiyasi'}
+              active={draft.kind === kind}
+              onPress={() => changeKind(kind)}
+              flex
+            />
+          ))}
         </View>
 
-        <View style={styles.segment}>
-          {(['expense', 'income'] as const).map(kind => {
-            const active = draft.kind === kind;
-            return (
-              <Pressable
-                key={kind}
-                onPress={() => changeKind(kind)}
-                accessibilityRole="button"
-                accessibilityState={{selected: active}}
-                style={[styles.segmentItem, active && styles.segmentActive]}
-              >
-                <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
-                  {kind === 'expense' ? '− Xarajat' : '+ Daromad'}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <View style={styles.amountCard}>
+        <SurfaceCard tone="light" style={styles.amountCard}>
           <Text style={styles.lightLabel}>SUMMA</Text>
           <View style={styles.amountRow}>
             <TextInput
@@ -101,8 +89,8 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
             <Text style={styles.currency}>so‘m</Text>
           </View>
           <Text style={styles.lightHint}>Faqat musbat, butun summa kiriting</Text>
-          {errors.amountText && <Text style={styles.errorDark}>{errors.amountText}</Text>}
-        </View>
+          {errors.amountText && <Text accessibilityLiveRegion="polite" style={styles.errorDark}>{errors.amountText}</Text>}
+        </SurfaceCard>
 
         <Text style={styles.fieldHeading}>Kategoriya</Text>
         <View style={styles.categories}>
@@ -126,21 +114,31 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
             );
           })}
         </View>
-        {errors.category && <Text style={styles.error}>{errors.category}</Text>}
+        {errors.category && <Text accessibilityLiveRegion="polite" style={styles.error}>{errors.category}</Text>}
 
         <Text style={styles.fieldHeading}>Sana</Text>
-        <TextInput
-          value={draft.occurredOn}
-          onChangeText={value => change('occurredOn', value)}
-          accessibilityLabel="Operatsiya sanasi"
-          placeholder="YYYY-MM-DD"
-          placeholderTextColor={colors.faint}
-          autoCapitalize="none"
-          maxLength={10}
-          style={styles.field}
-        />
-        <Text style={styles.hint}>Masalan: 2026-11-22. Kelajak sanasi qabul qilinmaydi.</Text>
-        {errors.occurredOn && <Text style={styles.error}>{errors.occurredOn}</Text>}
+        <View style={styles.dateRow}>
+          <TextInput
+            value={draft.occurredOn}
+            onChangeText={value => change('occurredOn', value)}
+            accessibilityLabel="Operatsiya sanasi, yil-oy-kun"
+            placeholder="YYYY-MM-DD"
+            placeholderTextColor={colors.faint}
+            autoCapitalize="none"
+            maxLength={10}
+            style={[styles.field, styles.dateField, Boolean(errors.occurredOn) && styles.fieldInvalid]}
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Sanani bugungi kunga o‘rnatish"
+            onPress={() => change('occurredOn', todayLocal())}
+            style={styles.todayAction}
+          >
+            <Text style={styles.todayText}>Bugun</Text>
+          </Pressable>
+        </View>
+        <Text style={styles.hint}>YYYY-MM-DD · Kelajak sanasi qabul qilinmaydi.</Text>
+        {errors.occurredOn && <Text accessibilityLiveRegion="polite" style={styles.error}>{errors.occurredOn}</Text>}
 
         <Text style={styles.fieldHeading}>Izoh (ixtiyoriy)</Text>
         <TextInput
@@ -154,7 +152,7 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
           style={[styles.field, styles.noteInput]}
         />
 
-        <Pressable onPress={save} accessibilityRole="button">
+        <Pressable onPress={save} accessibilityRole="button" accessibilityLabel={initial ? 'O‘zgarishlarni saqlash' : 'Operatsiyani qo‘shish'}>
           <LinearGradient
             colors={['#82DFFF', '#35B7E9']}
             start={{x: 0, y: 0}}
@@ -166,12 +164,19 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
           </LinearGradient>
         </Pressable>
 
+        {Object.keys(errors).length > 0 && (
+          <Text accessibilityLiveRegion="polite" style={styles.formFeedback}>
+            Ma’lumotlarni tekshiring. Xatolar tegishli maydonlar ostida ko‘rsatilgan.
+          </Text>
+        )}
+
         {initial && (
           <View style={styles.deleteArea}>
             {!confirmDelete ? (
               <Pressable
                 onPress={() => setConfirmDelete(true)}
                 accessibilityRole="button"
+                accessibilityLabel="Operatsiyani o‘chirishni tasdiqlash oynasini ochish"
                 style={styles.deleteOutline}
               >
                 <Text style={styles.deleteText}>Operatsiyani o‘chirish</Text>
@@ -181,10 +186,10 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
                 <Text style={styles.confirmTitle}>Rostdan o‘chirasizmi?</Text>
                 <Text style={styles.confirmCaption}>Ushbu demo sessiyadan operatsiya olib tashlanadi.</Text>
                 <View style={styles.confirmActions}>
-                  <Pressable onPress={() => setConfirmDelete(false)} style={styles.cancelDelete}>
+                  <Pressable accessibilityRole="button" accessibilityLabel="O‘chirishni bekor qilish" onPress={() => setConfirmDelete(false)} style={styles.cancelDelete}>
                     <Text style={styles.cancelDeleteText}>Bekor qilish</Text>
                   </Pressable>
-                  <Pressable onPress={onDelete} style={styles.confirmDelete}>
+                  <Pressable accessibilityRole="button" accessibilityLabel="Operatsiyani butunlay o‘chirish" onPress={onDelete} style={styles.confirmDelete}>
                     <Text style={styles.confirmDeleteText}>Ha, o‘chirish</Text>
                   </Pressable>
                 </View>
@@ -203,47 +208,63 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
 
 const styles = StyleSheet.create({
   fill: {flex: 1},
-  content: {paddingHorizontal: 20, paddingTop: 22, paddingBottom: 36, gap: 10},
-  header: {flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 10},
-  back: {width: 44, height: 44, borderRadius: 14, backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center'},
-  headerCopy: {flex: 1, minWidth: 0},
-  title: {color: colors.text, fontWeight: '800', fontSize: 20, letterSpacing: -0.35},
-  caption: {color: colors.muted, fontSize: 11, marginTop: 4},
-  segment: {flexDirection: 'row', padding: 5, backgroundColor: colors.surface, borderRadius: radius.lg, gap: 5},
-  segmentItem: {flex: 1, minHeight: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center'},
-  segmentActive: {backgroundColor: '#1B5379'},
-  segmentText: {fontSize: 13, fontWeight: '700', color: colors.muted},
-  segmentTextActive: {color: colors.text},
-  amountCard: {backgroundColor: colors.cardLight, borderRadius: radius.lg, padding: 20, marginTop: 6},
-  lightLabel: {color: '#557A96', fontSize: 10, fontWeight: '800', letterSpacing: 1},
-  amountRow: {flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 65},
-  amountInput: {color: colors.ink, fontSize: 32, fontWeight: '800', flex: 1, minWidth: 0, paddingVertical: 5},
+  content: {
+    paddingHorizontal: layout.screenGutter, paddingTop: 18, paddingBottom: 38,
+    gap: 10,
+  },
+  kindRow: {flexDirection: 'row', gap: 8, marginTop: 10},
+  amountCard: {padding: 17, marginTop: 4},
+  lightLabel: {color: semantic.lightSubtext, fontSize: typography.size.micro, fontWeight: '800', letterSpacing: 1},
+  amountRow: {flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 62},
+  amountInput: {color: colors.ink, fontSize: 31, fontWeight: '800', flex: 1, minWidth: 0, paddingVertical: 5},
   currency: {color: '#406F90', fontSize: 15, fontWeight: '700'},
-  lightHint: {color: '#577A95', fontSize: 11},
-  errorDark: {color: '#A32439', fontSize: 11, fontWeight: '600', marginTop: 5},
-  fieldHeading: {color: colors.text, fontWeight: '700', fontSize: 14, marginTop: 10},
+  lightHint: {color: semantic.lightSubtext, fontSize: typography.size.caption},
+  errorDark: {color: '#A32439', fontSize: typography.size.caption, fontWeight: '600', marginTop: 5},
+  fieldHeading: {color: colors.text, fontWeight: '700', fontSize: typography.size.body, marginTop: 8},
   categories: {flexDirection: 'row', flexWrap: 'wrap', gap: 8},
-  category: {borderRadius: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, padding: 8, paddingRight: 12, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48},
+  category: {
+    borderRadius: radius.sm, backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.divider, padding: 7, paddingRight: 12,
+    flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: layout.touchTarget,
+  },
   categoryActive: {borderColor: colors.primary, backgroundColor: '#18486A'},
   categoryIcon: {height: 30, width: 30, borderRadius: 10, justifyContent: 'center', alignItems: 'center'},
-  categoryText: {fontSize: 12, fontWeight: '600', color: colors.muted},
+  categoryText: {fontSize: typography.size.caption, fontWeight: '600', color: colors.muted},
   categoryActiveText: {color: colors.text},
-  field: {borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, borderRadius: 14, paddingHorizontal: 15, paddingVertical: 13, minHeight: 48, fontSize: 15, color: colors.text},
-  noteInput: {minHeight: 85, textAlignVertical: 'top'},
-  hint: {fontSize: 10, color: colors.faint},
-  error: {fontSize: 11, color: '#FFADAD', fontWeight: '600'},
-  save: {minHeight: 54, marginTop: 12, borderRadius: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 9},
-  saveText: {color: colors.ink, fontWeight: '800', fontSize: 15},
+  field: {
+    borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface,
+    borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 12,
+    minHeight: 48, fontSize: 15, color: colors.text,
+  },
+  fieldInvalid: {borderColor: colors.negative},
+  dateRow: {flexDirection: 'row', alignItems: 'center', gap: 8},
+  dateField: {flex: 1, minWidth: 0},
+  todayAction: {
+    minHeight: layout.touchTarget, minWidth: 72, borderRadius: radius.sm,
+    justifyContent: 'center', alignItems: 'center',
+    backgroundColor: colors.surfaceRaised, borderWidth: 1, borderColor: colors.divider,
+    paddingHorizontal: 10,
+  },
+  todayText: {fontSize: typography.size.caption, fontWeight: '700', color: colors.primarySoft},
+  noteInput: {minHeight: 76, textAlignVertical: 'top'},
+  hint: {fontSize: typography.size.caption, color: colors.muted},
+  error: {fontSize: typography.size.caption, color: '#FFADAD', fontWeight: '600'},
+  formFeedback: {color: colors.negative, fontSize: typography.size.caption, lineHeight: 18, marginTop: 2},
+  save: {
+    minHeight: 52, marginTop: 10, borderRadius: radius.md,
+    flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 9,
+  },
+  saveText: {color: colors.ink, fontWeight: '800', fontSize: typography.size.body},
   deleteArea: {marginTop: 8},
-  deleteOutline: {minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(244,153,153,0.35)', alignItems: 'center', justifyContent: 'center'},
-  deleteText: {color: '#FFB4B4', fontWeight: '700', fontSize: 13},
-  confirmCard: {borderRadius: 15, backgroundColor: '#3B263B', padding: 14, gap: 10},
-  confirmTitle: {color: '#FFFFFF', fontSize: 15, fontWeight: '800'},
-  confirmCaption: {color: '#FFD1D1', fontSize: 11},
+  deleteOutline: {minHeight: 48, borderRadius: radius.sm, borderWidth: 1, borderColor: 'rgba(244,153,153,0.35)', alignItems: 'center', justifyContent: 'center'},
+  deleteText: {color: '#FFB4B4', fontWeight: '700', fontSize: typography.size.label},
+  confirmCard: {borderRadius: radius.md, backgroundColor: '#3B263B', padding: 14, gap: 10},
+  confirmTitle: {color: '#FFFFFF', fontSize: typography.size.section, fontWeight: '800'},
+  confirmCaption: {color: '#FFD1D1', fontSize: typography.size.caption},
   confirmActions: {flexDirection: 'row', gap: 10},
-  cancelDelete: {flex: 1, padding: 12, borderRadius: 12, backgroundColor: '#534153', alignItems: 'center'},
-  cancelDeleteText: {color: '#FFFFFF', fontWeight: '600', fontSize: 12},
-  confirmDelete: {flex: 1, padding: 12, borderRadius: 12, backgroundColor: '#F6B5B5', alignItems: 'center'},
-  confirmDeleteText: {color: '#572020', fontWeight: '800', fontSize: 12},
-  disclaimer: {textAlign: 'center', fontSize: 11, lineHeight: 18, color: colors.faint, paddingHorizontal: 12, marginTop: 9},
+  cancelDelete: {flex: 1, minHeight: layout.touchTarget, padding: 12, borderRadius: radius.sm, backgroundColor: '#534153', alignItems: 'center', justifyContent: 'center'},
+  cancelDeleteText: {color: '#FFFFFF', fontWeight: '600', fontSize: typography.size.caption},
+  confirmDelete: {flex: 1, minHeight: layout.touchTarget, padding: 12, borderRadius: radius.sm, backgroundColor: '#F6B5B5', alignItems: 'center', justifyContent: 'center'},
+  confirmDeleteText: {color: '#572020', fontWeight: '800', fontSize: typography.size.caption},
+  disclaimer: {textAlign: 'center', fontSize: typography.size.caption, lineHeight: 18, color: colors.muted, paddingHorizontal: 10, marginTop: 8},
 });
