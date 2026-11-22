@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/ui-final-polish-v19
+      - feat/android-emulator-smoke-v22
       - test/web-responsive-e2e-v20
       - test/native-bundle-release-gate-v21
 
