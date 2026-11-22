@@ -1,79 +1,70 @@
-# Hisobchi AI Mobile — UI Prototype v0.1
+# Hisobchi AI Mobile — React Native / Expo demo
 
-A React Native (Expo + TypeScript) design prototype for the Hisobchi AI personal finance app in Uzbekistan.
+**Status (2026-11-22):** demo UI prototip, ishlab chiqarish ilovasi emas. Development feature branch `test/integration-release-gate-v18` Design System v1.x, transaction manager va Analytics v1.7 funksiyalarini o'z ichiga oladi. `main` hali ilk v0.1 holatida; ochiq Draft PRlar tekshirilmasdan unga birlashtirilmagan.
 
-> ⚠️ **Demo only.** All balances, budgets, graphs and transactions are hard-coded sample data. There is no authentication, bank connection, AI call, Supabase integration or network API.
+**Muhim:** hech qanday bank hisoblari ulanmagan, kirish/ro'yxatdan o'tish yo'q, real balans yoki Safe-to-Spend hisoblanmayapti, Supabase yoki AI API ulanmagan. Operatsiyalar faqat ishlayotgan sessiyada saqlanadi; sahifani yangilashda boshlang'ich demo qiymatlar tiklanadi. Dashboard balansi va oylik grafiki **mustaqil namuna**, Analytics esa sessiya operatsiyalaridan qayta hisoblanadi.
 
-## 1) Requirements
+## Mavjud imkoniyatlar (feature branch)
 
-- Node.js 22.13+ (recommended Node.js 22 LTS), npm and Git
-- Android smartphone with compatible Expo Go installed, or Android emulator
-- Expo SDK 58 compatible Expo Go (check https://expo.dev/go for your device)
+- **Bosh sahifa:** demo balans, Safe-to-Spend namunasi, mustaqil oylik grafik, sessiya operatsiyalari ro'yxati.
+- **Operatsiyalar:** xarajat va daromadni qo'shish, tahrirlash, tasdiqlab o'chirish, qidiruv, tur va davr bo'yicha filtrlash.
+- **Yangi operatsiya:** xarajat/daromad kategoriyasi, summani tekshirish, kalendardan sana tanlash (2000-01-01 dan bugungacha), izoh.
+- **Tahlil:** sessiyadan sof farq, kirim, chiqim, aylanma, kundalik dinamika va xarajat kategoriyalari. Muddatlar: Barchasi, Hafta, Oy, 30 kun, Oraliq (ikki kalendar).
+- **Profil:** sessiya operatsiyalari soni, real holat indikatorlari, navigatsiya va tasdiqlanadigan demo reset.
+- **Onboarding:** Profildan ochiladigan 3-qadamli majburiy bo'lmagan qo'llanma.
+- **Design System:** `src/theme/tokens.ts`, `src/components/ds/`, asosiy kartalar/filtrlar/typography uchun umumiy qoidalar.
 
-## 2) Run locally (Windows PowerShell)
+## Windows PowerShell 5.1 — brauzerda tekshirish
+
+Talablar: Node.js 22 (LTS), npm, Git.
 
 ```powershell
-cd hisobchi-ai-mobile
-npm install
-npx expo install --fix
+cd C:\Users\ASUS\Projects\hisobchi-ai-mobile
+git status --short
+git fetch origin
+git switch --track origin/test/integration-release-gate-v18
+npm ci
 npm run typecheck
-npx expo start --tunnel
+npm run test:transactions
+npm run test:analytics
+npm run test:calendar
+npm run test:design-system
+npm run test:ui-contract
+npm run test:integration
+npx expo start --web --clear --port 8090
 ```
 
-Scan the displayed QR code in Expo Go. `--tunnel` may ask to install `@expo/ngrok`; consent and allow internet traffic. If local Wi-Fi is available, `npx expo start` is usually simpler.
+Brauzer: `http://localhost:8090`. Agar filial/branch avval yaratilgan bo'lsa: `git switch test/integration-release-gate-v18`, so'ng `git pull --ff-only`. Agar `git status --short` bo'sh bo'lmasa, avval lokal o'zgarishlarni tekshiring. `npm audit fix --force` ni avtomatik ishlatmang.
 
-> The package versions in this source are an initial SDK 58 set. `npx expo install --fix` aligns SDK native module versions with the installed Expo SDK before the first run; review any package changes before committing.
+## Loyihaning tarkibi
 
-## 3) Upload to a new **private** GitHub repo
+| Joylashuv | Vazifasi |
+|---|---|
+| `App.tsx` | tab navigatsiya, sessiya state, create/edit/delete/reset |
+| `src/screens/` | Dashboard, Transactions, TransactionEditor, Analytics, Profile, Onboarding |
+| `src/components/ds/` | qayta ishlatiladigan UI elementlari |
+| `src/components/DateCalendar.tsx` | RN Web/native modal kalendar |
+| `src/data/transactions.ts` | demo operatsiya modeli va validatsiya |
+| `src/data/periods.ts` | sana muddatlari va filtr |
+| `src/data/analytics.ts` | daromad, chiqim, sof farq, aylanma, kategoriya va grafik |
+| `src/data/demo.ts` | namuna ma'lumotlar va valyuta formatlash |
+| `scripts/` | TypeScript tashqarisidagi model, UI contract va integratsiya testlari |
+| `docs/` | dizayn, QA va integratsiya bo'yicha bosqichma-bosqich qaydlar |
 
-Create an **empty** GitHub repo named `hisobchi-ai-mobile` (no README, license or `.gitignore` checkbox). In PowerShell, run from the extracted project folder:
+## Qo'lda bajariladigan release tekshiruvlari
 
-```powershell
-git init
-# If another Git remote already exists, inspect with: git remote -v
-git add .
-git commit -m "feat: initial Hisobchi AI mobile design prototype"
-git branch -M main
-git remote add origin https://github.com/abdulazizganiyev255-ship-it/hisobchi-ai-mobile.git
-git push -u origin main
-```
+1. Chrome Responsive: 320×640, 360×800, 393×852; scroll, tugmalar, summaa, izohlar kesilmasin.
+2. Operatsiya qo'shib/tahrirlab/o'chirib, Tahlil va Profil ko'rsatkichlari yangilanishini tekshiring.
+3. `Tahlil → Muddat → Oraliq`: kalendar sanalari, xato oraliq, bo'sh oraliq va qadamlarni bekor qilish.
+4. `Profil → Ilova bo'yicha qo'llanma`: `Boshlash` Home'ga, `Yopish` Profile'ga qaytishi kerak.
+5. Form xatolari, noto'g'ri sana, Android hardware back, klaviatura va font scaling'ni sinang.
+6. iOS va Android native emulyator/qurilmalari, screen-reader sinovi va barcha PR review talab qilinadi.
 
-Sign into GitHub when Git asks. GitHub HTTPS does not accept a normal account password for Git pushes; use browser authentication / Git Credential Manager or a suitable token.
+**CI Success production tayyor degani emas.** `main`ga UI stack faqat Draft PR'lar tekshirilib, vizual QA va funksional testlar o'tgandan keyin kiradi.
 
-## 4) Project structure
+## Xavfsizlik va backend chegaralari
 
-- `App.tsx` — app entry, bottom navigation and base background
-- `src/theme/tokens.ts` — colors, radii, spacing, shadows
-- `src/data/demo.ts` — sample data and UZS formatting
-- `src/components/AppIcon.tsx` — reusable SVG icon primitives
-- `src/components/ExpenseChart.tsx` — sample graph
-- `src/components/TransactionRow.tsx` — reusable transaction row
-- `src/screens/DashboardScreen.tsx` — main home screen, balance visibility and month filter
-- `src/screens/OtherScreens.tsx` — demo sections for navigation
-
-## 5) What's interactive
-
-- Balance show/hide eye control
-- This month / last month switch (cycles)
-- Bottom navigation between four tabs
-- Transaction history shortcut
-- Safe-to-spend explanatory dialog
-
-## 6) Product quality and security notes
-
-- **Do not** connect production Supabase or insert secrets into code.
-- Safe-to-spend is **not** yet computed; the displayed limit must never be treated as financial advice or a real budget.
-- Before production: validate data access controls, authenticated API integration, RLS, loading and error states, keyboard/screen-reader accessibility, edge cases, device previews and localized copy.
-- The chart uses static demo values, not an expense aggregation implementation.
-- This repository intentionally has no `.env` or real customer data.
-
-## 7) Acceptance checks
-
-1. Run `npm run typecheck` and `npx expo install --check` with packages installed.
-2. Open in Expo Go and check 360dp / 393dp width devices.
-3. Toggle eye icon, change chart period, switch tabs and open transaction history.
-4. Verify long currency amounts do not clip, swipe works, navbar stays visible.
-
-## Technology
-
-Expo SDK 58 / React Native 0.88 / TypeScript / react-native-svg / expo-linear-gradient / react-native-safe-area-context.
+- Frontend demo uchun real parol, service-role yoki boshqa maxfiy kalitni kiritmang.
+- Backend arxitekturasi `docs/05-mobile-data-architecture.md` loyihasi bilan alohida **Draft PR #9** orqali muhokama qilinmoqda; u hali `main`ga kiritilmagan.
+- Supabase integratsiyasidan oldin Auth, ownership, Row-Level Security, data mapping, izolyatsiya va migratsiya rollback talablari tasdiqlanishi kerak.
+- React Native / TypeScript va StyleSheet hozirgi frontend texnologiyalari; boshqa dasturlash tiliga ko'chish dizayn sifatini avtomatik oshirmaydi.
