@@ -1,0 +1,73 @@
+name: Living Ledger S+ pilot CI
+
+on:
+  push:
+    branches:
+      - design/splus-living-ledger-home-v01
+  pull_request:
+    branches:
+      - design/splus-d01-d03-ux-concepts
+
+jobs:
+  model-and-bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install frozen dependencies
+        run: npm ci
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Financial regression suite
+        run: |
+          npm run test:transactions
+          npm run test:analytics
+          npm run test:calendar
+          npm run test:integration
+          npm run test:design-system
+          npm run test:ui-contract
+          node scripts/test-living-ledger.cjs
+      - name: Export browser JavaScript
+        run: npx expo export --platform web --output-dir artifacts/living-ledger-web-build --clear
+      - name: Export Android JavaScript
+        run: npx expo export --platform android --output-dir artifacts/living-ledger-android-bundle --clear
+
+  responsive-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: "1"
+      SMOKE_URL: http://127.0.0.1:8090
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install frozen dependencies
+        run: npm ci
+      - name: Install browser runner
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Launch Expo Web
+        run: |
+          nohup npx expo start --web --port 8090 --clear > /tmp/living-ledger-expo.log 2>&1 &
+          echo $! > /tmp/living-ledger-expo.pid
+      - name: Responsive financial flow (320/360/393)
+        run: node scripts/test-living-ledger-web.cjs
+      - name: Expo logs on failure
+        if: failure()
+        run: cat /tmp/living-ledger-expo.log || true
+      - name: Upload rendering screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: living-ledger-responsive-screens
+          path: artifacts/living-ledger/*.png
+          if-no-files-found: warn
+          retention-days: 7
