@@ -8,9 +8,9 @@ import {demo, type Transaction} from './src/data/demo';
 import {transactionFromDraft, type TransactionDraft} from './src/data/transactions';
 import {LivingLedgerDashboardScreen} from './src/screens/LivingLedgerDashboardScreen';
 import {OtherScreen, type Tab} from './src/screens/OtherScreens';
-import {TransactionsScreen} from './src/screens/TransactionsScreen';
+import {LedgerTransactionsScreen} from './src/screens/LedgerTransactionsScreen';
 import {AnalyticsScreen} from './src/screens/AnalyticsScreen';
-import {TransactionEditorScreen} from './src/screens/TransactionEditorScreen';
+import {LedgerTransactionEditorScreen} from './src/screens/LedgerTransactionEditorScreen';
 import {OnboardingScreen} from './src/screens/OnboardingScreen';
 import {colors, radius} from './src/theme/tokens';
 import {ledger} from './src/theme/livingLedger';
@@ -30,7 +30,7 @@ function AppContent() {
   const [editor, setEditor] = useState<EditorState>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const nextId = useRef(1000);
-  const homeTheme = tab === 'home' && editor === null && !showOnboarding;
+  const ledgerShell = !showOnboarding && (editor !== null || tab === 'home' || tab === 'transactions');
 
   // Native Android Back should leave overlays before returning to Home.
   // React Native Modal handles its own Back press via onRequestClose.
@@ -77,9 +77,9 @@ function AppContent() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, homeTheme && styles.homeSafe]} edges={['top', 'bottom']}>
-      <StatusBar style={homeTheme ? 'dark' : 'light'}/>
-      {!homeTheme && <LinearGradient
+    <SafeAreaView style={[styles.safe, ledgerShell && styles.homeSafe]} edges={['top', 'bottom']}>
+      <StatusBar style={ledgerShell ? 'dark' : 'light'}/>
+      {!ledgerShell && <LinearGradient
         style={StyleSheet.absoluteFill}
         colors={[colors.backgroundDeep, colors.background, '#103454']}
         start={{x: 0, y: 0}} end={{x: 1, y: 1}}
@@ -94,7 +94,7 @@ function AppContent() {
             }}
           />
         ) : editor !== null ? (
-          <TransactionEditorScreen
+          <LedgerTransactionEditorScreen
             key={editor === 'new' ? 'new' : editor.id}
             initial={editor === 'new' ? undefined : editor}
             onCancel={() => setEditor(null)}
@@ -108,7 +108,7 @@ function AppContent() {
             onOpenTransactions={() => setTab('transactions')}
           />
         ) : tab === 'transactions' ? (
-          <TransactionsScreen
+          <LedgerTransactionsScreen
             transactions={transactions}
             onAdd={() => setEditor('new')}
             onEdit={item => setEditor(item)}
@@ -133,8 +133,8 @@ function AppContent() {
         )}
       </View>
       {editor === null && !showOnboarding && (
-        <View style={[styles.navOuter, homeTheme && styles.homeNavOuter]}>
-          <View style={[styles.nav, homeTheme && styles.homeNav]}>
+        <View style={[styles.navOuter, ledgerShell && styles.homeNavOuter]}>
+          <View style={[styles.nav, ledgerShell && styles.homeNav]}>
             {tabs.map(item => {
               const active = tab === item.key;
               return (
@@ -144,22 +144,22 @@ function AppContent() {
                   accessibilityState={{selected: active}}
                   accessibilityLabel={item.label}
                   onPress={() => setTab(item.key)}
-                  style={[styles.navItem, active && styles.navActive, homeTheme && active && styles.homeNavActive]}
+                  style={[styles.navItem, active && styles.navActive, ledgerShell && active && styles.homeNavActive]}
                 >
                   <AppIcon
                     name={item.icon}
-                    color={homeTheme ? (active ? ledger.dark : ledger.subtext) : (active ? colors.primarySoft : colors.faint)}
+                    color={ledgerShell ? (active ? ledger.dark : ledger.subtext) : (active ? colors.primarySoft : colors.faint)}
                     size={21}
                     strokeWidth={active ? 2.3 : 1.8}
                   />
                   <Text
-                    style={[styles.navLabel, active && styles.navLabelActive, homeTheme && styles.homeNavLabel, homeTheme && active && styles.homeNavLabelActive]}
+                    style={[styles.navLabel, active && styles.navLabelActive, ledgerShell && styles.homeNavLabel, ledgerShell && active && styles.homeNavLabelActive]}
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
-                    {homeTheme && item.key === 'transactions'
+                    {ledgerShell && item.key === 'transactions'
                       ? 'Tarix'
-                      : homeTheme && item.key === 'home'
+                      : ledgerShell && item.key === 'home'
                         ? 'Bosh'
                         : item.label}
                   </Text>

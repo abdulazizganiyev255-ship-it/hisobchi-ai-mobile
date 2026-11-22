@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - design/splus-living-ledger-home-v01
+      - design/splus-living-ledger-transactions-v02
   pull_request:
     branches:
       - design/splus-d01-d03-ux-concepts
+      - design/splus-living-ledger-home-v01
 
 jobs:
   model-and-bundle:
@@ -59,7 +61,9 @@ jobs:
           nohup npx expo start --web --port 8090 --clear > /tmp/living-ledger-expo.log 2>&1 &
           echo $! > /tmp/living-ledger-expo.pid
       - name: Responsive financial flow (320/360/393)
-        run: node scripts/test-living-ledger-web.cjs
+        run: |
+          node scripts/test-living-ledger-web.cjs
+          node scripts/test-living-ledger-workflows.cjs
       - name: Expo logs on failure
         if: failure()
         run: cat /tmp/living-ledger-expo.log || true
