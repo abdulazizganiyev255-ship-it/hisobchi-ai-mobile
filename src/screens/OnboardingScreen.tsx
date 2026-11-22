@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useRef, useState, type ElementRef} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon, type IconName} from '../components/AppIcon';
@@ -56,7 +56,7 @@ const STEPS: readonly Step[] = [
 
 export function OnboardingScreen({onExit, onFinish}: Props) {
   const [index, setIndex] = useState(0);
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ElementRef<typeof ScrollView>>(null);
   const step = STEPS[index];
   const isFirst = index === 0;
   const isLast = index === STEPS.length - 1;
