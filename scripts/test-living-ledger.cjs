@@ -64,7 +64,7 @@ assert.match(screen, /const month = demo\.months\[period\]/, 'Monthly display mu
 assert.match(screen, /\['current', 'previous'\] as const/, 'Home month selector has two options');
 assert.match(screen, /<LedgerMiniBars/, 'Home chart uses accessible sample bars');
 assert.match(screen, /filterAndSortTransactions\(transactions, 'all', ''\)/, 'Recent items read session transactions');
-assert.match(screen, /accessibilityRole="image"/.test(primitives) ? /accessibilityRole="image"/ : /NEVER/, 'Bars require chart alternative');
+assert.match(primitives, /accessibilityRole="image"/, 'Bars require chart alternative');
 assert.match(screen, /setExplanationOpen\(true\)/, 'Explanation action must be real');
 assert.match(screen, /onRequestClose=\{closeExplainer\}/, 'Native Back must close explanation');
 assert.match(screen, /testID="living-ledger-add-expense"/, 'Add is E2E testable');
