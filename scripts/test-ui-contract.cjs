@@ -73,6 +73,11 @@ assert.match(app, /transactionCount=\{transactions.length\}/, 'Profile count mus
 assert.match(app, /onOpenTransactions=\{\(\) => setTab\('transactions'\)\}/, 'Profile operations link must navigate');
 assert.match(app, /onOpenAnalytics=\{\(\) => setTab\('analytics'\)\}/, 'Profile analytics link must navigate');
 assert.match(app, /setTransactions\(\[...demo.transactions\]\)/, 'Profile reset must restore demo transactions');
+assert.match(app, /BackHandler\.addEventListener\('hardwareBackPress'/, 'Native Android Back handling must be installed');
+assert.match(app, /if \(showOnboarding\) \{\s*setShowOnboarding\(false\);\s*return true;/, 'Android Back should leave optional onboarding first');
+assert.match(app, /if \(editor !== null\) \{\s*setEditor\(null\);\s*return true;/, 'Android Back should close a transaction editor');
+assert.match(app, /if \(tab !== 'home'\) \{\s*setTab\('home'\);\s*return true;/, 'Android Back should go Home from tabs');
+assert.match(app, /return \(\) => listener\.remove\(\)/, 'Android hardware Back listener must be cleaned up');
 
 const onboarding = screen('src/screens/OnboardingScreen.tsx');
 assert.match(onboarding, /const STEPS: readonly Step\[\]/, 'Guide uses a typed static step model');
