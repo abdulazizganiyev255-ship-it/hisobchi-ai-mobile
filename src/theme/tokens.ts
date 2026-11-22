@@ -72,7 +72,7 @@ export const semantic = {
   darkText: colors.text,
   lightText: colors.ink,
   darkSubtext: colors.muted,
-  lightSubtext: '#52778E',
+  lightSubtext: '#4B7086',
   focusBorder: colors.primary,
   sectionIconDark: '#193B59',
   sectionIconLight: '#CAE9F7',
