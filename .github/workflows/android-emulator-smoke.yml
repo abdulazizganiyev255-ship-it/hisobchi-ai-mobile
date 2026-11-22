@@ -1,0 +1,80 @@
+name: Android APK and emulator smoke
+
+on:
+  pull_request:
+    branches:
+      - main
+      - test/native-bundle-release-gate-v21
+
+jobs:
+  android-emulator-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Gradle build cache
+        uses: gradle/actions/setup-gradle@v5
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate Android native project
+        run: npx expo prebuild --platform android --no-install
+      - name: Build installable debug APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace --max-workers=2
+      - name: Start Metro for debug APK
+        run: |
+          nohup npx expo start --localhost --port 8081 --clear > /tmp/hisobchi-metro.log 2>&1 &
+          echo $! > /tmp/hisobchi-metro.pid
+          for i in $(seq 1 60); do
+            if curl -fsS "http://127.0.0.1:8081/status" | grep -q "packager-status:running"; then
+              echo "Metro is ready"; exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/hisobchi-metro.log
+          exit 1
+      - name: Enable KVM acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Boot emulator and run native app interaction smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 2
+          ram-size: 2048M
+          emulator-options: -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect -camera-back none
+          disable-animations: true
+          script: python3 scripts/test-android-emulator.py
+      - name: Show build and Metro logs when failed
+        if: failure()
+        run: cat /tmp/hisobchi-metro.log || true
+      - name: Upload emulator screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hisobot-android-native-smoke
+          path: artifacts/android-emulator/
+          if-no-files-found: warn
+          retention-days: 7
