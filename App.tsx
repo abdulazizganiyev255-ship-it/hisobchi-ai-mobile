@@ -6,13 +6,14 @@ import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {AppIcon, type IconName} from './src/components/AppIcon';
 import {demo, type Transaction} from './src/data/demo';
 import {transactionFromDraft, type TransactionDraft} from './src/data/transactions';
-import {DashboardScreen} from './src/screens/DashboardScreen';
+import {LivingLedgerDashboardScreen} from './src/screens/LivingLedgerDashboardScreen';
 import {OtherScreen, type Tab} from './src/screens/OtherScreens';
 import {TransactionsScreen} from './src/screens/TransactionsScreen';
 import {AnalyticsScreen} from './src/screens/AnalyticsScreen';
 import {TransactionEditorScreen} from './src/screens/TransactionEditorScreen';
 import {OnboardingScreen} from './src/screens/OnboardingScreen';
 import {colors, radius} from './src/theme/tokens';
+import {ledger} from './src/theme/livingLedger';
 
 const tabs: {key: Tab; label: string; icon: IconName}[] = [
   {key: 'home', label: 'Bosh sahifa', icon: 'home'},
@@ -29,6 +30,7 @@ function AppContent() {
   const [editor, setEditor] = useState<EditorState>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const nextId = useRef(1000);
+  const homeTheme = tab === 'home' && editor === null && !showOnboarding;
 
   // Native Android Back should leave overlays before returning to Home.
   // React Native Modal handles its own Back press via onRequestClose.
@@ -75,13 +77,13 @@ function AppContent() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <StatusBar style="light"/>
-      <LinearGradient
+    <SafeAreaView style={[styles.safe, homeTheme && styles.homeSafe]} edges={['top', 'bottom']}>
+      <StatusBar style={homeTheme ? 'dark' : 'light'}/>
+      {!homeTheme && <LinearGradient
         style={StyleSheet.absoluteFill}
         colors={[colors.backgroundDeep, colors.background, '#103454']}
         start={{x: 0, y: 0}} end={{x: 1, y: 1}}
-      />
+      />}
       <View style={styles.body}>
         {showOnboarding ? (
           <OnboardingScreen
@@ -100,8 +102,9 @@ function AppContent() {
             onDelete={remove}
           />
         ) : tab === 'home' ? (
-          <DashboardScreen
+          <LivingLedgerDashboardScreen
             transactions={transactions}
+            onAdd={() => setEditor('new')}
             onOpenTransactions={() => setTab('transactions')}
           />
         ) : tab === 'transactions' ? (
@@ -130,8 +133,8 @@ function AppContent() {
         )}
       </View>
       {editor === null && !showOnboarding && (
-        <View style={styles.navOuter}>
-          <View style={styles.nav}>
+        <View style={[styles.navOuter, homeTheme && styles.homeNavOuter]}>
+          <View style={[styles.nav, homeTheme && styles.homeNav]}>
             {tabs.map(item => {
               const active = tab === item.key;
               return (
@@ -141,20 +144,24 @@ function AppContent() {
                   accessibilityState={{selected: active}}
                   accessibilityLabel={item.label}
                   onPress={() => setTab(item.key)}
-                  style={[styles.navItem, active && styles.navActive]}
+                  style={[styles.navItem, active && styles.navActive, homeTheme && active && styles.homeNavActive]}
                 >
                   <AppIcon
                     name={item.icon}
-                    color={active ? colors.primarySoft : colors.faint}
+                    color={homeTheme ? (active ? ledger.dark : ledger.subtext) : (active ? colors.primarySoft : colors.faint)}
                     size={21}
                     strokeWidth={active ? 2.3 : 1.8}
                   />
                   <Text
-                    style={[styles.navLabel, active && styles.navLabelActive]}
+                    style={[styles.navLabel, active && styles.navLabelActive, homeTheme && styles.homeNavLabel, homeTheme && active && styles.homeNavLabelActive]}
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
-                    {item.label}
+                    {homeTheme && item.key === 'transactions'
+                      ? 'Tarix'
+                      : homeTheme && item.key === 'home'
+                        ? 'Bosh'
+                        : item.label}
                   </Text>
                 </Pressable>
               );
@@ -173,7 +180,13 @@ export default function App() {
 const styles = StyleSheet.create({
   safe: {flex: 1, backgroundColor: colors.background},
   body: {flex: 1},
+  homeSafe: {backgroundColor: ledger.paper},
   navOuter: {paddingHorizontal: 16, paddingBottom: 8, paddingTop: 5},
+  homeNavOuter: {backgroundColor: ledger.paper, borderTopWidth: 1, borderTopColor: ledger.rule},
+  homeNav: {backgroundColor: ledger.paper, borderWidth: 0, borderRadius: 0},
+  homeNavActive: {backgroundColor: ledger.paleSage},
+  homeNavLabel: {color: ledger.subtext, fontSize: 11},
+  homeNavLabelActive: {color: ledger.dark},
   nav: {
     height: 70, borderRadius: radius.lg, backgroundColor: '#102F4C',
     borderWidth: 1, borderColor: 'rgba(151,220,255,0.14)',
