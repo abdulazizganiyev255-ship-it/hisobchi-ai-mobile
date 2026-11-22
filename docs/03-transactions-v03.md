@@ -5,6 +5,8 @@
 This is a **demo-only, in-memory** CRUD prototype for the Transactions tab. It does not connect to Supabase or persist data.
 
 Implemented:
+- UI refinement after mobile screenshot audit: large top CTA replaced by a floating thumb-reachable `+ Qo‘shish` above bottom navigation; list gets extra scroll-bottom clearance.
+- Income and expense totals moved under search/filter to two compact cards and explicitly labeled as **all demo records** (not filtered totals).
 - Grouped transaction history by ISO date.
 - Search by title, category, date text, or note.
 - Filters: All / Expenses / Income.
@@ -28,6 +30,9 @@ Automated:
 - GitHub Actions run both on pull requests to main and on stacked PRs targeting the v0.2 feature branch.
 
 Manual browser QA (Chrome Device Toolbar 393 x 852, then 360 x 800):
+- New `Qo‘shish` floating action is visible above bottom navigation during scrolling and opens the same editor; **must not obstruct the last row or footer** when scrolled to the bottom.
+- Two compact monetary summary cards appear below search/filter with income then expense; their totals reflect the whole demo session even when search/filter is active.
+
 1. **Operatsiyalar** → **Operatsiya qo‘shish**.
 2. Xarajat: **85 000 so‘m**, kategoriya **Kafe**, today's date, note. Save. It appears in the list and the expenses subtotal increases by 85 000.
 3. Open that row: edit to **120 000**, save. List and subtotal update (not double-count).
