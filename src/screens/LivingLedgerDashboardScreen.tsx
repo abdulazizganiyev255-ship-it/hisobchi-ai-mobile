@@ -147,7 +147,7 @@ export function LivingLedgerDashboardScreen({
 
         <View style={styles.sectionHeader}>
           <View style={styles.sectionHeadCopy}>
-            <Text style={styles.sectionOverline}>OYLIK XARAJAT</Text>
+            <Text style={styles.sectionOverline}>OYLIK XARAJAT · NAMUNA</Text>
             <Text style={styles.sectionTitle}>Xarajatlar ritmi</Text>
           </View>
           <View style={styles.periodSelector} accessibilityRole="radiogroup">
