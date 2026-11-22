@@ -54,7 +54,7 @@ export function ExpenseChart({ values }: { values: number[] }) {
         }),
       ),
     ),
-    ...[26, 58, 90, 122].map((y) =>
+    ...[17, 65, 112].map((y) =>
       React.createElement('line', {
         key: y,
         x1: 9,
@@ -91,12 +91,7 @@ export function ExpenseChart({ values }: { values: number[] }) {
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.axisLabels}>
-        <Text style={styles.axis}>6M</Text>
-        <Text style={styles.axis}>4M</Text>
-        <Text style={styles.axis}>2M</Text>
-        <Text style={styles.axis}>0</Text>
-      </View>
+      <View style={styles.axisLabels}><Text style={styles.axis}>100%</Text><Text style={styles.axis}>50%</Text><Text style={styles.axis}>0%</Text></View>
       <View style={styles.graph}>
         {chart}
         <View style={styles.monthLabels}>
@@ -111,7 +106,7 @@ export function ExpenseChart({ values }: { values: number[] }) {
 
 const styles = StyleSheet.create({
   wrapper: { flexDirection: 'row', gap: 10, marginTop: 16 },
-  axisLabels: { height: 126, justifyContent: 'space-between', alignItems: 'flex-end', width: 26 },
+  axisLabels: { height: 111, justifyContent: 'space-between', alignItems: 'flex-end', width: 32, paddingTop: 10 },
   axis: { fontSize: 11, color: colors.faint },
   graph: { flex: 1 },
   monthLabels: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 9, marginTop: -3 },
