@@ -14,7 +14,7 @@ import {
 import {
   displayDay, filterAndSortTransactions, TransactionFilter,
 } from '../data/transactions';
-import {colors, radius} from '../theme/tokens';
+import {colors, layout, radius} from '../theme/tokens';
 
 type Props = {
   transactions: Transaction[];
@@ -179,8 +179,8 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
                   />
                 </View>
               </View>
-              {dateError && <Text style={styles.rangeError}>{dateError}</Text>}
-              <Pressable onPress={applyCustom} accessibilityRole="button" style={styles.rangeApply}>
+              {dateError && <Text accessibilityLiveRegion="polite" style={styles.rangeError}>{dateError}</Text>}
+              <Pressable onPress={applyCustom} accessibilityRole="button" accessibilityLabel="Tanlangan sana oralig‘ini qo‘llash" style={styles.rangeApply}>
                 <Text style={styles.rangeApplyText}>Oraliqni qo‘llash</Text>
               </Pressable>
             </View>
@@ -243,7 +243,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
               : 'Birinchi demo operatsiyani qo‘shishdan boshlang.'}
           </Text>
           {hasFilters && (
-            <Pressable onPress={resetFilters} accessibilityRole="button" style={styles.clear}>
+            <Pressable onPress={resetFilters} accessibilityRole="button" accessibilityLabel="Barcha filtrlarni bekor qilish" style={styles.clear}>
               <Text style={styles.clearText}>Filtrni bekor qilish</Text>
             </Pressable>
           )}
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   periodPanel: {borderRadius: 15, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, padding: 12, gap: 12},
   periodPanelTitle: {fontSize: 11, fontWeight: '700', color: colors.muted},
   periodChips: {flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 7},
-  periodChip: {minHeight: 37, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, justifyContent: 'center'},
+  periodChip: {minHeight: layout.touchTarget, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, justifyContent: 'center'},
   periodChipActive: {backgroundColor: '#1D5679', borderColor: 'rgba(126,224,255,0.55)'},
   periodChipText: {fontSize: 11, color: colors.muted, fontWeight: '700'},
   periodChipActiveText: {color: colors.text},
@@ -324,11 +324,11 @@ const styles = StyleSheet.create({
   rangeLabel: {color: colors.muted, fontSize: 11},
   rangeInput: {borderWidth: 1, borderColor: colors.divider, borderRadius: 11, minHeight: 44, backgroundColor: '#153956', color: colors.text, paddingHorizontal: 9, fontSize: 13},
   rangeError: {color: '#FFB2B2', fontSize: 11},
-  rangeApply: {borderRadius: 12, backgroundColor: '#79D7F7', minHeight: 43, alignItems: 'center', justifyContent: 'center'},
+  rangeApply: {borderRadius: 12, backgroundColor: '#79D7F7', minHeight: layout.touchTarget, alignItems: 'center', justifyContent: 'center'},
   rangeApplyText: {color: colors.ink, fontSize: 13, fontWeight: '800'},
   resultsBar: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingHorizontal: 2},
   resultsText: {fontSize: 11, color: colors.muted},
-  resetButton: {paddingVertical: 8, paddingHorizontal: 9, borderRadius: 9, backgroundColor: colors.surfaceRaised},
+  resetButton: {minHeight: layout.touchTarget, paddingVertical: 8, paddingHorizontal: 9, borderRadius: 9, backgroundColor: colors.surfaceRaised, alignItems: 'center', justifyContent: 'center'},
   resetText: {fontSize: 11, fontWeight: '700', color: colors.primarySoft},
   totalsWrap: {gap: 8, marginTop: 1, marginBottom: 4},
   totalsCaption: {fontSize: 9, fontWeight: '700', letterSpacing: 0.9, color: colors.faint, marginLeft: 3},
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   emptyIcon: {height: 52, width: 52, borderRadius: 15, backgroundColor: '#1B4C70', justifyContent: 'center', alignItems: 'center'},
   emptyTitle: {color: colors.text, fontSize: 16, fontWeight: '800'},
   emptyBody: {textAlign: 'center', color: colors.muted, fontSize: 12, lineHeight: 19},
-  clear: {backgroundColor: colors.surfaceRaised, borderRadius: 12, padding: 12, marginTop: 5},
+  clear: {minHeight: layout.touchTarget, backgroundColor: colors.surfaceRaised, borderRadius: 12, padding: 12, marginTop: 5, alignItems: 'center', justifyContent: 'center'},
   clearText: {color: colors.primarySoft, fontSize: 12, fontWeight: '700'},
   footer: {fontSize: 10, lineHeight: 17, color: colors.faint, textAlign: 'center', paddingHorizontal: 8, marginTop: 6},
 });
