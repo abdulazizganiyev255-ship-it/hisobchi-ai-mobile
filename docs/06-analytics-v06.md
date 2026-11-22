@@ -1,5 +1,13 @@
 # Hisobchi AI — Analytics UI v0.6
 
+## v0.6.3 — UI density / spacing audit
+- No separate CSS phase is necessary: Expo React Native uses StyleSheet; RN Web maps the layout to CSS automatically.
+- Preserve font sizes for category names, figures and labels wherever possible; reduce excess **vertical padding/gaps** first.
+- Compact top hero, turnover KPI, chart summary and controls, and category row spacing. Keep selected-day tooltips and turnover values.
+- Chart view height reduced from 158 to 136 logical pixels; bar scaling target from 104 to 85 so bars do not overflow.
+- Preserve ScrollView, fixed bottom tab navigation and chart metric switching; the user should be able to scroll to the final comparison and disclaimer blocks.
+- CI checks compilation, financial calculations and filters. Manual mobile QA at 393×852, 360×800, 320×640 and font scale 1.3 is still required before merge.
+
 ## v0.6.2 — kunlik aylanma va izchil x-o‘qi
 - Umumiy aylanma **kirim + chiqim** (masalan 3 000 000 + 259 000 = **3 259 000 UZS**) sifatida Kunlik dinamika kartasida aniq, yuqori darajadagi KPI ko‘rsatiladi. Aylanma =/= sof farq (2 741 000 UZS).
 - Chiqim / Kirim / Aylanma segmentlari bir xil qayd etilgan kunlar o‘qini ishlatadi (19,20,21,22 noyabr); faqat tanlangan rejimda 0 bo‘lgan sanalar yashirilmaydi. Ularga 0 qiymatini uydirma balandliksiz, kichik bazaviy chiziq bilan ko‘rsatamiz.
