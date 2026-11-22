@@ -49,4 +49,50 @@ assert.equal(m.filterAndSortTransactions([food, salary], 'expense', 'oziq')[0].i
 assert.equal(m.filterAndSortTransactions([food, salary], 'all', 'NOT FOUND').length, 0);
 assert.equal(m.displayDay('2024-02-29'), '29 fevral');
 
-process.stdout.write('Transactions model tests passed.\n');
+
+const periodSource = fs.readFileSync(path.join(__dirname, '../src/data/periods.ts'), 'utf8');
+const periodCode = ts.transpileModule(periodSource, {
+  compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022},
+}).outputText;
+const periodSandbox = {module: {exports: {}}};
+periodSandbox.exports = periodSandbox.module.exports;
+vm.runInNewContext(periodCode, periodSandbox, {filename: 'periods.js'});
+const p = periodSandbox.module.exports;
+
+function sameRange(actual, start, end) {
+  assert.equal(actual.start, start);
+  assert.equal(actual.end, end);
+}
+assert.equal(p.getPeriodRange('all', '2026-11-22'), null);
+sameRange(p.getPeriodRange('week', '2026-11-22'), '2026-11-16', '2026-11-22');
+sameRange(p.getPeriodRange('week', '2026-11-23'), '2026-11-23', '2026-11-23');
+sameRange(p.getPeriodRange('week', '2027-01-03'), '2026-12-28', '2027-01-03');
+sameRange(p.getPeriodRange('month', '2024-02-29'), '2024-02-01', '2024-02-29');
+sameRange(p.getPeriodRange('last30', '2026-11-22'), '2026-10-24', '2026-11-22');
+sameRange(p.getPeriodRange('last30', '2024-03-01'), '2024-02-01', '2024-03-01');
+assert.equal(p.shiftCalendarDate('2024-03-01', -1), '2024-02-29');
+assert.equal(p.validateCustomRange('2026-11-01', '2026-11-22', '2026-11-22'), null);
+assert.ok(p.validateCustomRange('2026-11-31', '2026-11-22', '2026-11-22'));
+assert.ok(p.validateCustomRange('2026-11-23', '2026-11-22', '2026-11-22'));
+assert.ok(p.validateCustomRange('2026-11-01', '2026-11-23', '2026-11-22'));
+assert.ok(p.validateCustomRange('2025-02-29', '2025-03-01', '2026-11-22'));
+const dateRange = {start: '2026-11-20', end: '2026-11-22'};
+const periodFixture = [
+  {...food, id: 'first', occurredOn: '2026-11-19', amount: -5000},
+  {...salary, id: 'second', occurredOn: '2026-11-20', amount: 3000000},
+  {...food, id: 'third', occurredOn: '2026-11-22', amount: -85000},
+  {...food, id: 'future', occurredOn: '2026-11-23', amount: -1000},
+];
+const covered = p.transactionsInPeriod(periodFixture, dateRange);
+assert.equal(covered.length, 2);
+assert.equal(p.withinPeriod('2026-11-20', dateRange), true);
+assert.equal(p.withinPeriod('2026-11-22', dateRange), true);
+assert.equal(p.withinPeriod('2026-11-23', dateRange), false);
+const totals = p.sumTransactionTotals(covered);
+assert.equal(totals.income, 3000000);
+assert.equal(totals.expense, 85000);
+const empty = p.sumTransactionTotals([]);
+assert.equal(empty.income, 0);
+assert.equal(empty.expense, 0);
+
+process.stdout.write('Transactions + date-period model tests passed.\n');
