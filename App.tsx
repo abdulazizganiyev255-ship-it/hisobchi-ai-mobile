@@ -9,6 +9,7 @@ import {transactionFromDraft, type TransactionDraft} from './src/data/transactio
 import {DashboardScreen} from './src/screens/DashboardScreen';
 import {OtherScreen, type Tab} from './src/screens/OtherScreens';
 import {TransactionsScreen} from './src/screens/TransactionsScreen';
+import {AnalyticsScreen} from './src/screens/AnalyticsScreen';
 import {TransactionEditorScreen} from './src/screens/TransactionEditorScreen';
 import {colors, radius} from './src/theme/tokens';
 
@@ -76,6 +77,11 @@ function AppContent() {
             transactions={transactions}
             onAdd={() => setEditor('new')}
             onEdit={item => setEditor(item)}
+          />
+        ) : tab === 'analytics' ? (
+          <AnalyticsScreen
+            transactions={transactions}
+            onOpenTransactions={() => setTab('transactions')}
           />
         ) : (
           <OtherScreen tab={tab}/>

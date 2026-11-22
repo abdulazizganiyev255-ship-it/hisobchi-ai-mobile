@@ -1,5 +1,18 @@
 # 01 — Hisobchi AI Design System
 
+## Muhandislik chegaralari (v0.6.4)
+
+- **React** allaqachon ishlatilmoqda: `.tsx` komponentlar — React Native UI.
+- **TypeScript** komponent state, props va moliyaviy modellarni tip bilan tekshiradi.
+- **React Native StyleSheet** ilovaning rang, spacing, radius va layoutini belgilaydi; React Native Web brauzer uchun ularni CSS ga aylantiradi. Keyinroq alohida Java yoki React qatlamini qo‘shish shart emas.
+- **Kotlin/Java** faqat alohida native Android modul zarur bo‘lsa ishlatiladi. Hozir Expo boshqaruvidagi standart UI bilan davom etamiz.
+- **Tokenlar** `src/theme/tokens.ts`da markazlashadi; UI ekranlarda imkon qadar takroriy hardcoded rang, spacing va radius ishlatmaslik kerak. Keyingi refaktorda barcha ekranlar uchun qayta ishlatiladigan `MetricCard`, `PeriodPicker`, `SectionHeader` kabi komponentlar ajratiladi.
+- **Dizayn iteratsiyasi tartibi:** 1) ekranning asosiy savoli; 2) bloklarning ustuvorligi; 3) takroriy qiymatlarni kamaytirish; 4) tugmalar va touch-targetlar; 5) bo‘shliq/typography; 6) rang/gradient; 7) Web + native QA. Har mayda detal uchun alohida patch emas, ekran maqsadiga ko‘ra qaror.
+- **Tahlil v0.6.4 IA:** davrni tanlash → bitta KPI karta (sof farq, kirim, chiqim, jami aylanma) → Kunlik dinamika (filtr + ustunlar + tanlangan kun summasi) → kategoriya taqsimoti → oldingi davr cheklovi.
+- Joriy ekran uchun `Barchasi/Hafta/Oy/30 kun` doim ochiq emas: bir dona davr tugmasi ichida. Kunlik dinamikaning `Chiqim/Kirim/Aylanma` rejimlari grafikga tegishli, jami raqamlar ikkinchi marta katta bloklarda qaytarilmaydi.
+- **Responsive gate:** 320, 360 va 393 dp/px kengliklarda summalar kesilmasin, boshqaruvlar foydalaniladigan bo‘lsin; dinamik shrift 1.3x/1.5x va Android/iOS real qurilma alohida tekshirilsin.
+- Demo tranzaksiyalar sessiya xotirasida. `main` va Supabase schema ushbu dizayn refaktoridan o‘zgarmaydi.
+
 ## Ish jarayoni
 
 1. Ekranning asosiy savolini aniqlash: "Bugun qancha pulni xavfsiz sarflash mumkin?"
@@ -27,6 +40,6 @@
 
 ## Hozirgi chegaralar
 
-- Bu v0.1 frontend prototipi; auth/API yo‘q.
+- Ishlayotgan dizayn branchida Analytics UI v0.6.4 gacha yetdi; auth/API integratsiyasi hali yo‘q. Bu ishlab chiqarish versiyasi emas.
 - Grafik ko‘rsatkichlari va safe-to-spend moliyaviy hisoblashga asoslanmagan.
 - Runtime screenshot yoki haqiqiy qurilmada render ushbu muhitda sinovdan o‘tmagan.
