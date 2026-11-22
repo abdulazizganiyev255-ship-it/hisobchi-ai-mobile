@@ -11,6 +11,7 @@ import {OtherScreen, type Tab} from './src/screens/OtherScreens';
 import {TransactionsScreen} from './src/screens/TransactionsScreen';
 import {AnalyticsScreen} from './src/screens/AnalyticsScreen';
 import {TransactionEditorScreen} from './src/screens/TransactionEditorScreen';
+import {OnboardingScreen} from './src/screens/OnboardingScreen';
 import {colors, radius} from './src/theme/tokens';
 
 const tabs: {key: Tab; label: string; icon: IconName}[] = [
@@ -26,6 +27,7 @@ function AppContent() {
   const [tab, setTab] = useState<Tab>('home');
   const [transactions, setTransactions] = useState<Transaction[]>(() => [...demo.transactions]);
   const [editor, setEditor] = useState<EditorState>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const nextId = useRef(1000);
 
   const save = (draft: TransactionDraft) => {
@@ -59,7 +61,9 @@ function AppContent() {
         start={{x: 0, y: 0}} end={{x: 1, y: 1}}
       />
       <View style={styles.body}>
-        {editor !== null ? (
+        {showOnboarding ? (
+          <OnboardingScreen onExit={() => setShowOnboarding(false)}/>
+        ) : editor !== null ? (
           <TransactionEditorScreen
             key={editor === 'new' ? 'new' : editor.id}
             initial={editor === 'new' ? undefined : editor}
@@ -89,6 +93,7 @@ function AppContent() {
             transactionCount={transactions.length}
             onOpenTransactions={() => setTab('transactions')}
             onOpenAnalytics={() => setTab('analytics')}
+            onOpenOnboarding={() => setShowOnboarding(true)}
             onResetDemo={() => {
               setTransactions([...demo.transactions]);
               nextId.current = 1000;
@@ -96,7 +101,7 @@ function AppContent() {
           />
         )}
       </View>
-      {editor === null && (
+      {editor === null && !showOnboarding && (
         <View style={styles.navOuter}>
           <View style={styles.nav}>
             {tabs.map(item => {
