@@ -1,5 +1,15 @@
 # Hisobchi AI — Operatsiyalar muddat filtri v0.4 (demo)
 
+## UI revisiya — screenshot feedback (2026-11-22)
+
+- Oldingi variantda muddat chiplar qatori doimiy joy egallardi. Endi bitta `Muddat: Barchasi` tugmasi bor; bosilgandagina Hafta/Oy/30 kun/Oraliq tanlovlari ko‘rinadi.
+- Tezkor muddat tanlanganda ochilgan panel avtomatik yopiladi; `Oraliq` uchun sana maydonlari ko‘rinadi, tasdiqlangandan so‘ng yopiladi.
+- Sana xatosida panel yopilmasin va avvalgi aktiv muddat o‘zgarmasin.
+- `Tozalash` tugmasi ma'nosi noaniq: nomi `Filtrni bekor qilish`ga almashtirildi. Bu yozuvlarni o‘chirmaydi, faqat muddat, kirim/chiqim va qidiruvni tozalaydi.
+- Oldingi `actionDock` minHeight 64 + border/fonli alohida bar bo‘sh qoramtir joy hosil qilgan. U butunlay olib tashlandi. `Qo‘shish` ixcham tugmasi sarlavhaning o‘ng tarafida va bosh qism scroll tashqarisida; shu sabab pastdagi operatsiyalar ustiga chiqmaydi.
+- Kichik ekran QA: 320×640, 360×800 va 393×852; sarlavha va qo‘shish tugmasi bir qatorda sig‘ishi, muddat paneli to‘g‘ri ochilib yopilishi, `Filtrni bekor qilish` bosilganda barcha yozuvlar qaytishi kerak.
+
+
 ## UX auditdan keyingi o‘zgarish
 
 Foydalanuvchi screenshotda operatsiyalarning muddati bo‘yicha saralashni so‘radi. Tanlangan davrga mos summa va operatsiyalar ko‘rinishi kerak.
@@ -28,8 +38,8 @@ Foydalanuvchi screenshotda operatsiyalarning muddati bo‘yicha saralashni so‘
 4. Oraliq: 21–22 noyabr 2026 → 3 ta yozuv, kirim 0, chiqim 139 000.
 5. Noto‘g‘ri sana (2026-11-31), teskari davr, kelajak sanasi: xato ko‘rsatsin, avvalgi qo‘llangan filtrni o‘zgartirmasin.
 6. `Xarajat` filtri faqat chiqimlarni ko‘rsatsin; daromad jamisi tanlangan muddat bo‘yicha qolishini tushuntiruvchi label aniq.
-7. `Tozalash` → muddat barcha vaqt, tur barchasi, qidiruv bo‘sh; operatsiyalar qaytsin.
-8. Barcha ro‘yxat elementlarini pastga scroll qilganda `Qo‘shish` ularni yopmasin.
+7. `Filtrni bekor qilish` → muddat barcha vaqt, tur barchasi, qidiruv bo‘sh; operatsiyalar qaytsin. Ushbu tugma operatsiyalarni o‘chirmaydi.
+8. Barcha ro‘yxat elementlarini pastga scroll qilganda sarlavhadagi `Qo‘shish` tugmasi ko‘rinib turadi, lekin yozuvlarni yopmaydi; oldingi dock bo‘sh joyi yo‘q.
 9. Yangi operatsiya kiritilsa, shu sana tegishli muddat ichida bo‘lsa filtrda ko‘rinsin; aksi bo‘lsa faqat barcha va mos muddatda.
 10. TypeScript va `npm run test:transactions` xatosiz bo‘lsin.
 
