@@ -16,8 +16,9 @@ assert.match(transactions, /<ChoiceChip\b/, 'Transaction filters should use DS C
 assert.doesNotMatch(transactions, /styles\.actionArea|actionDock:/, 'No full-width background dock behind Add CTA');
 assert.match(transactions, /fab:\s*\{\s*position:\s*'absolute'/, 'Add CTA should float without an action rail');
 assert.match(transactions, /accessibilityLabel="Yangi operatsiya qo‘shish"/, 'Add CTA must have a screen-reader label');
-assert.match(transactions, /listViewport: \{flex: 1, marginBottom: 64\}/, 'Scroll viewport must end above the floating Add CTA');
-assert.match(transactions, /paddingBottom: 28/, 'Scrolled last transaction should remain reachable');
+assert.match(transactions, /listViewport: \{flex: 1\}/, 'List must fill the viewport without a 64dp strip');
+assert.doesNotMatch(transactions, /listViewport:\s*\{[^}]*marginBottom:/, 'Never recreate a full-width reserved FAB rail');
+assert.match(transactions, /paddingBottom: 116/, 'List needs scrollable bottom clearance past the floating FAB');
 assert.match(transactions, /testID="transactions-scroll"/, 'E2E must be able to check the actual list viewport');
 
 assert.match(dashboard, /<SurfaceCard\b/g, 'Dashboard must use shared surface cards');
@@ -35,6 +36,11 @@ assert.match(dashboard, /demoText:\{fontSize:typography\.size\.micro/, 'Demo dis
 assert.match(dashboard, /legendText:\{fontSize:typography\.size\.caption/, 'Demo chart disclosure should remain readable');
 assert.match(dashboard, /eyeBtn:\{minWidth:44,minHeight:44/, 'Balance visibility button requires a 44dp target');
 assert.match(dashboard, /Mustaqil demo grafik/, 'Compact dashboard chart must retain honest demo labeling');
+assert.match(dashboard, /const \[periodOpen,setPeriodOpen\] = useState\(false\)/, 'Monthly picker requires explicit open state');
+assert.match(dashboard, /accessibilityState=\{\{expanded: periodOpen\}\}/, 'Monthly period trigger must expose expanded state');
+assert.match(dashboard, /\(\['current', 'previous'\] as const\)\.map/, 'Monthly dropdown limited to two supported demo months');
+assert.match(dashboard, /setPeriod\(key\);\s*setPeriodOpen\(false\)/, 'Period selection must update model and close dropdown');
+assert.match(dashboard, /accessibilityLabel=\{'Oylik xarajat: ' \+ demo\.months\[key\]\.label\}/, 'Monthly options require explicit accessible labels');
 
 
 const analyticsUI = screen('src/screens/AnalyticsScreen.tsx');
