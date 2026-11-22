@@ -2,6 +2,9 @@ import {useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
+import {DateCalendar} from '../components/DateCalendar';
+import {DateRangeFields} from '../components/ds/DateRangeFields';
+import {EmptyState} from '../components/ds/EmptyState';
 import {ScreenHeader} from '../components/ds/ScreenHeader';
 import {ChoiceChip} from '../components/ds/ChoiceChip';
 import {TransactionRow} from '../components/TransactionRow';
@@ -38,6 +41,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
   const [customEnd, setCustomEnd] = useState(() => todayLocal());
   const [customApplied, setCustomApplied] = useState<DateRange | null>(null);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [calendarTarget, setCalendarTarget] = useState<'start' | 'end' | null>(null);
   const today = todayLocal();
   const range = getPeriodRange(period, today, customApplied);
   const selectedPeriodLabel = PERIOD_OPTIONS.find(option => option.key === period)?.label ?? 'Barchasi';
@@ -91,7 +95,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
       <View style={styles.headerBar}>
         <ScreenHeader
           title="Operatsiyalar"
-          subtitle={'Demo sessiya · ' + transactions.length + ' ta yozuv · UI v1.6'}
+          subtitle={'Demo sessiya · ' + transactions.length + ' ta yozuv · UI v1.9'}
           icon="receipt"
         />
       </View>
@@ -151,34 +155,12 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
           {customOpen && (
             <View style={styles.rangePanel}>
               <Text style={styles.rangeTitle}>Sana oralig‘ini tanlash</Text>
-              <View style={styles.rangeInputs}>
-                <View style={styles.rangeField}>
-                  <Text style={styles.rangeLabel}>Boshlanish</Text>
-                  <TextInput
-                    value={customStart}
-                    onChangeText={setCustomStart}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor={colors.faint}
-                    autoCapitalize="none"
-                    maxLength={10}
-                    accessibilityLabel="Boshlanish sanasi"
-                    style={styles.rangeInput}
-                  />
-                </View>
-                <View style={styles.rangeField}>
-                  <Text style={styles.rangeLabel}>Tugash</Text>
-                  <TextInput
-                    value={customEnd}
-                    onChangeText={setCustomEnd}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor={colors.faint}
-                    autoCapitalize="none"
-                    maxLength={10}
-                    accessibilityLabel="Tugash sanasi"
-                    style={styles.rangeInput}
-                  />
-                </View>
-              </View>
+              <DateRangeFields
+                start={customStart}
+                end={customEnd}
+                onOpenStart={() => setCalendarTarget('start')}
+                onOpenEnd={() => setCalendarTarget('end')}
+              />
               {dateError && <Text accessibilityLiveRegion="polite" style={styles.rangeError}>{dateError}</Text>}
               <Pressable onPress={applyCustom} accessibilityRole="button" accessibilityLabel="Tanlangan sana oralig‘ini qo‘llash" style={styles.rangeApply}>
                 <Text style={styles.rangeApplyText}>Oraliqni qo‘llash</Text>
@@ -186,6 +168,19 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
             </View>
           )}
         </View>
+      )}
+
+      {calendarTarget !== null && (
+        <DateCalendar
+          selectedDate={calendarTarget === 'start' ? customStart : customEnd}
+          onSelect={date => {
+            if (calendarTarget === 'start') setCustomStart(date);
+            else setCustomEnd(date);
+            setCalendarTarget(null);
+            setDateError(null);
+          }}
+          onCancel={() => setCalendarTarget(null)}
+        />
       )}
 
       <View style={styles.filters}>
@@ -234,19 +229,15 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
       </View>
 
       {filtered.length === 0 ? (
-        <View style={styles.empty}>
-          <View style={styles.emptyIcon}><AppIcon name="receipt" size={27} color={colors.primarySoft}/></View>
-          <Text style={styles.emptyTitle}>Operatsiya topilmadi</Text>
-          <Text style={styles.emptyBody}>
-            {transactions.length
-              ? 'Bu muddat yoki filtrga mos demo yozuv topilmadi.'
-              : 'Birinchi demo operatsiyani qo‘shishdan boshlang.'}
-          </Text>
-          {hasFilters && (
-            <Pressable onPress={resetFilters} accessibilityRole="button" accessibilityLabel="Barcha filtrlarni bekor qilish" style={styles.clear}>
-              <Text style={styles.clearText}>Filtrni bekor qilish</Text>
-            </Pressable>
-          )}
+        <View style={styles.emptySurface}>
+          <EmptyState
+            title={hasFilters ? 'Mos operatsiya topilmadi' : 'Operatsiyalar hali yo‘q'}
+            description={hasFilters
+              ? 'Tanlangan muddat, tur yoki qidiruvga mos yozuv mavjud emas.'
+              : 'Birinchi operatsiyani kiritib, moliyaviy tarixni boshlang.'}
+            actionLabel={hasFilters ? 'Filtrlarni tozalash' : 'Operatsiya qo‘shish'}
+            onAction={hasFilters ? resetFilters : onAdd}
+          />
         </View>
       ) : groups.map(group => (
         <View key={group.day} style={styles.group}>
@@ -363,7 +354,7 @@ const styles = StyleSheet.create({
   groupCount: {fontSize: 11, color: colors.faint},
   lightCard: {backgroundColor: colors.cardLight, borderRadius: radius.lg, paddingHorizontal: 15, paddingVertical: 7},
   divider: {height: 1, backgroundColor: '#CEE1EB', marginLeft: 57},
-  empty: {padding: 25, alignItems: 'center', gap: 10, backgroundColor: colors.surface, borderRadius: radius.lg},
+  emptySurface: {backgroundColor: colors.surface, borderRadius: radius.lg},
   emptyIcon: {height: 52, width: 52, borderRadius: 15, backgroundColor: '#1B4C70', justifyContent: 'center', alignItems: 'center'},
   emptyTitle: {color: colors.text, fontSize: 16, fontWeight: '800'},
   emptyBody: {textAlign: 'center', color: colors.muted, fontSize: 12, lineHeight: 19},

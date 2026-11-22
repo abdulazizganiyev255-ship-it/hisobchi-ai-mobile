@@ -95,4 +95,24 @@ assert.match(transactions, /rangeApply: \{[^\n]*minHeight: layout.touchTarget/, 
 assert.match(transactions, /resetButton: \{minHeight: layout.touchTarget/, 'Reset filters action needs >=44dp');
 assert.match(transactions, /accessibilityLiveRegion="polite"/, 'Date range errors announced accessibly');
 
-console.log('UI, transaction form, profile, onboarding and tap-target contracts passed. Mobile QA remains manual.');
+const rangeFields = screen('src/components/ds/DateRangeFields.tsx');
+const emptyState = screen('src/components/ds/EmptyState.tsx');
+
+assert.match(transactions, /<DateRangeFields\b/, 'Transactions custom range must reuse DS date fields');
+assert.match(transactions, /<DateCalendar\b/, 'Transactions custom range must open the date calendar');
+assert.match(transactions, /setCalendarTarget\('start'\)/, 'Start date can be opened');
+assert.match(transactions, /setCalendarTarget\('end'\)/, 'End date can be opened');
+assert.match(transactions, /setDateError\(null\)/, 'Calendar selection clears old range error');
+assert.doesNotMatch(transactions, /onChangeText=\{setCustomStart\}|onChangeText=\{setCustomEnd\}/, 'Custom dates must not require typing');
+assert.match(analyticsUI, /<DateRangeFields\b/, 'Analytics must reuse DS date fields');
+assert.match(rangeFields, /accessibilityRole="button"/, 'Date range triggers must be accessible');
+assert.match(rangeFields, /minHeight: layout.touchTarget \+ 2/, 'Date range must have >=44dp tap target');
+
+assert.match(transactions, /<EmptyState\b/, 'Transactions should use shared actionable empty state');
+assert.match(transactions, /onAction=\{hasFilters \? resetFilters : onAdd\}/, 'Empty action must reset filters or add a real transaction');
+assert.match(dashboard, /<EmptyState tone="light"/, 'Dashboard must show shared light empty state');
+assert.match(analyticsUI, /<EmptyState\b/, 'Analytics chart and categories must show shared empty state');
+assert.match(emptyState, /onAction \? \(/, 'Empty state must not show an inert action');
+assert.match(emptyState, /minHeight: layout.touchTarget/, 'Empty action must be tappable');
+
+console.log('UI, transaction form, profile, onboarding and tap-target and polish contracts passed. Mobile QA remains manual.');

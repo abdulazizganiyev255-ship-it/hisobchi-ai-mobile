@@ -6,6 +6,7 @@ import {ExpenseChart} from '../components/ExpenseChart';
 import {TransactionRow} from '../components/TransactionRow';
 import {SectionHeader} from '../components/ds/SectionHeader';
 import {SurfaceCard} from '../components/ds/SurfaceCard';
+import {EmptyState} from '../components/ds/EmptyState';
 import {demo, formatMoney, type Transaction} from '../data/demo';
 import {filterAndSortTransactions} from '../data/transactions';
 import {colors, radius, shadow, spacing} from '../theme/tokens';
@@ -83,7 +84,7 @@ export function DashboardScreen({onOpenTransactions, transactions}: {onOpenTrans
           }
         />
       </View>
-      {recent.length ? recent.map((item,i)=><React.Fragment key={item.id}>{i>0&&<View style={styles.separator}/>}<TransactionRow item={item} light/></React.Fragment>) : <Text style={styles.emptyTransactions}>Operatsiya mavjud emas</Text>}
+      {recent.length ? recent.map((item,i)=><React.Fragment key={item.id}>{i>0&&<View style={styles.separator}/>}<TransactionRow item={item} light/></React.Fragment>) : <EmptyState tone="light" title="Operatsiyalar yo‘q" description="Ro‘yxat hozircha bo‘sh. Operatsiyalar bo‘limida birinchi yozuvni qo‘shing." actionLabel="Operatsiyalarni ochish" onAction={onOpenTransactions}/>}
     </SurfaceCard>
     <Text style={styles.disclaimer}>Hisobchi AI · DS v1.1 · Balans va oylik grafik mustaqil demo qiymatlar</Text>
   </ScrollView>;
