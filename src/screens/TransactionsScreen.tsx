@@ -2,6 +2,8 @@ import {useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
+import {DateCalendar} from '../components/DateCalendar';
+import {DateRangeFields} from '../components/ds/DateRangeFields';
 import {ScreenHeader} from '../components/ds/ScreenHeader';
 import {ChoiceChip} from '../components/ds/ChoiceChip';
 import {TransactionRow} from '../components/TransactionRow';
@@ -38,6 +40,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
   const [customEnd, setCustomEnd] = useState(() => todayLocal());
   const [customApplied, setCustomApplied] = useState<DateRange | null>(null);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [calendarTarget, setCalendarTarget] = useState<'start' | 'end' | null>(null);
   const today = todayLocal();
   const range = getPeriodRange(period, today, customApplied);
   const selectedPeriodLabel = PERIOD_OPTIONS.find(option => option.key === period)?.label ?? 'Barchasi';
@@ -91,7 +94,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
       <View style={styles.headerBar}>
         <ScreenHeader
           title="Operatsiyalar"
-          subtitle={'Demo sessiya · ' + transactions.length + ' ta yozuv · UI v1.6'}
+          subtitle={'Demo sessiya · ' + transactions.length + ' ta yozuv · UI v1.9'}
           icon="receipt"
         />
       </View>
@@ -151,34 +154,12 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
           {customOpen && (
             <View style={styles.rangePanel}>
               <Text style={styles.rangeTitle}>Sana oralig‘ini tanlash</Text>
-              <View style={styles.rangeInputs}>
-                <View style={styles.rangeField}>
-                  <Text style={styles.rangeLabel}>Boshlanish</Text>
-                  <TextInput
-                    value={customStart}
-                    onChangeText={setCustomStart}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor={colors.faint}
-                    autoCapitalize="none"
-                    maxLength={10}
-                    accessibilityLabel="Boshlanish sanasi"
-                    style={styles.rangeInput}
-                  />
-                </View>
-                <View style={styles.rangeField}>
-                  <Text style={styles.rangeLabel}>Tugash</Text>
-                  <TextInput
-                    value={customEnd}
-                    onChangeText={setCustomEnd}
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor={colors.faint}
-                    autoCapitalize="none"
-                    maxLength={10}
-                    accessibilityLabel="Tugash sanasi"
-                    style={styles.rangeInput}
-                  />
-                </View>
-              </View>
+              <DateRangeFields
+                start={customStart}
+                end={customEnd}
+                onOpenStart={() => setCalendarTarget('start')}
+                onOpenEnd={() => setCalendarTarget('end')}
+              />
               {dateError && <Text accessibilityLiveRegion="polite" style={styles.rangeError}>{dateError}</Text>}
               <Pressable onPress={applyCustom} accessibilityRole="button" accessibilityLabel="Tanlangan sana oralig‘ini qo‘llash" style={styles.rangeApply}>
                 <Text style={styles.rangeApplyText}>Oraliqni qo‘llash</Text>
@@ -186,6 +167,19 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
             </View>
           )}
         </View>
+      )}
+
+      {calendarTarget !== null && (
+        <DateCalendar
+          selectedDate={calendarTarget === 'start' ? customStart : customEnd}
+          onSelect={date => {
+            if (calendarTarget === 'start') setCustomStart(date);
+            else setCustomEnd(date);
+            setCalendarTarget(null);
+            setDateError(null);
+          }}
+          onCancel={() => setCalendarTarget(null)}
+        />
       )}
 
       <View style={styles.filters}>
