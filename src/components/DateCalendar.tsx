@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Modal, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Modal, Pressable, StyleSheet, Text, View} from 'react-native';
 import {AppIcon} from './AppIcon';
 import {
   buildCalendarCells, calendarMonthTitle, canNavigateMonth,
