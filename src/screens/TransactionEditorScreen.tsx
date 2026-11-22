@@ -126,7 +126,7 @@ export function TransactionEditorScreen({initial, onCancel, onSave, onDelete}: P
             placeholderTextColor={colors.faint}
             autoCapitalize="none"
             maxLength={10}
-            style={[styles.field, styles.dateField, errors.occurredOn && styles.fieldInvalid]}
+            style={[styles.field, styles.dateField, Boolean(errors.occurredOn) && styles.fieldInvalid]}
           />
           <Pressable
             accessibilityRole="button"
