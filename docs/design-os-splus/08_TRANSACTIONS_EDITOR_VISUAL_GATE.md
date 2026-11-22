@@ -35,7 +35,7 @@
 - 320px calendar seven-column layout fits the width, disabled future dates and selected day visually distinguishable.
 - List after creation shows 100,000 UZS entry and sum increase.
 - Editor screenshot at 320px shows large input, form type, category; lower controls require vertical scroll and were exercised by browser E2E.
-- 320px first viewport shows only top of first transaction below summary. This is a **P2 density trade-off**; can be improved after user testing, but no action appears obstructed by an overlay.
+- First 320px screenshot revealed only a partial first transaction. **Fixed with compact short-screen spacing; latest screenshot displays the full first row without scrolling.** A geometry-based browser assertion confirms the row clears the bottom navigation.
 - Native font scaling/keyboard and screen-reader reading order remain unverified.
 
 ## Independent contrast sample (WCAG formula)
@@ -55,7 +55,7 @@ These validate selected palette roles only; they do not establish full WCAG comp
 | P0 release | No real Safe-to-Spend engine, secure user persistence or Auth/RLS | Keep DEMO; separate data-security workstream |
 | P1 native | TalkBack/VoiceOver, keyboard cover, focus restoration and 1.3×/2× font scaling untested | Native QA on representative Android and iOS |
 | P1 product | Other Analytics/Profile/Onboarding screens remain old themed | Move to Living Ledger by separate staged PRs and test before merge |
-| P2 UX | At 320px first transaction is below fold; too many blocks above it | Consider compact information architecture after usability evidence |
+| P2 UX | Original 320px first row was below fold | FIXED: compact spacing and browser geometry assertion; continue usability checks for real devices |
 | P2 architecture | Parallel legacy screens remain in repo for transition/source-contract safety | Remove only after PR chain merges safely and tests are updated |
 | P2 test | Existing legacy web smoke script targets old Home/Transactions texts | New Living Ledger suite is authoritative for new routes; update legacy suite when migration finishes |
 | P1 QA | No signed APK, native end-to-end or device screenshot signoff | Block release/production designation |
@@ -67,3 +67,11 @@ D11: multi-device/manual accessibility and performance tests.
 D12: score only once full target is rendered and verified; current 90+/S+ claim is not justified.
 
 No production data, bank or Supabase records changed in this PR.
+
+
+## Subsequent visual polish verified
+- **Latest actual code commit:** `583b2222ff2c964376f0eb8bcded7f6d7ee630c5`.
+- **Latest-head [GitHub Actions #45048609257](https://github.com/abdulazizganiyev255-ship-it/hisobchi-ai-mobile/actions/runs/45048609257): both jobs PASSED** (TypeScript, model tests, Web/Android JS exports and Chromium 320/360/393).
+- Dedicated 320×640 E2E assertion verifies the **first transaction row is completely visible above the bottom tab navigation** before scrolling. Verified by latest Chromium screenshot (artifacts in run).
+- Amount editor includes a guard to prevent duplicate synchronous submissions before navigation unmounts the form.
+- Still blocked: 2× dynamic fonts, iOS/Android device interaction, TalkBack/VoiceOver and real data integrations.
