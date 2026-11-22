@@ -23,6 +23,18 @@ assert.ok((dashboard.match(/<SectionHeader\b/g) || []).length >= 2, 'Dashboard s
 assert.match(dashboard, /Mustaqil demo grafik/, 'Dashboard static graph must be clearly labeled as separate demo data');
 assert.match(dashboard, /Balans va oylik grafik mustaqil demo qiymatlar/, 'Dashboard disclaimers should distinguish static demo figures');
 
+const analyticsUI = screen('src/screens/AnalyticsScreen.tsx');
+assert.match(analyticsUI, /<PeriodPicker\b/, 'Analytics must retain the compact period dropdown');
+assert.match(analyticsUI, /onChange=\{selectPeriod\}/, 'Analytics period selection must go through custom logic');
+assert.match(analyticsUI, /next === 'custom'/, 'Choosing custom period must open a range editor');
+assert.match(analyticsUI, /validateCustomRange\(customStart, customEnd, todayLocal\(\)\)/, 'Range must be validated before apply');
+assert.match(analyticsUI, /setAppliedRange\(\{start: customStart, end: customEnd\}\)/, 'Validated range must update analytics');
+assert.match(analyticsUI, /setPeriod\('custom'\)/, 'Custom period must be activated only on apply');
+assert.match(analyticsUI, /setSelectedDay\(null\)/, 'Changing the period must clear selected chart day');
+assert.match(analyticsUI, /<DateCalendar\b/, 'Analytics date fields must use a reusable calendar');
+assert.match(analyticsUI, /accessibilityLabel="Tanlangan sana oralig‘ini tahlilga qo‘llash"/, 'Custom apply button needs an accessibility label');
+assert.match(analyticsUI, /accessibilityLiveRegion="polite"/, 'Invalid ranges require accessible errors');
+
 const editor = screen('src/screens/TransactionEditorScreen.tsx');
 assert.match(editor, /<FormHeader\b/, 'Form must use shared FormHeader');
 assert.match(editor, /<DateCalendar\b/, 'Editor must render a calendar date picker');
