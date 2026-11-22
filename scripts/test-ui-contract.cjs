@@ -24,6 +24,18 @@ assert.match(dashboard, /<SurfaceCard\b/g, 'Dashboard must use shared surface ca
 assert.ok((dashboard.match(/<SectionHeader\b/g) || []).length >= 2, 'Dashboard sections need shared headers');
 assert.match(dashboard, /Mustaqil demo grafik/, 'Dashboard static graph must be clearly labeled as separate demo data');
 assert.match(dashboard, /Balans va oylik grafik mustaqil demo qiymatlar/, 'Dashboard disclaimers should distinguish static demo figures');
+const dashboardChart = screen('src/components/ExpenseChart.tsx');
+assert.match(dashboard, /<ExpenseChart values=\{month\.chart\} compact\s*\/>/, 'Only Dashboard should request compact chart');
+assert.match(dashboardChart, /compact = false/, 'Chart compact mode must be opt-in so existing usage is preserved');
+assert.match(dashboardChart, /height=\{compact \? 126 : 143\}/, 'Compact dashboard chart must use a shorter physical height');
+assert.match(dashboard, /balanceCard:\{minHeight:148/, 'Balance card density follows dashboard visual spec');
+assert.match(dashboard, /safeCard:\{borderRadius:radius\.lg,padding:14,minHeight:98/, 'Safe-to-Spend card density follows visual spec');
+assert.match(dashboard, /content:\{paddingHorizontal:layout\.screenGutter/, 'Dashboard spacing must use shared Design System gutter');
+assert.match(dashboard, /demoText:\{fontSize:typography\.size\.micro/, 'Demo disclosure must not use a sub-10dp font');
+assert.match(dashboard, /legendText:\{fontSize:typography\.size\.caption/, 'Demo chart disclosure should remain readable');
+assert.match(dashboard, /eyeBtn:\{minWidth:44,minHeight:44/, 'Balance visibility button requires a 44dp target');
+assert.match(dashboard, /Mustaqil demo grafik/, 'Compact dashboard chart must retain honest demo labeling');
+
 
 const analyticsUI = screen('src/screens/AnalyticsScreen.tsx');
 assert.match(analyticsUI, /<PeriodPicker\b/, 'Analytics must retain the compact period dropdown');
