@@ -3,7 +3,12 @@ import {Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-na
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
 import {TransactionRow} from '../components/TransactionRow';
-import {Transaction, formatMoney} from '../data/demo';
+import {type Transaction, formatMoney} from '../data/demo';
+import {todayLocal} from '../data/transactions';
+import {
+  PERIOD_OPTIONS, getPeriodRange, validateCustomRange, transactionsInPeriod,
+  sumTransactionTotals, shiftCalendarDate, type PeriodKey, type DateRange,
+} from '../data/periods';
 import {
   displayDay, filterAndSortTransactions, TransactionFilter,
 } from '../data/transactions';
@@ -24,9 +29,46 @@ const FILTERS: {key: TransactionFilter; label: string}[] = [
 export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [search, setSearch] = useState('');
-  const filtered = filterAndSortTransactions(transactions, filter, search);
-  const expenses = transactions.filter(t => t.amount < 0).reduce((sum, t) => sum - t.amount, 0);
-  const income = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+  const [period, setPeriod] = useState<PeriodKey>('all');
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customStart, setCustomStart] = useState(() => shiftCalendarDate(todayLocal(), -6));
+  const [customEnd, setCustomEnd] = useState(() => todayLocal());
+  const [customApplied, setCustomApplied] = useState<DateRange | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null);
+  const today = todayLocal();
+  const range = getPeriodRange(period, today, customApplied);
+  const periodItems = transactionsInPeriod(transactions, range);
+  const filtered = filterAndSortTransactions(periodItems, filter, search);
+  const {income, expense: expenses} = sumTransactionTotals(periodItems);
+  const hasFilters = period !== 'all' || filter !== 'all' || search.trim().length > 0;
+
+  const selectPeriod = (key: PeriodKey) => {
+    if (key === 'custom') {
+      setCustomOpen(value => !value);
+      setDateError(null);
+      return;
+    }
+    setPeriod(key);
+    setCustomOpen(false);
+    setDateError(null);
+  };
+  const applyCustom = () => {
+    const start = customStart.trim();
+    const end = customEnd.trim();
+    const error = validateCustomRange(start, end, today);
+    setDateError(error);
+    if (error) return;
+    setCustomApplied({start, end});
+    setPeriod('custom');
+    setCustomOpen(false);
+  };
+  const resetFilters = () => {
+    setPeriod('all');
+    setFilter('all');
+    setSearch('');
+    setCustomOpen(false);
+    setDateError(null);
+  };
   const groups: {day: string; items: Transaction[]}[] = [];
   for (const item of filtered) {
     const last = groups[groups.length - 1];
@@ -79,8 +121,76 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         })}
       </View>
 
+      <View style={styles.periodHeading}>
+        <Text style={styles.periodTitle}>Muddat</Text>
+        <Text style={styles.periodDate} numberOfLines={1}>
+          {range ? range.start + ' — ' + range.end : 'Barcha sanalar'}
+        </Text>
+      </View>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.periodChips}
+        accessibilityLabel="Operatsiyalar muddati"
+      >
+        {PERIOD_OPTIONS.map(option => {
+          const active = period === option.key || (option.key === 'custom' && customOpen);
+          return (
+            <Pressable
+              key={option.key}
+              accessibilityRole="button"
+              accessibilityState={{selected: active}}
+              accessibilityLabel={'Muddat: ' + option.label}
+              onPress={() => selectPeriod(option.key)}
+              style={[styles.periodChip, active && styles.periodChipActive]}
+            >
+              <Text style={[styles.periodChipText, active && styles.periodChipActiveText]}>
+                {option.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+      {customOpen && (
+        <View style={styles.rangePanel}>
+          <Text style={styles.rangeTitle}>Sana oralig‘ini tanlash</Text>
+          <View style={styles.rangeInputs}>
+            <View style={styles.rangeField}>
+              <Text style={styles.rangeLabel}>Boshlanish</Text>
+              <TextInput
+                value={customStart}
+                onChangeText={setCustomStart}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={colors.faint}
+                autoCapitalize="none"
+                maxLength={10}
+                accessibilityLabel="Boshlanish sanasi"
+                style={styles.rangeInput}
+              />
+            </View>
+            <View style={styles.rangeField}>
+              <Text style={styles.rangeLabel}>Tugash</Text>
+              <TextInput
+                value={customEnd}
+                onChangeText={setCustomEnd}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={colors.faint}
+                autoCapitalize="none"
+                maxLength={10}
+                accessibilityLabel="Tugash sanasi"
+                style={styles.rangeInput}
+              />
+            </View>
+          </View>
+          {dateError && <Text style={styles.rangeError}>{dateError}</Text>}
+          <Pressable onPress={applyCustom} accessibilityRole="button" style={styles.rangeApply}>
+            <Text style={styles.rangeApplyText}>Oraliqni qo‘llash</Text>
+          </Pressable>
+        </View>
+      )}
+
       <View style={styles.totalsWrap}>
-        <Text style={styles.totalsCaption}>BARCHA DEMO YOZUVLAR BO‘YICHA</Text>
+        <Text style={styles.totalsCaption}>TANLANGAN MUDDAT · DEMO YOZUVLARI</Text>
         <View style={styles.summary}>
           <View style={styles.summaryColumn}>
             <View style={styles.metricHeading}>
@@ -103,17 +213,26 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         </View>
       </View>
 
+      <View style={styles.resultsBar}>
+        <Text style={styles.resultsText}>{filtered.length} ta operatsiya topildi</Text>
+        {hasFilters && (
+          <Pressable onPress={resetFilters} accessibilityRole="button" style={styles.resetButton}>
+            <Text style={styles.resetText}>Tozalash</Text>
+          </Pressable>
+        )}
+      </View>
+
       {filtered.length === 0 ? (
         <View style={styles.empty}>
           <View style={styles.emptyIcon}><AppIcon name="receipt" size={27} color={colors.primarySoft}/></View>
           <Text style={styles.emptyTitle}>Operatsiya topilmadi</Text>
           <Text style={styles.emptyBody}>
             {transactions.length
-              ? 'Filtrni yoki qidiruv matnini o‘zgartiring.'
+              ? 'Bu muddat yoki filtrga mos demo yozuv topilmadi.'
               : 'Birinchi demo operatsiyani qo‘shishdan boshlang.'}
           </Text>
-          {(search || filter !== 'all') && (
-            <Pressable onPress={() => {setSearch(''); setFilter('all');}} style={styles.clear}>
+          {hasFilters && (
+            <Pressable onPress={resetFilters} style={styles.clear}>
               <Text style={styles.clearText}>Filtrni tozalash</Text>
             </Pressable>
           )}
@@ -145,6 +264,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         Ma’lumotlar faqat shu sessiya xotirasida. Yangilaganda dastlabki demo yozuvlar qaytadi.
       </Text>
       </ScrollView>
+      <View style={styles.actionDock}>
       <Pressable
         onPress={onAdd}
         accessibilityRole="button"
@@ -160,18 +280,40 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
           <Text style={styles.fabLabel}>Qo‘shish</Text>
         </LinearGradient>
       </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   fill: {flex: 1},
-  content: {padding: 20, paddingTop: 21, paddingBottom: 112, gap: 14},
+  content: {padding: 20, paddingTop: 21, paddingBottom: 38, gap: 12},
   header: {flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 3},
   icon: {width: 48, height: 48, borderRadius: 15, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center'},
   heading: {flex: 1},
   title: {fontSize: 24, fontWeight: '800', color: colors.text, letterSpacing: -0.6},
   caption: {color: colors.muted, fontSize: 11, marginTop: 3},
+  periodHeading: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 9, marginTop: 1},
+  periodTitle: {fontSize: 13, fontWeight: '800', color: colors.text},
+  periodDate: {fontSize: 10, color: colors.muted, flexShrink: 1},
+  periodChips: {flexDirection: 'row', alignItems: 'center', gap: 7, paddingRight: 5},
+  periodChip: {minHeight: 37, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, justifyContent: 'center'},
+  periodChipActive: {backgroundColor: '#1D5679', borderColor: 'rgba(126,224,255,0.55)'},
+  periodChipText: {fontSize: 11, color: colors.muted, fontWeight: '700'},
+  periodChipActiveText: {color: colors.text},
+  rangePanel: {borderWidth: 1, borderColor: colors.divider, padding: 14, borderRadius: radius.md, backgroundColor: colors.surface, gap: 11},
+  rangeTitle: {color: colors.text, fontSize: 13, fontWeight: '800'},
+  rangeInputs: {flexDirection: 'row', gap: 10},
+  rangeField: {flex: 1, minWidth: 0, gap: 5},
+  rangeLabel: {color: colors.muted, fontSize: 11},
+  rangeInput: {borderWidth: 1, borderColor: colors.divider, borderRadius: 11, minHeight: 44, backgroundColor: '#153956', color: colors.text, paddingHorizontal: 9, fontSize: 13},
+  rangeError: {color: '#FFB2B2', fontSize: 11},
+  rangeApply: {borderRadius: 12, backgroundColor: '#79D7F7', minHeight: 43, alignItems: 'center', justifyContent: 'center'},
+  rangeApplyText: {color: colors.ink, fontSize: 13, fontWeight: '800'},
+  resultsBar: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingHorizontal: 2},
+  resultsText: {fontSize: 11, color: colors.muted},
+  resetButton: {paddingVertical: 8, paddingHorizontal: 9, borderRadius: 9, backgroundColor: colors.surfaceRaised},
+  resetText: {fontSize: 11, fontWeight: '700', color: colors.primarySoft},
   totalsWrap: {gap: 8, marginTop: 1, marginBottom: 4},
   totalsCaption: {fontSize: 9, fontWeight: '700', letterSpacing: 0.9, color: colors.faint, marginLeft: 3},
   summary: {flexDirection: 'row', gap: 10},
@@ -187,11 +329,16 @@ const styles = StyleSheet.create({
   summaryLabel: {fontSize: 11, fontWeight: '600', color: colors.muted},
   summaryExpense: {fontSize: 17, fontWeight: '800', color: '#FFB2B2'},
   summaryIncome: {fontSize: 17, fontWeight: '800', color: '#6BE4BE'},
+  actionDock: {
+    minHeight: 64, flexDirection: 'row', justifyContent: 'flex-end',
+    paddingHorizontal: 20, paddingTop: 6, paddingBottom: 7,
+    borderTopWidth: 1, borderColor: colors.divider,
+    backgroundColor: 'rgba(7, 24, 44, 0.96)',
+  },
   fab: {
-    position: 'absolute', right: 20, bottom: 13, zIndex: 5,
     borderRadius: 999, overflow: 'hidden', shadowColor: '#20B4ED',
-    shadowOpacity: 0.32, shadowRadius: 16, shadowOffset: {width: 0, height: 7},
-    elevation: 8,
+    shadowOpacity: 0.24, shadowRadius: 14, shadowOffset: {width: 0, height: 5},
+    elevation: 4,
   },
   fabContent: {minWidth: 135, minHeight: 52, paddingHorizontal: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 9},
   fabLabel: {fontSize: 14, fontWeight: '800', color: colors.ink},
