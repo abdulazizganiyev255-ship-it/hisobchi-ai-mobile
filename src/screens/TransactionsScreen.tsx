@@ -100,7 +100,7 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         />
       </View>
       <ScrollView
-        style={styles.fill}
+        style={styles.listViewport}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.content}
@@ -287,7 +287,10 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
 
 const styles = StyleSheet.create({
   fill: {flex: 1},
-  content: {paddingHorizontal: 20, paddingTop: 8, paddingBottom: 118, gap: 12},
+  // Keep the floating CTA below the *clipped* list viewport: no row or amount
+  // is obscured, and no extra full-width colored action rail is added.
+  listViewport: {flex: 1, marginBottom: 64},
+  content: {paddingHorizontal: 20, paddingTop: 8, paddingBottom: 28, gap: 12},
   headerBar: {paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12},
   header: {flexDirection: 'row', alignItems: 'center', gap: 10},
   icon: {width: 44, height: 44, borderRadius: 14, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center'},
