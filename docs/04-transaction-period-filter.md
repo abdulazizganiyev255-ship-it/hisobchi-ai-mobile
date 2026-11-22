@@ -1,5 +1,14 @@
 # Hisobchi AI — Operatsiyalar muddat filtri v0.4 (demo)
 
+## v0.4.2 — 3-screenshot audit (kompakt joylashuv)
+- Foydalanuvchi talabiga ko‘ra muddat **alohida qatordan butunlay olib tashlandi**: endi qidiruv inputi bilan **bir qatorda** o‘ngda 100–112 px ixcham `Muddat` tugmasi, uni bosganda davrlar paneli inputning **ostida** ochiladi.
+- Tanlangan `Hafta`, `Oy`, `30 kun` va `Oraliq` qiymati yopiq chipda ko‘rinadi. To‘liq sana oralig‘i accessibility label va ochilgan panel sarlavhasida ko‘rsatiladi.
+- Sarlavha yonidagi `Qo‘shish` olib tashlandi; tugma qayta **pastki o‘ng** pozitsiyada. Uning atrofida alohida `actionDock`, qator, fon yoki border **yo‘q**.
+- Floating tugma mavjud kontent ustida turadi: ScrollView paddingBottom 106 px; **eng oxirgi yozuvni pastga scroll qilib to‘liq ko‘rish** manual vizual QA mezoni.
+- O‘zgarishlarni eski versiyadan farqlash uchun UI ichida `UI v0.4.2` yozuvi bor.
+- Qidiruvning ekranga sig‘ishi uchun placeholder `Qidirish...` ga qisqartirildi, accessibility labelida kategoriya/izoh bo‘yicha qidiruv aniq qoldi.
+- **Hali sinovdan o‘tmagan:** haqiqiy Chrome 320×640/360×800/393×852 vizual render, ochiladigan panel, keyboard cover, scroll ostidagi button, ikkita bir-birini yopadigan CTA yo‘qligi. TypeScript va model testlari CI bilan tekshiriladi.
+
 ## UI revisiya — screenshot feedback (2026-11-22)
 
 - Oldingi variantda muddat chiplar qatori doimiy joy egallardi. Endi bitta `Muddat: Barchasi` tugmasi bor; bosilgandagina Hafta/Oy/30 kun/Oraliq tanlovlari ko‘rinadi.
