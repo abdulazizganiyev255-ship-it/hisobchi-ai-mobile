@@ -1,5 +1,13 @@
 # Hisobchi AI — Analytics UI v0.6
 
+## v0.6.4 — information hierarchy, not just small spacing patches
+- Screenshot audit found repeated large totals: net in hero, turnover in nested card, same expense again as chart total and category amount. Prominence was inconsistent.
+- Updated hierarchy: compact period dropdown → one financial KPI hero (net, income, expense, turnover) → chart first (single chart metric selector, no duplicate sum) → compact category breakdown → history-comparison limitation.
+- Period options open on demand only; chart control chips remain visible so user understands which figure is drawn.
+- Net calculation and financial aggregation functions unchanged. The actual chart remains real session-demo data, not backend values.
+- No backend, Supabase or main branch modification.
+- Automatic tests: TypeScript, transaction model, analytics. Chrome screenshot + 320/360/393 px visual tests and Android/iOS checks remain manual.
+
 ## v0.6.3 — UI density / spacing audit
 - No separate CSS phase is necessary: Expo React Native uses StyleSheet; RN Web maps the layout to CSS automatically.
 - Preserve font sizes for category names, figures and labels wherever possible; reduce excess **vertical padding/gaps** first.
