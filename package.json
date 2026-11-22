@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check": "npx expo install --check",
     "test:transactions": "node scripts/test-transactions.cjs",
-    "test:analytics": "node scripts/test-analytics.cjs"
+    "test:analytics": "node scripts/test-analytics.cjs",
+    "test:design-system": "node scripts/test-design-system.cjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.17",

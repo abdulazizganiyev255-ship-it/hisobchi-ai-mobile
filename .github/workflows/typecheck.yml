@@ -2,7 +2,7 @@ name: TypeScript validation
 
 on:
   pull_request:
-    branches: [main, feat/dashboard-premium-v02, feat/transactions-v03, feat/transactions-date-range-v04]
+    branches: [main, feat/dashboard-premium-v02, feat/transactions-v03, feat/transactions-date-range-v04, feat/analytics-premium-v06]
   push:
     branches: [main]
 
@@ -23,3 +23,5 @@ jobs:
         run: npm run test:transactions
       - name: Analytics aggregation tests
         run: npm run test:analytics
+      - name: Design system and contrast tests
+        run: npm run test:design-system
