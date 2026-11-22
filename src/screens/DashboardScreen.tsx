@@ -9,7 +9,7 @@ import {SurfaceCard} from '../components/ds/SurfaceCard';
 import {EmptyState} from '../components/ds/EmptyState';
 import {demo, formatMoney, type Transaction} from '../data/demo';
 import {filterAndSortTransactions} from '../data/transactions';
-import {colors, layout, radius, shadow, spacing, typography} from '../theme/tokens';
+import {colors, layout, radius, shadow, typography} from '../theme/tokens';
 
 export function DashboardScreen({onOpenTransactions, transactions}: {onOpenTransactions:()=>void; transactions:Transaction[]}) {
   const [visible,setVisible] = useState(true);
