@@ -91,23 +91,8 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
           <View style={styles.icon}><AppIcon name="receipt" color={colors.primary} size={23}/></View>
           <View style={styles.heading}>
             <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>Operatsiyalar</Text>
-            <Text style={styles.caption}>Demo sessiya · {transactions.length} ta yozuv · UI v0.4.1</Text>
+            <Text style={styles.caption}>Demo sessiya · {transactions.length} ta yozuv · UI v0.4.2</Text>
           </View>
-          <Pressable
-            onPress={onAdd}
-            accessibilityRole="button"
-            accessibilityLabel="Yangi operatsiya qo‘shish"
-            style={styles.headerAdd}
-          >
-            <LinearGradient
-              colors={['#A0E9FF', '#44BEEB']}
-              start={{x: 0, y: 0}} end={{x: 1, y: 1}}
-              style={styles.headerAddInner}
-            >
-              <AppIcon name="plus" color={colors.ink} size={19} strokeWidth={2.5}/>
-              <Text style={styles.headerAddText}>Qo‘shish</Text>
-            </LinearGradient>
-          </Pressable>
         </View>
       </View>
       <ScrollView
@@ -116,36 +101,16 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.content}
       >
-      <TextInput
-        value={search}
-        onChangeText={setSearch}
-        placeholder="Kategoriya yoki izoh bo‘yicha qidirish"
-        placeholderTextColor={colors.faint}
-        accessibilityLabel="Operatsiyalarni qidirish"
-        autoCapitalize="none"
-        style={styles.search}
-      />
-
-      <View style={styles.filters}>
-        {FILTERS.map(option => {
-          const selected = filter === option.key;
-          return (
-            <Pressable
-              key={option.key}
-              onPress={() => setFilter(option.key)}
-              accessibilityRole="button"
-              accessibilityState={{selected}}
-              style={[styles.filter, selected && styles.filterActive]}
-            >
-              <Text style={[styles.filterText, selected && styles.filterTextActive]}>
-                {option.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      <View style={styles.periodHeading}>
+      <View style={styles.searchPeriodRow}>
+        <TextInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder="Qidirish..."
+          placeholderTextColor={colors.faint}
+          accessibilityLabel="Kategoriya yoki izoh bo‘yicha qidirish"
+          autoCapitalize="none"
+          style={[styles.search, styles.searchInline]}
+        />
         <Pressable
           onPress={() => {
             setPeriodOpen(previous => !previous);
@@ -157,15 +122,13 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
           accessibilityState={{expanded: periodOpen}}
           style={[styles.periodTrigger, periodOpen && styles.periodTriggerActive]}
         >
-          <Text style={styles.periodTitle}>Muddat</Text>
-          <Text style={styles.periodChosen} numberOfLines={1}>
-            {selectedPeriodLabel}{range ? ' · ' + rangeLabel : ''}
-          </Text>
-          <AppIcon name="chevron-down" color={colors.primarySoft} size={16}/>
+          <Text style={styles.periodTitle} numberOfLines={1}>{selectedPeriodLabel === 'Barchasi' ? 'Muddat' : selectedPeriodLabel}</Text>
+          <AppIcon name="chevron-down" color={colors.primarySoft} size={15}/>
         </Pressable>
       </View>
       {periodOpen && (
         <View style={styles.periodPanel}>
+          <Text style={styles.periodPanelTitle}>Muddatni tanlang · {rangeLabel}</Text>
           <View style={styles.periodChips}>
             {PERIOD_OPTIONS.map(option => {
               const active = customOpen ? option.key === 'custom' : period === option.key;
@@ -186,44 +149,63 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
             })}
           </View>
           {customOpen && (
-        <View style={styles.rangePanel}>
-          <Text style={styles.rangeTitle}>Sana oralig‘ini tanlash</Text>
-          <View style={styles.rangeInputs}>
-            <View style={styles.rangeField}>
-              <Text style={styles.rangeLabel}>Boshlanish</Text>
-              <TextInput
-                value={customStart}
-                onChangeText={setCustomStart}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.faint}
-                autoCapitalize="none"
-                maxLength={10}
-                accessibilityLabel="Boshlanish sanasi"
-                style={styles.rangeInput}
-              />
+            <View style={styles.rangePanel}>
+              <Text style={styles.rangeTitle}>Sana oralig‘ini tanlash</Text>
+              <View style={styles.rangeInputs}>
+                <View style={styles.rangeField}>
+                  <Text style={styles.rangeLabel}>Boshlanish</Text>
+                  <TextInput
+                    value={customStart}
+                    onChangeText={setCustomStart}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor={colors.faint}
+                    autoCapitalize="none"
+                    maxLength={10}
+                    accessibilityLabel="Boshlanish sanasi"
+                    style={styles.rangeInput}
+                  />
+                </View>
+                <View style={styles.rangeField}>
+                  <Text style={styles.rangeLabel}>Tugash</Text>
+                  <TextInput
+                    value={customEnd}
+                    onChangeText={setCustomEnd}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor={colors.faint}
+                    autoCapitalize="none"
+                    maxLength={10}
+                    accessibilityLabel="Tugash sanasi"
+                    style={styles.rangeInput}
+                  />
+                </View>
+              </View>
+              {dateError && <Text style={styles.rangeError}>{dateError}</Text>}
+              <Pressable onPress={applyCustom} accessibilityRole="button" style={styles.rangeApply}>
+                <Text style={styles.rangeApplyText}>Oraliqni qo‘llash</Text>
+              </Pressable>
             </View>
-            <View style={styles.rangeField}>
-              <Text style={styles.rangeLabel}>Tugash</Text>
-              <TextInput
-                value={customEnd}
-                onChangeText={setCustomEnd}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.faint}
-                autoCapitalize="none"
-                maxLength={10}
-                accessibilityLabel="Tugash sanasi"
-                style={styles.rangeInput}
-              />
-            </View>
-          </View>
-          {dateError && <Text style={styles.rangeError}>{dateError}</Text>}
-          <Pressable onPress={applyCustom} accessibilityRole="button" style={styles.rangeApply}>
-            <Text style={styles.rangeApplyText}>Oraliqni qo‘llash</Text>
-          </Pressable>
-          </View>
           )}
         </View>
       )}
+
+      <View style={styles.filters}>
+        {FILTERS.map(option => {
+          const selected = filter === option.key;
+          return (
+            <Pressable
+              key={option.key}
+              onPress={() => setFilter(option.key)}
+              accessibilityRole="button"
+              accessibilityState={{selected}}
+              style={[styles.filter, selected && styles.filterActive]}
+            >
+              <Text style={[styles.filterText, selected && styles.filterTextActive]}>
+                {option.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
       <View style={styles.totalsWrap}>
         <Text style={styles.totalsCaption}>TANLANGAN MUDDAT · DEMO YOZUVLARI</Text>
@@ -300,28 +282,41 @@ export function TransactionsScreen({transactions, onAdd, onEdit}: Props) {
         Ma’lumotlar faqat shu sessiya xotirasida. Yangilaganda dastlabki demo yozuvlar qaytadi.
       </Text>
       </ScrollView>
+      <Pressable
+        onPress={onAdd}
+        accessibilityRole="button"
+        accessibilityLabel="Yangi operatsiya qo‘shish"
+        style={styles.fab}
+      >
+        <LinearGradient
+          colors={['#A0E9FF', '#44BEEB']}
+          start={{x: 0, y: 0}} end={{x: 1, y: 1}}
+          style={styles.fabContent}
+        >
+          <AppIcon name="plus" color={colors.ink} size={21} strokeWidth={2.5}/>
+          <Text style={styles.fabLabel}>Qo‘shish</Text>
+        </LinearGradient>
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   fill: {flex: 1},
-  content: {paddingHorizontal: 20, paddingTop: 8, paddingBottom: 36, gap: 12},
+  content: {paddingHorizontal: 20, paddingTop: 8, paddingBottom: 106, gap: 12},
   headerBar: {paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12},
   header: {flexDirection: 'row', alignItems: 'center', gap: 10},
   icon: {width: 44, height: 44, borderRadius: 14, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center'},
   heading: {flex: 1, minWidth: 0},
   title: {fontSize: 22, fontWeight: '800', color: colors.text, letterSpacing: -0.6},
   caption: {color: colors.muted, fontSize: 10, marginTop: 3},
-  headerAdd: {borderRadius: 14, overflow: 'hidden'},
-  headerAddInner: {minHeight: 44, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5},
-  headerAddText: {fontSize: 12, fontWeight: '800', color: colors.ink},
-  periodHeading: {marginTop: 2},
-  periodTrigger: {minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 13, borderRadius: 13, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface},
+  searchPeriodRow: {flexDirection: 'row', gap: 9, alignItems: 'center'},
+  searchInline: {flex: 1, minWidth: 0},
+  periodTrigger: {minWidth: 100, maxWidth: 112, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, paddingHorizontal: 10, borderRadius: 13, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface},
   periodTriggerActive: {borderColor: colors.primary},
-  periodTitle: {fontSize: 12, fontWeight: '800', color: colors.text},
-  periodChosen: {fontSize: 12, fontWeight: '700', color: colors.primarySoft, flex: 1, textAlign: 'right'},
+  periodTitle: {fontSize: 11, fontWeight: '800', color: colors.primarySoft, flexShrink: 1},
   periodPanel: {borderRadius: 15, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, padding: 12, gap: 12},
+  periodPanelTitle: {fontSize: 11, fontWeight: '700', color: colors.muted},
   periodChips: {flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 7},
   periodChip: {minHeight: 37, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.divider, justifyContent: 'center'},
   periodChipActive: {backgroundColor: '#1D5679', borderColor: 'rgba(126,224,255,0.55)'},
@@ -355,6 +350,9 @@ const styles = StyleSheet.create({
   summaryLabel: {fontSize: 11, fontWeight: '600', color: colors.muted},
   summaryExpense: {fontSize: 17, fontWeight: '800', color: '#FFB2B2'},
   summaryIncome: {fontSize: 17, fontWeight: '800', color: '#6BE4BE'},
+  fab: {position: 'absolute', right: 20, bottom: 12, zIndex: 10, borderRadius: 999, overflow: 'hidden', shadowColor: '#20B4ED', shadowOpacity: 0.28, shadowRadius: 12, shadowOffset: {width: 0, height: 5}, elevation: 7},
+  fabContent: {minWidth: 134, minHeight: 52, paddingHorizontal: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 9},
+  fabLabel: {fontSize: 14, fontWeight: '800', color: colors.ink},
   search: {minHeight: 49, borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: colors.divider, backgroundColor: colors.surface, color: colors.text, fontSize: 12},
   filters: {flexDirection: 'row', padding: 4, gap: 5, backgroundColor: colors.surface, borderRadius: 15},
   filter: {flex: 1, minHeight: 39, borderRadius: 12, alignItems: 'center', justifyContent: 'center'},
