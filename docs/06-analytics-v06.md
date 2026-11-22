@@ -1,5 +1,14 @@
 # Hisobchi AI — Analytics UI v0.6
 
+## v0.6.2 — kunlik aylanma va izchil x-o‘qi
+- Umumiy aylanma **kirim + chiqim** (masalan 3 000 000 + 259 000 = **3 259 000 UZS**) sifatida Kunlik dinamika kartasida aniq, yuqori darajadagi KPI ko‘rsatiladi. Aylanma =/= sof farq (2 741 000 UZS).
+- Chiqim / Kirim / Aylanma segmentlari bir xil qayd etilgan kunlar o‘qini ishlatadi (19,20,21,22 noyabr); faqat tanlangan rejimda 0 bo‘lgan sanalar yashirilmaydi. Ularga 0 qiymatini uydirma balandliksiz, kichik bazaviy chiziq bilan ko‘rsatamiz.
+- Har bir sanani tanlash bilan rejimga tegishli aniq summa **va shu kunning jami aylanmasi** ko‘rsatiladi.
+- Aylanma rejimida 20-noyabrdagi 3 000 000 so‘mlik kirim kattaroq ustun hosil qiladi: bu to‘g‘ri masshtab, chunki ko‘rsatkich jami pul harakati. Chiqim rejimida kichik xarajatlarni alohida o‘qish mumkin.
+- Tanlangan davr bo‘yicha jami aylanma to‘liq yozuvlardan hisoblanadi; grafik esa maksimum so‘nggi 7 ta qayd etilgan kunni ko‘rsatadi. Ushbu farq matnda oshkor qilingan.
+- Empty-state, tor ekran, kun tanlash, ikkita metric toggle, navigatsiya va forma regressiyasi keyingi Chrome visual QA’da tekshiriladi.
+- GitHub CI’da npm run test:analytics: aylanma/net farqi, 0 chiqimli kirim kuni, 22-noyabr guruhlangan chiqim 97 000, qo‘shimcha tranzaksiya, bo‘sh davr sinovlari.
+
 ## v0.6.1 screenshot audit and chart fix
 - Mobile QA observed that income 3 000 000 UZS dwarfed all smaller expense bars on a shared axis. Although mathematically valid, it made the spending trend visually unreadable.
 - The Pul oqimi panel is now Kunlik dinamika, with a Chiqim / Kirim segmented selector. Default is Chiqim.
