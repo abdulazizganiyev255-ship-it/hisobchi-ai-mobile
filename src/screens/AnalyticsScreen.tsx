@@ -11,6 +11,7 @@ import {SurfaceCard} from '../components/ds/SurfaceCard';
 import {PeriodPicker} from '../components/ds/PeriodPicker';
 import {ChoiceChip} from '../components/ds/ChoiceChip';
 import {DateCalendar} from '../components/DateCalendar';
+import {DateRangeFields} from '../components/ds/DateRangeFields';
 import type {Transaction} from '../data/demo';
 import {formatMoney} from '../data/demo';
 import {
@@ -84,7 +85,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
         title="Tahlil"
         subtitle="Qayd etilgan operatsiyalar · demo"
         icon="chart"
-        trailing={<View style={styles.demoPill}><Text style={styles.demoPillText}>UI v1.7</Text></View>}
+        trailing={<View style={styles.demoPill}><Text style={styles.demoPillText}>UI v1.9</Text></View>}
       />
 
       <PeriodPicker
@@ -107,32 +108,12 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
               <Text style={styles.customCancelText}>Bekor qilish</Text>
             </Pressable>
           </View>
-          <View style={styles.customDateRow}>
-            <View style={styles.customDateColumn}>
-              <Text style={styles.customLabel}>Boshlanish</Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={'Boshlanish sanasi: ' + customStart + '. Kalendarni ochish'}
-                onPress={() => setCalendarTarget('start')}
-                style={styles.customDateButton}
-              >
-                <AppIcon name="calendar" size={17} color={colors.primarySoft}/>
-                <Text style={styles.customDateText} numberOfLines={1} adjustsFontSizeToFit>{customStart}</Text>
-              </Pressable>
-            </View>
-            <View style={styles.customDateColumn}>
-              <Text style={styles.customLabel}>Tugash</Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={'Tugash sanasi: ' + customEnd + '. Kalendarni ochish'}
-                onPress={() => setCalendarTarget('end')}
-                style={styles.customDateButton}
-              >
-                <AppIcon name="calendar" size={17} color={colors.primarySoft}/>
-                <Text style={styles.customDateText} numberOfLines={1} adjustsFontSizeToFit>{customEnd}</Text>
-              </Pressable>
-            </View>
-          </View>
+          <DateRangeFields
+            start={customStart}
+            end={customEnd}
+            onOpenStart={() => setCalendarTarget('start')}
+            onOpenEnd={() => setCalendarTarget('end')}
+          />
           {dateError ? <Text accessibilityLiveRegion="polite" style={styles.customError}>{dateError}</Text> : null}
           <Pressable
             accessibilityRole="button"
@@ -352,7 +333,7 @@ export function AnalyticsScreen({transactions, onOpenTransactions}: Props) {
         </View>
       </View>
       <Text style={styles.footer}>
-        Hisobchi AI · UI v1.7 · demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
+        Hisobchi AI · UI v1.9 · demo. Natijalar shu sessiyadagi operatsiyalardan hisoblanadi,
         serverda saqlanmaydi. Dashboard balansi va Safe-to-Spend hali mustaqil namuna.
       </Text>
     </ScrollView>
