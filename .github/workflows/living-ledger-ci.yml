@@ -5,10 +5,12 @@ on:
     branches:
       - design/splus-living-ledger-home-v01
       - design/splus-living-ledger-transactions-v02
+      - design/splus-living-ledger-analytics-v03
   pull_request:
     branches:
       - design/splus-d01-d03-ux-concepts
       - design/splus-living-ledger-home-v01
+      - design/splus-living-ledger-transactions-v02
 
 jobs:
   model-and-bundle:
@@ -64,6 +66,7 @@ jobs:
         run: |
           node scripts/test-living-ledger-web.cjs
           node scripts/test-living-ledger-workflows.cjs
+          node scripts/test-ledger-analytics-web.cjs
       - name: Expo logs on failure
         if: failure()
         run: cat /tmp/living-ledger-expo.log || true
