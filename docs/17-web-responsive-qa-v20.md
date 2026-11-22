@@ -5,7 +5,7 @@ Previous CI passed source-contract tests and pure finance model calculations; it
 
 ## Tested flow per width
 1. Home loads, summary visible, no document-level horizontal overflow.
-2. Transactions opens; 5 baseline demo records and 259,000 UZS expense; floating Add CTA visible and above tab bar.
+2. Transactions opens; 5 baseline demo records and 259,000 UZS expense; floating Add CTA visible above tab bar **and below the clipped scroll viewport**, so the button never covers a row's amount (confirmed defect in first 320px screenshot, then fixed). No full-width blue dock was reintroduced.
 3. Search an impossible term → actionable empty state; clear filters → 5 records.
 4. Add operation: open the new editor, open and cancel date calendar, enter 100,000 UZS expense, save → 6 records, 359,000 UZS total expense.
 5. Analytics displays net 2,641,000 UZS and turnover 3,359,000 UZS.
