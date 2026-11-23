@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View, useWindowDimensions} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import type {DimensionValue} from 'react-native';
@@ -45,7 +45,7 @@ export function Stage06PreviewScreen(){
   };
   const bottom= <View style={s.bottom}>{nav.map(item=><Pressable key={item.id} accessibilityRole="tab" accessibilityState={{selected:tab===item.id}} accessibilityLabel={item.label} onPress={()=>setTab(item.id)} style={[s.navItem,tab===item.id&&s.navActive]}><Text style={[s.navIcon,tab===item.id&&s.navActiveText]}>{item.icon}</Text><Text style={[s.navText,tab===item.id&&s.navActiveText]}>{item.label}</Text></Pressable>)}</View>;
   return <SafeAreaView style={s.safe} edges={['top','bottom']}>
-    <StatusBar barStyle="dark-content" backgroundColor={c.bg}/>
+    <StatusBar barStyle="dark-content"/>
     <ScrollView style={s.scroll} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
       <View style={s.top}><View><Text style={s.brand}>hisobchi<Text style={{color:c.cobalt}}>●</Text></Text><Text style={s.subBrand}>Moliyangiz — aniq va tushunarli.</Text></View><View style={s.avatar}><Text style={s.avatarText}>H</Text></View></View>
       <DemoPill/>
