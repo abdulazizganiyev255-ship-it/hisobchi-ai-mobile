@@ -7,6 +7,7 @@ import {AppIcon, IconName} from './src/components/AppIcon';
 import {DashboardScreen} from './src/screens/DashboardScreen';
 import {OtherScreen, Tab} from './src/screens/OtherScreens';
 import {colors, radius} from './src/theme/tokens';
+import {Stage06PreviewScreen} from './src/design-os06/Stage06PreviewScreen';
 
 const tabs:{key:Tab;label:string;icon:IconName}[]=[
   {key:'home',label:'Bosh sahifa',icon:'home'},
@@ -33,7 +34,7 @@ function AppContent() {
   </SafeAreaView>;
 }
 
-export default function App(){return <SafeAreaProvider><AppContent/></SafeAreaProvider>}
+export default function App(){return <SafeAreaProvider>{__DEV__ && process.env.EXPO_PUBLIC_HISOBCHI_DESIGN_OS === '1' ? <Stage06PreviewScreen/> : <AppContent/>}</SafeAreaProvider>}
 
 const styles=StyleSheet.create({
   safe:{flex:1,backgroundColor:colors.background},body:{flex:1},navOuter:{paddingHorizontal:16,paddingBottom:8,paddingTop:5},nav:{height:70,borderRadius:radius.lg,backgroundColor:'#102F4C',borderWidth:1,borderColor:'rgba(151,220,255,0.14)',flexDirection:'row',alignItems:'stretch',padding:5},navItem:{flex:1,alignItems:'center',justifyContent:'center',gap:5,borderRadius:16,minWidth:0},navActive:{backgroundColor:'#1C537A'},navLabel:{fontSize:10,color:colors.muted,fontWeight:'600'},navLabelActive:{color:colors.text,fontWeight:'700'}
