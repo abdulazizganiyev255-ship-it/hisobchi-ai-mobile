@@ -1,0 +1,27 @@
+name: Stage 06 Native Preview Checks
+on:
+  push:
+    branches:
+      - feature/hisobchi-design-os-native-06
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-types-and-ledger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Expo dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify Expo compatibility
+        run: npx expo install --check
+      - name: TypeScript typecheck
+        run: npm run typecheck
+      - name: Synthetic ledger invariants
+        run: node --experimental-strip-types --test tests/stage06-ledger.test.mjs
