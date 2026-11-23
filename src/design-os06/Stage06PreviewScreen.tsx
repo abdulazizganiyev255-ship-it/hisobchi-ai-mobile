@@ -1,7 +1,9 @@
 import React, {useMemo, useState} from 'react';
 import {Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View, useWindowDimensions} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {CATEGORIES, Category, deriveLedger, Entry, INITIAL_LEDGER, LIMITS, money, parseAmount} from './ledger';
+import type {DimensionValue} from 'react-native';
+import {CATEGORIES, deriveLedger, INITIAL_LEDGER, LIMITS, money, parseAmount} from './ledger';
+import type {Category, Entry} from './ledger';
 
 type Tab = 'home' | 'history' | 'plan' | 'profile';
 type FormKind = 'expense' | 'income';
@@ -12,7 +14,7 @@ const nav:{id:Tab;icon:string;label:string}[]=[{id:'home',icon:'⌂',label:'Bosh
 function DemoPill(){return <View style={s.demo}><View style={s.demoDot}/><Text style={s.demoText}>DEMO · HAQIQIY HISOB EMAS</Text></View>}
 function Heading({title,side}:{title:string;side?:string}){return <View style={s.heading}><Text style={s.headingText}>{title}</Text>{side&&<Text style={s.headingSide}>{side}</Text>}</View>}
 function PrimaryAction({title,icon,onPress,dark=false}:{title:string;icon:string;onPress:()=>void;dark?:boolean}){return <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={({pressed})=>[s.action,dark?s.actionDark:s.actionBlue,pressed&&{opacity:0.82}]}><Text style={[s.actionIcon,dark&&{color:c.ink}]}>{icon}</Text><Text style={[s.actionText,dark&&{color:c.ink}]}>{title}</Text></Pressable>}
-function Bar({value,color= c.cobalt}:{value:number;color?:string}){return <View style={s.barTrack}><View style={[s.barFill,{backgroundColor:color,width:(Math.max(0,Math.min(100,value)))+'%'}]}/></View>}
+function Bar({value,color= c.cobalt}:{value:number;color?:string}){return <View style={s.barTrack}><View style={[s.barFill,{backgroundColor:color,width:((Math.max(0,Math.min(100,value)))+'%') as DimensionValue}]}/></View>}
 
 export function Stage06PreviewScreen(){
   const [tab,setTab]=useState<Tab>('home');
