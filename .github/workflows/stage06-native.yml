@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - feature/hisobchi-design-os-native-06
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
