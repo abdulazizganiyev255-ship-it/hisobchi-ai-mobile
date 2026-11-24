@@ -106,12 +106,17 @@ function AppContent() {
                 onPress={()=>{setTab(item.key);setNotice('');}}
                 style={[styles.navItem,active&&styles.navActive]}
               >
-                <AppIcon
-                  name={item.icon}
-                  color={active?colors.primary:colors.faint}
-                  size={21}
-                  strokeWidth={active?2.2:1.8}
-                />
+                {item.key==='ai'
+                  ? <Text
+                      style={[styles.aiSymbol,active&&styles.aiSymbolActive]}
+                    >✦</Text>
+                  : <AppIcon
+                      name={item.icon}
+                      color={active?colors.primary:colors.faint}
+                      size={21}
+                      strokeWidth={active?2.2:1.8}
+                    />
+                }
                 <Text style={[styles.navLabel,active&&styles.navLabelActive]} numberOfLines={1} adjustsFontSizeToFit>{item.label}</Text>
               </Pressable>;
             })}
@@ -145,4 +150,6 @@ const styles=StyleSheet.create({
   navActive:{backgroundColor:colors.primarySoft},
   navLabel:{fontSize:10,color:colors.muted,fontWeight:'600'},
   navLabelActive:{color:colors.primary,fontWeight:'800'},
+  aiSymbol:{fontSize:23,lineHeight:24,width:24,height:24,textAlign:'center',color:colors.faint,fontWeight:'800'},
+  aiSymbolActive:{color:colors.primary},
 });
