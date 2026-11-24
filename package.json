@@ -15,7 +15,8 @@
     "test:ui-contract": "node scripts/test-ui-contract.cjs",
     "test:calendar": "node scripts/test-calendar.cjs",
     "test:integration": "node scripts/test-integration.cjs",
-    "test:finance-foundation": "node scripts/test-finance-foundation.cjs"
+    "test:finance-foundation": "node scripts/test-finance-foundation.cjs",
+    "test:plum-home": "node scripts/test-plum-home.cjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.17",

@@ -4,23 +4,28 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import {AppIcon} from '../components/AppIcon';
+import {SculpturalRibbon} from '../components/finance/SculpturalRibbon';
 import {
   LedgerMiniBars, LedgerTransactionRow, SourceTag,
 } from '../components/living/LedgerPrimitives';
 import {demo, formatMoney, type Transaction} from '../data/demo';
 import {filterAndSortTransactions} from '../data/transactions';
-import {ledger} from '../theme/livingLedger';
+import {semanticV1} from '../theme/semantic';
 
 type Props = {
   transactions: Transaction[];
   onAdd: () => void;
   onOpenTransactions: () => void;
 };
+const palette = semanticV1;
+const plum = palette.brand.primary;
+const deep = palette.brand.deep;
 
 /**
- * First Living Ledger screen: no remote money, no real Safe-to-Spend engine.
- * Sample balance, daily sample amount and monthly demo chart stay immutable.
- * Recent transaction rows are derived from the mutable session ledger only.
+ * Hisobchi Home D01: ivory/plum editorial composition with sculptural ribbon.
+ * Strictly demo-only. Fixed Home amounts remain independent of the local
+ * transaction array; recent rows use the mutable session ledger.
+ * No invented bank balance or Safe-to-Spend calculation.
  */
 export function LivingLedgerDashboardScreen({
   transactions, onAdd, onOpenTransactions,
@@ -47,12 +52,13 @@ export function LivingLedgerDashboardScreen({
       >
         <View style={styles.header}>
           <View style={styles.brand} accessible accessibilityLabel="Hisobchi AI">
-            <View style={styles.brandMark}>
-              <View style={[styles.brandBar, {height: 11}]}/>
-              <View style={[styles.brandBar, {height: 17}]}/>
-              <View style={[styles.brandBar, {height: 24}]}/>
+            <View style={styles.brandGlyph}>
+              <Text style={styles.brandGlyphText}>h.</Text>
             </View>
-            <Text style={styles.brandText}>Hisobchi AI</Text>
+            <View style={styles.brandCopy}>
+              <Text style={styles.brandLabel}>PULINGIZNI TUSHUNING</Text>
+              <Text style={styles.brandText}>Hisobchi AI</Text>
+            </View>
           </View>
           <Pressable
             accessibilityRole="button"
@@ -60,7 +66,7 @@ export function LivingLedgerDashboardScreen({
             onPress={() => setExplanationOpen(true)}
             style={({pressed}) => [styles.iconButton, pressed && styles.pressed]}
           >
-            <AppIcon name="shield" color={ledger.ink} size={21}/>
+            <AppIcon name="shield" color={plum} size={21}/>
           </Pressable>
         </View>
 
@@ -69,66 +75,77 @@ export function LivingLedgerDashboardScreen({
           <Text style={styles.noticeText}>DEMO MUHIT — HAQIQIY HISOB EMAS</Text>
         </View>
 
-        <View style={[styles.hero, shortScreen && styles.heroShort]}>
-          <Text style={styles.eyebrow}>BUGUN XAVFSIZ SARFLASH</Text>
-          <View style={styles.figure} accessible accessibilityLabel={
-            'Xavfsiz sarflash, hisoblanmagan namuna: ' +
-            formatMoney(demo.safeToSpendToday)
+        <View style={[styles.balanceHero, shortScreen && styles.balanceHeroShort]} testID="plum-home-balance-card">
+          <View
+            pointerEvents="none"
+            accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={styles.ribbonLayer}
+          >
+            <SculpturalRibbon/>
+          </View>
+          <View style={styles.balanceTop}>
+            <View style={styles.balanceLabelRow}>
+              <AppIcon name="wallet" color="#F6E5E8" size={17}/>
+              <Text style={styles.balanceOverline}>UMUMIY BALANS · NAMUNA</Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={balanceVisible ?
+                'Namuna balansni yashirish' : 'Namuna balansni ko‘rsatish'}
+              accessibilityState={{selected: balanceVisible}}
+              onPress={() => setBalanceVisible(value => !value)}
+              style={({pressed}) => [styles.eyeButton, pressed && styles.pressed]}
+            >
+              <AppIcon name={balanceVisible ? 'eye' : 'eye-off'} color="#FFF7F5" size={20}/>
+            </Pressable>
+          </View>
+          <View style={styles.balanceValues} accessible accessibilityLabel={
+            balanceVisible ? 'Demo balans: ' + balance : 'Demo balans yashirilgan'
           }>
             <Text
-              style={[styles.amount, compact && styles.amountCompact]}
+              style={[styles.balanceDigits, compact && styles.balanceDigitsCompact]}
               accessibilityElementsHidden
               importantForAccessibility="no"
-            >{amount}</Text>
-            <Text
-              style={[styles.unit, compact && styles.unitCompact]}
-              accessibilityElementsHidden
-              importantForAccessibility="no"
-            >so‘m</Text>
+            >
+              {balanceVisible ? balance.replace(/ so‘m$/, '') : '••• •••'}
+            </Text>
+            <Text style={styles.balanceCurrency} accessibilityElementsHidden importantForAccessibility="no">so‘m</Text>
           </View>
-          <SourceTag label="DEMO · hisoblanmagan"/>
-          <Text style={[styles.heroHelp, shortScreen && styles.heroHelpShort]}>
-            Bu ko‘rsatkich hozir hisob-kitob emas, faqat dizayn namunasi.
+          <Text style={styles.balanceDisclosure}>
+            Bank bilan ulanmagan · ko‘rgazmali qiymat
           </Text>
-          <Pressable
-            testID="living-ledger-safe-explainer"
-            accessibilityRole="button"
-            accessibilityLabel="Xavfsiz sarflash namunasi qanday ishlashi haqida"
-            onPress={() => setExplanationOpen(true)}
-            style={({pressed}) => [styles.explainButton, shortScreen && styles.explainButtonShort, pressed && styles.pressed]}
-          >
-            <AppIcon name="shield" color={ledger.dark} size={18}/>
-            <Text style={styles.explainText}>Bu raqam haqida</Text>
-            <AppIcon name="chevron" color={ledger.dark} size={17}/>
-          </Pressable>
         </View>
 
-        <View style={[styles.rule, shortScreen && styles.ruleShort]}/>
-
-        <View style={styles.balanceBlock}>
-          <View style={styles.balanceCopy}>
-            <Text style={styles.eyebrow}>UMUMIY BALANS · NAMUNA</Text>
-            <Text
-              style={[styles.balanceValue, compact && styles.balanceCompact]}
-              accessibilityLabel={balanceVisible ?
-                'Demo balans: ' + balance :
-                'Demo balans yashirilgan'
-              }
-            >
-              {balanceVisible ? balance : '••••••'}
-            </Text>
+        <View style={[styles.safetyCard, shortScreen && styles.safetyCardShort]}>
+          <View style={styles.safetyHeader}>
+            <View style={styles.safetyLabelRow}>
+              <View style={styles.shieldTile}><AppIcon name="shield" size={17} color={plum}/></View>
+              <Text testID="plum-home-safety-title" style={styles.safetyTitle}>Bugun xavfsiz sarflash</Text>
+            </View>
           </View>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={balanceVisible ?
-              'Namuna balansni yashirish' : 'Namuna balansni ko‘rsatish'
-            }
-            accessibilityState={{selected: balanceVisible}}
-            onPress={() => setBalanceVisible(value => !value)}
-            style={({pressed}) => [styles.eyeButton, pressed && styles.pressed]}
-          >
-            <AppIcon name={balanceVisible ? 'eye' : 'eye-off'} size={21} color={ledger.ink}/>
-          </Pressable>
+          <View style={styles.safetyBottom}>
+            <View style={styles.safetyAmountRow} accessible accessibilityLabel={
+              'Xavfsiz sarflash, hisoblanmagan namuna: ' + formatMoney(demo.safeToSpendToday)
+            }>
+              <Text style={[styles.safetyAmount, compact && styles.safetyAmountCompact]}
+                accessibilityElementsHidden importantForAccessibility="no">{amount}</Text>
+              <Text style={styles.safetyCurrency}
+                accessibilityElementsHidden importantForAccessibility="no">so‘m</Text>
+            </View>
+            <Pressable
+              testID="living-ledger-safe-explainer"
+              accessibilityRole="button"
+              accessibilityLabel="Xavfsiz sarflash namunasi qanday ishlashi haqida"
+              onPress={() => setExplanationOpen(true)}
+              style={({pressed}) => [styles.explainButton, pressed && styles.pressed]}
+            >
+              <Text style={styles.explainText}>Bu raqam haqida</Text>
+              <AppIcon name="chevron" color={plum} size={15}/>
+            </Pressable>
+          </View>
+          <SourceTag label="DEMO · hisoblanmagan" tone="plum"/>
         </View>
 
         <Pressable
@@ -136,14 +153,17 @@ export function LivingLedgerDashboardScreen({
           accessibilityRole="button"
           accessibilityLabel="Xarajat qo‘shish, ushbu sessiya uchun"
           onPress={onAdd}
-          style={({pressed}) => [styles.addButton, shortScreen && styles.addButtonShort, pressed && styles.addPressed]}
+          style={({pressed}) => [
+            styles.addButton, shortScreen && styles.addButtonShort,
+            pressed && styles.addPressed,
+          ]}
         >
-          <View style={styles.addIcon}><AppIcon name="plus" size={20} color={ledger.ink}/></View>
+          <View style={styles.addIcon}><AppIcon name="plus" size={20} color={plum}/></View>
           <View style={styles.addCopy}>
             <Text style={styles.addTitle}>Xarajat qo‘shish</Text>
             <Text style={styles.addSubtitle}>Sessiyadagi yozuvlarga saqlanadi</Text>
           </View>
-          <AppIcon name="chevron" color={ledger.ink} size={20}/>
+          <AppIcon name="chevron" color="#FFFFFF" size={19}/>
         </Pressable>
 
         <View style={styles.sectionHeader}>
@@ -175,24 +195,27 @@ export function LivingLedgerDashboardScreen({
             })}
           </View>
         </View>
-        <Text
-          testID="living-ledger-period-total"
-          style={styles.chartAmount}
-          accessibilityLabel={'Namuna xarajat: ' + formatMoney(month.total)}
-        >
-          {formatMoney(month.total)}
-        </Text>
-        <LedgerMiniBars
-          values={month.chart}
-          description={
-            'Oylik xarajatlarning 9 ta shartli namuna nuqtasi. ' +
-            month.label + '. ' + formatMoney(month.total) +
-            '. Real sessiya operatsiyalaridan olinmagan.'
-          }
-        />
-        <Text style={styles.chartNote}>
-          DEMO GRAFIK · 9 SHARTLI NUQTA · SESSIYADAN HISOBLANMAGAN
-        </Text>
+        <View style={styles.chartCard}>
+          <Text
+            testID="living-ledger-period-total"
+            style={[styles.chartAmount, compact && styles.chartAmountCompact]}
+            accessibilityLabel={'Namuna xarajat: ' + formatMoney(month.total)}
+          >
+            {formatMoney(month.total)}
+          </Text>
+          <LedgerMiniBars
+            tone="plum"
+            values={month.chart}
+            description={
+              'Oylik xarajatlarning 9 ta shartli namuna nuqtasi. ' +
+              month.label + '. ' + formatMoney(month.total) +
+              '. Real sessiya operatsiyalaridan olinmagan.'
+            }
+          />
+          <Text style={styles.chartNote}>
+            DEMO GRAFIK · 9 SHARTLI NUQTA · SESSIYADAN HISOBLANMAGAN
+          </Text>
+        </View>
 
         <View style={styles.activityHeading}>
           <View style={styles.sectionHeadCopy}>
@@ -206,20 +229,22 @@ export function LivingLedgerDashboardScreen({
             style={({pressed}) => [styles.allButton, pressed && styles.pressed]}
           >
             <Text style={styles.allText}>Barchasi</Text>
-            <AppIcon name="chevron" color={ledger.dark} size={17}/>
+            <AppIcon name="chevron" color={plum} size={17}/>
           </Pressable>
         </View>
-        {recent.length > 0 ? recent.map(item =>
-          <LedgerTransactionRow key={item.id} item={item}/>
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>Hozircha yozuv yo‘q</Text>
-            <Text style={styles.emptyText}>Birinchi sessiya xarajatingizni kiriting.</Text>
-            <Pressable accessibilityRole="button" onPress={onAdd} style={styles.emptyAction}>
-              <Text style={styles.emptyActionText}>Xarajat qo‘shish</Text>
-            </Pressable>
-          </View>
-        )}
+        <View style={styles.activityCard}>
+          {recent.length > 0 ? recent.map(item =>
+            <LedgerTransactionRow key={item.id} item={item} tone="plum"/>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>Hozircha yozuv yo‘q</Text>
+              <Text style={styles.emptyText}>Birinchi sessiya xarajatingizni kiriting.</Text>
+              <Pressable accessibilityRole="button" onPress={onAdd} style={styles.emptyAction}>
+                <Text style={styles.emptyActionText}>Xarajat qo‘shish</Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
         <Text style={styles.footer}>
           Namuna balans va xavfsiz sarflash hisoblanmaydi. Sessiya tugasa yoki ilova qayta ishga tushsa, yozuvlar boshlang‘ich namunaga qaytadi.
         </Text>
@@ -235,13 +260,15 @@ export function LivingLedgerDashboardScreen({
         <View style={styles.modalRoot}>
           <Pressable
             style={StyleSheet.absoluteFill}
-            accessibilityLabel="Izoh oynasini yopish"
             accessibilityRole="button"
+            accessibilityLabel="Izoh oynasini yopish"
             onPress={closeExplainer}
           />
           <View style={styles.modalSheet}>
-            <SourceTag label="DEMO · hisoblanmagan"/>
-            <Text accessibilityRole="header" style={styles.modalTitle}>Bu raqam nimani bildiradi?</Text>
+            <SourceTag label="DEMO · hisoblanmagan" tone="plum"/>
+            <Text accessibilityRole="header" style={styles.modalTitle}>
+              Bu raqam nimani bildiradi?
+            </Text>
             <Text style={styles.modalBody}>
               {formatMoney(demo.safeToSpendToday)} hozir faqat namuna. Hisobchi AI real daromad,
               majburiy to‘lovlar yoki bank hisobingiz asosida ushbu qiymatni hisoblamayapti.
@@ -267,71 +294,150 @@ export function LivingLedgerDashboardScreen({
 }
 
 const styles = StyleSheet.create({
-  screen: {flex: 1, backgroundColor: ledger.paper},
-  container: {paddingHorizontal: 22, paddingTop: 18, paddingBottom: 40},
-  containerShort: {paddingTop: 11},
-  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48},
+  screen: {flex: 1, backgroundColor: palette.bg.canvas},
+  container: {paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40},
+  containerShort: {paddingTop: 8},
+  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 46},
   brand: {flexDirection: 'row', alignItems: 'center', gap: 10},
-  brandMark: {width: 28, height: 28, flexDirection: 'row', alignItems: 'flex-end', gap: 3},
-  brandBar: {width: 5, borderRadius: 2, backgroundColor: ledger.dark, transform: [{skewX: '-12deg'}]},
-  brandText: {fontSize: 21, fontWeight: '800', letterSpacing: -0.5, color: ledger.ink},
-  iconButton: {width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: ledger.rule},
-  pressed: {opacity: 0.65},
-  notice: {marginTop: 20, backgroundColor: ledger.paleSage, paddingVertical: 12, paddingHorizontal: 13, borderRadius: 10, flexDirection: 'row', alignItems: 'center', gap: 9},
-  noticeShort: {marginTop: 12, paddingVertical: 9},
-  noticeDot: {height: 8, width: 8, borderRadius: 4, backgroundColor: ledger.dark},
-  noticeText: {fontSize: 12, fontWeight: '800', color: ledger.dark, letterSpacing: 0.2, flexShrink: 1},
-  hero: {paddingTop: 30},
-  heroShort: {paddingTop: 20},
-  eyebrow: {fontSize: 12, fontWeight: '800', letterSpacing: 1.4, color: ledger.subtext},
-  figure: {flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', gap: 7, marginTop: 8, marginBottom: 10},
-  amount: {fontSize: 54, fontWeight: '800', color: ledger.ink, letterSpacing: -2.2, includeFontPadding: false},
-  amountCompact: {fontSize: 47},
-  unit: {fontSize: 23, fontWeight: '700', color: ledger.ink},
-  unitCompact: {fontSize: 20},
-  heroHelp: {fontSize: 14, lineHeight: 21, color: ledger.subtext, marginTop: 12},
-  heroHelpShort: {marginTop: 8},
-  explainButton: {alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 9, minHeight: 48, marginTop: 10, paddingRight: 7},
-  explainButtonShort: {marginTop: 5},
-  explainText: {fontSize: 15, fontWeight: '800', color: ledger.dark},
-  rule: {height: 1, backgroundColor: ledger.rule, marginTop: 22, marginBottom: 20},
-  ruleShort: {marginTop: 14, marginBottom: 13},
-  balanceBlock: {flexDirection: 'row', alignItems: 'center', gap: 8},
-  balanceCopy: {flex: 1, minWidth: 0},
-  balanceValue: {fontSize: 30, fontWeight: '800', letterSpacing: -0.9, color: ledger.ink, marginTop: 7},
-  balanceCompact: {fontSize: 26},
-  eyeButton: {width: 44, height: 44, alignItems: 'center', justifyContent: 'center'},
-  addButton: {marginTop: 20, backgroundColor: ledger.coral, borderRadius: 16, minHeight: 66, paddingHorizontal: 16, paddingVertical: 11, flexDirection: 'row', alignItems: 'center', gap: 12},
-  addButtonShort: {marginTop: 14},
-  addPressed: {opacity: 0.78},
-  addIcon: {height: 38, width: 38, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.55)', alignItems: 'center', justifyContent: 'center'},
-  addCopy: {flex: 1, gap: 3},
-  addTitle: {fontSize: 16, fontWeight: '800', color: ledger.ink},
-  addSubtitle: {fontSize: 12, fontWeight: '600', color: ledger.ink},
-  sectionHeader: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10, marginTop: 32},
-  sectionHeadCopy: {flex: 1, minWidth: 0, gap: 6},
-  sectionOverline: {fontSize: 11, fontWeight: '800', letterSpacing: 1.1, color: ledger.subtext},
-  sectionTitle: {fontSize: 20, fontWeight: '800', color: ledger.ink, letterSpacing: -0.4},
-  periodSelector: {flexDirection: 'row', padding: 3, backgroundColor: ledger.paleSage, borderRadius: 15, gap: 3},
-  periodItem: {minHeight: 44, paddingHorizontal: 9, justifyContent: 'center', alignItems: 'center', borderRadius: 12},
-  periodActive: {backgroundColor: ledger.dark},
-  periodLabel: {fontSize: 12, fontWeight: '800', color: ledger.ink},
+  brandGlyph: {
+    width: 38, height: 38, borderRadius: 14, backgroundColor: plum,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  brandGlyphText: {fontSize: 25, fontWeight: '800', letterSpacing: -2, color: '#FFFFFF', marginTop: -5},
+  brandCopy: {gap: 2},
+  brandLabel: {fontSize: 9, fontWeight: '800', letterSpacing: 1.35, color: palette.text.secondary},
+  brandText: {fontSize: 21, fontWeight: '800', letterSpacing: -0.6, color: palette.text.primary},
+  iconButton: {
+    width: 44, height: 44, borderRadius: 15,
+    backgroundColor: palette.bg.surface, borderWidth: 1, borderColor: palette.border.subtle,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  pressed: {opacity: 0.74},
+  notice: {
+    alignSelf: 'flex-start', marginTop: 9, paddingHorizontal: 9, paddingVertical: 6,
+    backgroundColor: palette.brand.tint, borderRadius: 999,
+    flexDirection: 'row', alignItems: 'center', gap: 7,
+  },
+  noticeShort: {marginTop: 6, paddingVertical: 5},
+  noticeDot: {width: 6, height: 6, backgroundColor: plum, borderRadius: 3},
+  noticeText: {color: plum, fontSize: 10, fontWeight: '800', letterSpacing: 0.25},
+  balanceHero: {
+    marginTop: 12, minHeight: 158, borderRadius: 27,
+    backgroundColor: deep, paddingHorizontal: 19, paddingTop: 16, paddingBottom: 16,
+    overflow: 'hidden', justifyContent: 'space-between',
+  },
+  balanceHeroShort: {marginTop: 9, minHeight: 148},
+  ribbonLayer: {
+    position: 'absolute', right: -39, top: -15, opacity: 0.52,
+  },
+  balanceTop: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', zIndex: 1},
+  balanceLabelRow: {flexDirection: 'row', alignItems: 'center', gap: 8},
+  balanceOverline: {fontSize: 10, fontWeight: '800', letterSpacing: 0.75, color: '#F4E3E9'},
+  eyeButton: {
+    width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.13)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  balanceValues: {flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, zIndex: 1},
+  balanceDigits: {
+    fontSize: 35, fontWeight: '800', color: '#FFFFFF', letterSpacing: -1.7,
+    includeFontPadding: false,
+  },
+  balanceDigitsCompact: {fontSize: 30},
+  balanceCurrency: {color: '#F3DFE6', fontSize: 17, fontWeight: '700'},
+  balanceDisclosure: {color: '#EAD9E0', fontSize: 11, fontWeight: '500', zIndex: 1},
+  safetyCard: {
+    marginTop: 11, backgroundColor: palette.bg.surface, borderRadius: 23,
+    borderWidth: 1, borderColor: '#E5D9D9', paddingHorizontal: 14, paddingVertical: 12,
+    minHeight: 122, gap: 6,
+  },
+  safetyCardShort: {minHeight: 116, paddingVertical: 10, gap: 5},
+  safetyHeader: {flexDirection: 'row', alignItems: 'center', gap: 5},
+  safetyLabelRow: {flexDirection: 'row', alignItems: 'center', gap: 7, flexShrink: 1},
+  shieldTile: {
+    height: 29, width: 29, borderRadius: 10, backgroundColor: palette.brand.tint,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  safetyTitle: {fontSize: 13, fontWeight: '800', color: palette.text.primary, flexShrink: 1},
+  safetyBottom: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 5},
+  safetyAmountRow: {flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', gap: 4, flexShrink: 1},
+  safetyAmount: {
+    fontSize: 28, letterSpacing: -1.1, fontWeight: '800', color: palette.text.primary,
+    includeFontPadding: false,
+  },
+  safetyAmountCompact: {fontSize: 25},
+  safetyCurrency: {fontSize: 13, fontWeight: '700', color: palette.text.secondary},
+  explainButton: {
+    minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 2, paddingHorizontal: 3, flexShrink: 1,
+  },
+  explainText: {fontSize: 12, fontWeight: '800', color: plum},
+  addButton: {
+    marginTop: 11, minHeight: 62, borderRadius: 17, backgroundColor: plum,
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, gap: 11,
+  },
+  addButtonShort: {marginTop: 9},
+  addPressed: {opacity: 0.8},
+  addIcon: {
+    width: 40, height: 40, backgroundColor: '#F5E8ED', borderRadius: 13,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  addCopy: {flex: 1, gap: 3, minWidth: 0},
+  addTitle: {fontSize: 16, fontWeight: '800', color: '#FFFFFF'},
+  addSubtitle: {fontSize: 11, fontWeight: '500', color: '#F3E0E7'},
+  sectionHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
+    gap: 8, marginTop: 28,
+  },
+  sectionHeadCopy: {flex: 1, minWidth: 0, gap: 5},
+  sectionOverline: {fontSize: 11, fontWeight: '800', letterSpacing: 0.9, color: palette.text.secondary},
+  sectionTitle: {fontSize: 21, fontWeight: '800', letterSpacing: -0.5, color: palette.text.primary},
+  periodSelector: {
+    flexDirection: 'row', backgroundColor: palette.brand.tint,
+    borderRadius: 15, padding: 3, gap: 2,
+  },
+  periodItem: {
+    minHeight: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center',
+    paddingHorizontal: 9,
+  },
+  periodActive: {backgroundColor: plum},
+  periodLabel: {fontSize: 11, fontWeight: '800', color: plum},
   periodLabelActive: {color: '#FFFFFF'},
-  chartAmount: {fontSize: 27, fontWeight: '800', color: ledger.ink, letterSpacing: -0.5, marginTop: 16},
-  chartNote: {fontSize: 10, fontWeight: '700', letterSpacing: 0.35, lineHeight: 15, color: ledger.subtext, marginTop: 10},
-  activityHeading: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 30, gap: 10, marginBottom: 5},
+  chartCard: {
+    backgroundColor: palette.bg.surface, borderRadius: 24,
+    borderWidth: 1, borderColor: '#E5D9D9', padding: 17, marginTop: 15,
+  },
+  chartAmount: {fontSize: 28, color: palette.text.primary, fontWeight: '800', letterSpacing: -0.6},
+  chartAmountCompact: {fontSize: 25},
+  chartNote: {
+    fontSize: 10, lineHeight: 15, letterSpacing: 0.25, fontWeight: '600',
+    color: palette.text.secondary, marginTop: 12,
+  },
+  activityHeading: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginTop: 28, marginBottom: 10, gap: 8,
+  },
   allButton: {minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 2},
-  allText: {fontSize: 13, fontWeight: '800', color: ledger.dark},
-  emptyState: {padding: 20, gap: 10, backgroundColor: ledger.paleSage, borderRadius: 16, marginTop: 12},
-  emptyTitle: {fontSize: 16, fontWeight: '800', color: ledger.ink},
-  emptyText: {fontSize: 14, color: ledger.subtext},
-  emptyAction: {minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center'},
-  emptyActionText: {fontWeight: '800', color: ledger.dark, fontSize: 14},
-  footer: {fontSize: 12, lineHeight: 19, color: ledger.subtext, marginTop: 20},
-  modalRoot: {flex: 1, backgroundColor: 'rgba(8,20,15,0.56)', justifyContent: 'flex-end'},
-  modalSheet: {paddingTop: 24, paddingHorizontal: 24, paddingBottom: 34, backgroundColor: ledger.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26, gap: 16},
-  modalTitle: {fontSize: 26, fontWeight: '800', letterSpacing: -0.5, color: ledger.ink},
-  modalBody: {fontSize: 15, lineHeight: 23, color: ledger.subtext},
-  closeButton: {minHeight: 52, backgroundColor: ledger.dark, borderRadius: 15, justifyContent: 'center', alignItems: 'center', marginTop: 4},
+  allText: {fontSize: 13, fontWeight: '800', color: plum},
+  activityCard: {
+    backgroundColor: palette.bg.surface, borderRadius: 22,
+    borderWidth: 1, borderColor: '#E5D9D9', paddingHorizontal: 13, overflow: 'hidden',
+  },
+  emptyState: {padding: 12, gap: 10},
+  emptyTitle: {fontSize: 16, fontWeight: '800', color: palette.text.primary},
+  emptyText: {fontSize: 14, color: palette.text.secondary},
+  emptyAction: {minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start'},
+  emptyActionText: {fontSize: 14, fontWeight: '800', color: plum},
+  footer: {fontSize: 12, lineHeight: 19, color: palette.text.secondary, marginTop: 19},
+  modalRoot: {flex: 1, backgroundColor: 'rgba(30,16,25,0.58)', justifyContent: 'flex-end'},
+  modalSheet: {
+    backgroundColor: palette.bg.canvas, paddingHorizontal: 23, paddingTop: 23,
+    paddingBottom: 34, borderTopLeftRadius: 28, borderTopRightRadius: 28, gap: 14,
+  },
+  modalTitle: {fontSize: 26, fontWeight: '800', letterSpacing: -0.55, color: palette.text.primary},
+  modalBody: {fontSize: 15, lineHeight: 23, color: palette.text.secondary},
+  closeButton: {
+    minHeight: 54, borderRadius: 16, backgroundColor: plum,
+    alignItems: 'center', justifyContent: 'center', marginTop: 3,
+  },
   closeText: {color: '#FFFFFF', fontSize: 16, fontWeight: '800'},
 });
