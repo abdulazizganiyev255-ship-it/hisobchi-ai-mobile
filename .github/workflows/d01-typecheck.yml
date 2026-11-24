@@ -5,10 +5,12 @@ on:
     branches:
       - design/d01-ivory-plum-foundation
       - design/d02-transaction-entry-calendar
+      - design/d03-profile-accounts-goals
   pull_request:
     branches:
       - main
       - design/d01-ivory-plum-foundation
+      - design/d02-transaction-entry-calendar
 
 jobs:
   typecheck:
@@ -22,6 +24,6 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - name: Calendar and integer UZS validation tests
-        run: node --experimental-strip-types --test tests/calendar.test.mjs tests/amount-validation.test.mjs
+        run: node --experimental-strip-types --test tests/calendar.test.mjs tests/amount-validation.test.mjs tests/finance-setup.test.mjs
       - name: Expo web bundle smoke test
         run: npx expo export --platform web --output-dir dist-web
