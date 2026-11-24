@@ -1,6 +1,8 @@
 import type {IconName} from '../components/AppIcon';
 import type {Transaction} from './demo';
 import {formatUzDate,parseISODate,toLocalISODate} from './calendar';
+import {parseMockAmount} from './amountValidation';
+export {cleanMoneyInput,MAX_MOCK_AMOUNT} from './amountValidation';
 
 export type EntryKind='expense'|'income';
 export type CategoryOption={
@@ -31,16 +33,9 @@ export const categories:Record<EntryKind,CategoryOption[]>={
   ],
 };
 
-export const MAX_MOCK_AMOUNT=999_999_999_999;
-
-export function cleanMoneyInput(text:string):string {
-  return text.replace(/[^0-9]/g,'').slice(0,12);
-}
-
 export function validateMockEntry(entry:MockEntryDraft,today=toLocalISODate(new Date())):string|null {
   if(!/^[0-9]+$/.test(entry.amountDigits))return 'Summani kiriting';
-  const amount=Number(entry.amountDigits);
-  if(!Number.isSafeInteger(amount)||amount<=0||amount>MAX_MOCK_AMOUNT)return '0 dan katta, to‘g‘ri summani kiriting';
+  if(parseMockAmount(entry.amountDigits)===null)return '0 dan katta, to‘g‘ri summani kiriting';
   if(!categories[entry.kind]?.some(c=>c.id===entry.categoryId))return 'Kategoriyani tanlang';
   if(entry.note.length>120)return 'Izoh 120 belgidan oshmasin';
   if(!parseISODate(entry.occurredOn)||entry.occurredOn>today)return 'To‘g‘ri sanani tanlang';
@@ -52,7 +47,8 @@ export function makeMockTransaction(entry:MockEntryDraft,id:string,today=toLocal
   if(error)throw new Error(error);
   const category=categories[entry.kind].find(c=>c.id===entry.categoryId);
   if(!category)throw new Error('Kategoriya topilmadi');
-  const amount=Number(entry.amountDigits);
+  const amount=parseMockAmount(entry.amountDigits);
+  if(amount===null)throw new Error('Yaroqsiz summa');
   return {
     id,
     title:entry.note.trim()||category.label,
