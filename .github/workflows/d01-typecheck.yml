@@ -23,3 +23,5 @@ jobs:
       - run: npm run typecheck
       - name: Calendar and integer UZS validation tests
         run: node --experimental-strip-types --test tests/calendar.test.mjs tests/amount-validation.test.mjs
+      - name: Expo web bundle smoke test
+        run: npx expo export --platform web --output-dir dist-web
