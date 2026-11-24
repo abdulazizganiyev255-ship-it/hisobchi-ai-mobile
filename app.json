@@ -5,8 +5,8 @@
     "scheme": "hisobchiai",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
-    "backgroundColor": "#07182C",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F7F1EB",
     "ios": {"supportsTablet": false},
     "android": {"package": "uz.hisobchi.mobile", "edgeToEdgeEnabled": true}
   }
