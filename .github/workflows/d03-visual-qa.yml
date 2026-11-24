@@ -1,9 +1,9 @@
 name: Hisobchi D03 Responsive Visual QA
 
 on:
-  push:
+  pull_request:
     branches:
-      - design/d03-profile-accounts-goals
+      - design/d02-transaction-entry-calendar
   workflow_dispatch:
 
 jobs:
