@@ -1,0 +1,72 @@
+name: Pul Izi Frontend Reboot CI
+
+on:
+  push:
+    branches:
+      - design/pul-izi-reboot-v01
+  pull_request:
+    branches:
+      - design/quiet-finance-home-v02
+
+jobs:
+  model-and-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Finance regression and reboot contracts
+        run: |
+          npm run test:transactions
+          npm run test:analytics
+          npm run test:calendar
+          npm run test:integration
+          npm run test:finance-foundation
+          node scripts/test-reboot-contract.cjs
+      - name: Web JS export
+        run: npx expo export --platform web --output-dir artifacts/reboot-web --clear
+      - name: Android JS export
+        run: npx expo export --platform android --output-dir artifacts/reboot-android --clear
+
+  browser-e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: "1"
+      SMOKE_URL: http://127.0.0.1:8093
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Start Expo Web
+        run: |
+          nohup npx expo start --web --port 8093 --clear > /tmp/reboot-expo.log 2>&1 &
+          echo $! > /tmp/reboot-expo.pid
+      - name: Real 320 360 393 430 browser flows
+        run: node scripts/test-reboot-web.cjs
+      - name: Expo error logs
+        if: failure()
+        run: cat /tmp/reboot-expo.log || true
+      - name: Capture real rendered screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pul-izi-real-screens
+          path: artifacts/reboot/*.png
+          if-no-files-found: warn
+          retention-days: 7
