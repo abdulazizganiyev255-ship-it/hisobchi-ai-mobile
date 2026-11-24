@@ -54,15 +54,16 @@ function parseInteger(
   text:string,
   allowZero:boolean,
 ):number|null {
-  if(!/^\d+$/.test(text))return null;
-  const value=Number(text);
+  const digits=text.replace(/[\s\u00a0\u202f]/g,'');
+  if(!/^\d+$/.test(digits))return null;
+  const value=Number(digits);
   if(!Number.isSafeInteger(value)||value>MAX_SETUP_UZS)return null;
   if(allowZero?value<0:value<=0)return null;
   return value;
 }
 
 export function parseOpeningBalance(text:string):number|null|undefined {
-  if(text==='')return null; // unspecified, not 0
+  if(text.trim()==='')return null; // unspecified, not 0
   const number=parseInteger(text,true);
   return number===null?undefined:number;
 }
