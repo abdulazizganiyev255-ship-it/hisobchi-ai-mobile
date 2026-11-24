@@ -91,6 +91,13 @@ for (const [name, foreground, background, target] of [
   assert.equal(analyticsBefore.income.amountUzs, "3000000");
   assert.equal(analyticsBefore.net.amountUzs, "2741000");
 
+  // The seed transactions are in Nov 19–22: a live Nov 24 week must be empty.
+  // Browser UI tests freeze time to Nov 22 when asserting the old sample week.
+  const nextWeek = await repository.getAnalytics({period: "week", today: "2026-11-24"});
+  assert.equal(nextWeek.income.amountUzs, "0");
+  assert.equal(nextWeek.expense.amountUzs, "0");
+  assert.equal(nextWeek.net.amountUzs, "0");
+
   records.push({...demo.transactions[0], id: "foundation-test", amount: -100000});
   const analyticsAfter = await repository.getAnalytics(query);
   assert.equal(analyticsAfter.expense.amountUzs, "359000");

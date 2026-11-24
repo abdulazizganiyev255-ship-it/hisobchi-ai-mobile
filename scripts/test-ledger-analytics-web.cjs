@@ -52,6 +52,9 @@ async function verify(browser, size) {
   page.on('pageerror', error => runtimeErrors.push(String(error)));
   const name = size.width + 'x' + size.height;
   try {
+    // Date-dependent weekly assertions use the fixed seeded ledger calendar.
+    // Playwright keeps timers active while new Date() is pinned to Nov 22.
+    await page.clock.setFixedTime(new Date('2026-11-22T12:00:00Z'));
     await page.goto(BASE, {waitUntil: 'domcontentloaded', timeout: 90000});
     await page.getByRole('tab', {name: 'Tahlil'}).click();
     await page.getByText('SESSIYADAN HISOBLANGAN').first().waitFor({state: 'visible'});
