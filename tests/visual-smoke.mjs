@@ -33,7 +33,13 @@ try {
     screenshots.push(await capture(page,'home'));
 
     const aiTab=page.getByRole('tab',{name:'AI'});
-    await aiTab.getByText('✦').waitFor({state:'visible'});
+    try{
+      await aiTab.getByText('✦').waitFor({state:'visible',timeout:5000});
+    }catch(error){
+      const html=await aiTab.evaluate(element=>element.outerHTML);
+      await writeFile(`${OUT}/ai-tab-dom-${width}.txt`,html);
+      throw error;
+    }
     await aiTab.click();
     await page.getByText('AI yordamchi').waitFor();
     screenshots.push(await capture(page,'ai'));
