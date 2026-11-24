@@ -1,3 +1,5 @@
+import type {IconName} from '../components/AppIcon';
+
 // Fake, deterministic values. Never present these as a user's real financial data.
 export type Transaction = {
   id: string;
@@ -5,7 +7,7 @@ export type Transaction = {
   category: string;
   date: string;
   amount: number;
-  icon: 'cart' | 'bus' | 'wallet' | 'coffee' | 'heart';
+  icon: IconName;
   iconBg: string;
   iconColor: string;
 };
