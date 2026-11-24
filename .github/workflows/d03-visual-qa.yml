@@ -1,0 +1,45 @@
+name: Hisobchi D03 Responsive Visual QA
+
+on:
+  push:
+    branches:
+      - design/d03-profile-accounts-goals
+  workflow_dispatch:
+
+jobs:
+  responsive-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Install temporary browser test dependency
+        run: npm install --no-save --package-lock=false playwright@1.56.1
+      - name: Install Chromium dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Build Expo web app
+        run: npx expo export --platform web --output-dir dist-web
+      - name: Start preview and verify health
+        run: |
+          nohup npx --yes serve@14.2.5 -s dist-web -l 4173 >/tmp/hisobchi-preview.log 2>&1 &
+          for i in {1..35}; do
+            if curl -fsS http://127.0.0.1:4173 >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/hisobchi-preview.log
+          exit 1
+      - name: Screenshot + interactive flow audit
+        run: node tests/visual-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hisb-d03-responsive-screenshots
+          path: artifacts/d03-screenshots/
+          if-no-files-found: warn
+          retention-days: 14
