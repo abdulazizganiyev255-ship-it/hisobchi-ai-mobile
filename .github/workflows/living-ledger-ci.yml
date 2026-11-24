@@ -61,7 +61,8 @@ jobs:
       - name: Install browser runner
         run: |
           npm install --no-save --package-lock=false playwright@1.56.1
-          npx playwright install --with-deps chromium
+          # GitHub ubuntu-24.04 ships compatible runtime libraries; avoid slow apt roundtrip.
+          npx playwright install chromium
       - name: Launch Expo Web
         run: |
           nohup npx expo start --web --port 8090 --clear > /tmp/living-ledger-expo.log 2>&1 &
