@@ -32,38 +32,41 @@ export function SculpturalRibbon() {
           <Stop offset="100%" stopColor="#FFF7F5" stopOpacity="0.02"/>
         </LinearGradient>
       </Defs>
-      <G id="floating-shadow">
-        <Ellipse cx="119" cy="146" rx="79" ry="21" fill="#260E1C" opacity="0.12"/>
+      <G id="shadow-depth">
+        <Ellipse cx="143" cy="155" rx="68" ry="13" fill="#260E1C" opacity="0.09"/>
       </G>
-      <G id="rear-ribbon-underpass">
+      <G id="rear-fold">
         <Path
-          d="M32 157 C67 172 124 158 150 127 C159 116 168 102 170 90"
-          fill="none" stroke="url(#ribbonRear)"
-          strokeWidth={31} strokeLinecap="round"
-        />
-        <Path
-          d="M171 56 C163 46 149 44 136 43 C100 31 64 42 55 72"
-          fill="none" stroke="url(#ribbonRear)"
-          strokeWidth={31} strokeLinecap="round"
+          d="M38 167 C75 147 109 130 146 113 C169 103 184 88 186 69
+             L187 97 C183 131 159 147 123 163 C92 177 64 181 38 179 Z"
+          fill="url(#ribbonRear)"
         />
       </G>
-      <G id="foreground-ribbon-overpass">
+      <G id="satin-main-body">
         <Path
-          d="M55 68 C59 43 85 28 111 32 C145 37 161 64 150 84 C139 104 100 109 77 98 C51 85 43 63 51 47"
-          fill="none" stroke="url(#ribbonFront)"
-          strokeWidth={30} strokeLinecap="round"
+          d="M17 112 C46 65 82 27 123 28 C157 29 184 49 190 81
+             C174 69 153 69 137 76 C113 87 89 114 67 141
+             C43 157 27 148 17 130 Z"
+          fill="url(#ribbonFront)"
         />
       </G>
-      <G id="satin-highlights">
+      <G id="fold-overlap">
         <Path
-          d="M52 51 C57 41 69 36 84 34 C109 30 135 46 144 66"
-          fill="none" stroke="url(#ribbonGlint)"
-          strokeWidth={6} strokeLinecap="round" opacity="0.88"
+          d="M67 141 C90 113 113 87 137 76 C153 69 174 69 190 81
+             C185 100 169 109 148 116 C115 128 98 148 75 157 Z"
+          fill="url(#ribbonRear)" opacity="0.88"
+        />
+      </G>
+      <G id="fabric-highlights">
+        <Path
+          d="M28 112 C61 69 88 40 124 40 C147 40 163 53 174 67"
+          fill="none" stroke="url(#ribbonGlint)" strokeWidth={5}
+          strokeLinecap="round" opacity="0.45"
         />
         <Path
-          d="M49 158 C86 164 132 145 152 113"
-          fill="none" stroke="url(#ribbonGlint)"
-          strokeWidth={5} strokeLinecap="round" opacity="0.40"
+          d="M80 154 C105 133 135 120 161 108"
+          fill="none" stroke="url(#ribbonGlint)" strokeWidth={3}
+          strokeLinecap="round" opacity="0.32"
         />
       </G>
     </Svg>

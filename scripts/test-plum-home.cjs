@@ -10,6 +10,7 @@ const primitives = read('src/components/living/LedgerPrimitives.tsx');
 const app = read('App.tsx');
 assert.match(home, /testID="plum-home-balance-card"/, 'New plum balance composition must be mounted');
 assert.match(home, /<SculpturalRibbon\/>/, 'Hero must include signature ribbon');
+assert.match(home, /testID="plum-home-safety-title"/, 'Safety label is measurable in responsive tests');
 assert.match(home, /DEMO MUHIT — HAQIQIY HISOB EMAS/, 'Demo provenance must remain visible');
 assert.match(home, /SourceTag label="DEMO · hisoblanmagan" tone="plum"/);
 assert.match(home, /testID="living-ledger-safe-explainer"/, 'Explanation action retained');

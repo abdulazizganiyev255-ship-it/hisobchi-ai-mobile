@@ -122,9 +122,8 @@ export function LivingLedgerDashboardScreen({
           <View style={styles.safetyHeader}>
             <View style={styles.safetyLabelRow}>
               <View style={styles.shieldTile}><AppIcon name="shield" size={17} color={plum}/></View>
-              <Text style={styles.safetyTitle}>Bugun xavfsiz sarflash</Text>
+              <Text testID="plum-home-safety-title" style={styles.safetyTitle}>Bugun xavfsiz sarflash</Text>
             </View>
-            <SourceTag label="DEMO · hisoblanmagan" tone="plum"/>
           </View>
           <View style={styles.safetyBottom}>
             <View style={styles.safetyAmountRow} accessible accessibilityLabel={
@@ -146,6 +145,7 @@ export function LivingLedgerDashboardScreen({
               <AppIcon name="chevron" color={plum} size={15}/>
             </Pressable>
           </View>
+          <SourceTag label="DEMO · hisoblanmagan" tone="plum"/>
         </View>
 
         <Pressable
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   balanceHeroShort: {marginTop: 9, minHeight: 148},
   ribbonLayer: {
-    position: 'absolute', right: -39, top: -50, opacity: 0.54,
+    position: 'absolute', right: -39, top: -15, opacity: 0.52,
   },
   balanceTop: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', zIndex: 1},
   balanceLabelRow: {flexDirection: 'row', alignItems: 'center', gap: 8},
@@ -348,16 +348,16 @@ const styles = StyleSheet.create({
   safetyCard: {
     marginTop: 11, backgroundColor: palette.bg.surface, borderRadius: 23,
     borderWidth: 1, borderColor: '#E5D9D9', paddingHorizontal: 14, paddingVertical: 12,
-    minHeight: 107, gap: 10,
+    minHeight: 122, gap: 6,
   },
-  safetyCardShort: {minHeight: 102, paddingVertical: 10, gap: 7},
-  safetyHeader: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 5},
+  safetyCardShort: {minHeight: 116, paddingVertical: 10, gap: 5},
+  safetyHeader: {flexDirection: 'row', alignItems: 'center', gap: 5},
   safetyLabelRow: {flexDirection: 'row', alignItems: 'center', gap: 7, flexShrink: 1},
   shieldTile: {
     height: 29, width: 29, borderRadius: 10, backgroundColor: palette.brand.tint,
     alignItems: 'center', justifyContent: 'center',
   },
-  safetyTitle: {fontSize: 12, fontWeight: '800', color: palette.text.primary, flexShrink: 1},
+  safetyTitle: {fontSize: 13, fontWeight: '800', color: palette.text.primary, flexShrink: 1},
   safetyBottom: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 5},
   safetyAmountRow: {flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', gap: 4, flexShrink: 1},
   safetyAmount: {
