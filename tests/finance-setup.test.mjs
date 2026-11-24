@@ -11,6 +11,8 @@ test('unknown opening balance must differ from confirmed zero',()=>{
   assert.equal(parseOpeningBalance(''),null);
   assert.equal(parseOpeningBalance('0'),0);
   assert.equal(parseOpeningBalance('120000'),120000);
+  assert.equal(parseOpeningBalance('120 000'),120000);
+  assert.equal(parseOpeningBalance('   '),null);
 });
 
 test('unsafe opening balances must not be silently coerced',()=>{
@@ -34,6 +36,7 @@ test('optional goal deadline is valid',()=>{
   assert.equal(goal.dueOn,null);
   assert.equal(goal.savedUzs,0);
   assert.equal(goalPercent(goal),0);
+  assert.equal(validateGoalDraft({title:'Maqsad',targetDigits:'5 000 000',savedDigits:'1 000 000',dueOn:null},today),null);
 });
 
 test('future deadline is permitted and past deadline rejected',()=>{
