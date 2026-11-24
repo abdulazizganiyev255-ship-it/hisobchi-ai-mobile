@@ -64,7 +64,7 @@ export function CalendarSheet({visible,value,todayISO,onClose,onSelect}:Props) {
             style={styles.arrow}
             onPress={()=>setMonth(m=>shiftMonth(m,-1))}
           >
-            <AppIcon name="chevron" color={colors.primary} size={19}/>
+            <View style={styles.leftChevron}><AppIcon name="chevron" color={colors.primary} size={19}/></View>
           </Pressable>
           <Text style={styles.monthTitle}>{monthTitle(month)}</Text>
           <Pressable
@@ -124,6 +124,7 @@ const styles=StyleSheet.create({
   monthNav:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginBottom:11},
   arrow:{width:44,height:44,borderRadius:22,backgroundColor:colors.background,alignItems:'center',justifyContent:'center'},
   disabled:{opacity:0.35},
+  leftChevron:{transform:[{rotate:'180deg'}]},
   monthTitle:{fontSize:16,fontWeight:'800',color:colors.text},
   grid:{flexDirection:'row',flexWrap:'wrap'},
   weekCell:{width:'14.2857%',alignItems:'center',justifyContent:'center',height:34},
