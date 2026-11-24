@@ -6,6 +6,10 @@ on:
       - design/d02-transaction-entry-calendar
   workflow_dispatch:
 
+concurrency:
+  group: d03-visual-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   responsive-web:
     runs-on: ubuntu-24.04 # Playwright 1.56.1 supports this image; ubuntu-latest resolved to 26.04
