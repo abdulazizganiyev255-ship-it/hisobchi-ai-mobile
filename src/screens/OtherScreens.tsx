@@ -1,9 +1,10 @@
 import React from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {AppIcon, IconName} from '../components/AppIcon';
 import {TransactionRow} from '../components/TransactionRow';
 import {ExpenseChart} from '../components/ExpenseChart';
-import {demo, formatMoney} from '../data/demo';
+import {demo, formatMoney, Transaction} from '../data/demo';
+import {EntryKind} from '../data/mockEntry';
 import {colors, radius, spacing} from '../theme/tokens';
 
 export type Tab = 'home' | 'transactions' | 'ai' | 'analytics' | 'profile';
@@ -36,7 +37,13 @@ const details:Record<Exclude<Tab,'home'>,Detail> = {
   }
 };
 
-export function OtherScreen({tab}:{tab:Exclude<Tab,'home'>}) {
+export function OtherScreen({tab,transactions,demoCount,notice,onAddTransaction}:{
+  tab:Exclude<Tab,'home'>;
+  transactions:Transaction[];
+  demoCount:number;
+  notice:string;
+  onAddTransaction:(kind:EntryKind)=>void;
+}) {
   const detail = details[tab];
   return <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
     <View style={styles.header}>
@@ -54,9 +61,20 @@ export function OtherScreen({tab}:{tab:Exclude<Tab,'home'>}) {
     </View>
 
     {tab==='transactions' && <View style={styles.card}>
-      <Text style={styles.sectionHeading}>Barcha operatsiyalar</Text>
-      <Text style={styles.sectionHint}>Namuna yozuvlar · yangi ma’lumot kiritilmaydi</Text>
-      {demo.transactions.map((item,i)=><React.Fragment key={item.id}>
+      <View style={styles.historyHeader}>
+        <View style={{flex:1}}>
+          <Text style={styles.sectionHeading}>Namuna tarixi</Text>
+          <Text style={styles.sectionHint}>{demoCount>0?`Yangi mock yozuvlar: ${demoCount}`:'Namunaviy operatsiyalar'}</Text>
+        </View>
+        <Pressable
+          style={styles.addButton}
+          accessibilityRole="button"
+          accessibilityLabel="Yangi xarajat qo‘shish"
+          onPress={()=>onAddTransaction('expense')}
+        ><AppIcon name="plus" color={colors.white} size={18}/><Text style={styles.addButtonText}>Qo‘shish</Text></Pressable>
+      </View>
+      {notice?<View style={styles.notice}><AppIcon name="check" color={colors.positive} size={18}/><Text style={styles.noticeText}>{notice}</Text></View>:null}
+      {transactions.map((item,i)=><React.Fragment key={item.id}>
         {i>0&&<View style={styles.divider}/>}
         <TransactionRow light item={item}/>
       </React.Fragment>)}
@@ -130,6 +148,11 @@ const styles=StyleSheet.create({
   demoPillText:{fontSize:9,letterSpacing:0.3,color:colors.primary,fontWeight:'700'},
   card:{backgroundColor:colors.surface,borderRadius:radius.xl,padding:18,borderWidth:1,borderColor:colors.divider},
   sectionHeading:{fontSize:18,fontWeight:'800',letterSpacing:-0.4,color:colors.text},
+  historyHeader:{flexDirection:'row',alignItems:'center',gap:10,marginBottom:4},
+  addButton:{minHeight:44,backgroundColor:colors.primary,borderRadius:radius.md,flexDirection:'row',alignItems:'center',paddingHorizontal:12,gap:7},
+  addButtonText:{fontSize:12,fontWeight:'800',color:colors.white},
+  notice:{flexDirection:'row',gap:9,alignItems:'center',backgroundColor:'#E7F2E9',padding:12,borderRadius:radius.md,marginBottom:12},
+  noticeText:{fontSize:11,color:colors.positive,flex:1,lineHeight:16},
   sectionHint:{fontSize:11,color:colors.muted,marginTop:5,marginBottom:12,lineHeight:16},
   divider:{backgroundColor:colors.line,height:1,marginVertical:3},
   amount:{fontSize:31,fontWeight:'800',color:colors.text,marginTop:12},

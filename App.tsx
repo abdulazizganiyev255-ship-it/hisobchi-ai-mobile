@@ -1,10 +1,13 @@
-import {useState} from 'react';
+import {useRef,useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import {StatusBar} from 'expo-status-bar';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {AppIcon, IconName} from './src/components/AppIcon';
 import {DashboardScreen} from './src/screens/DashboardScreen';
 import {OtherScreen, Tab} from './src/screens/OtherScreens';
+import {TransactionEntryScreen} from './src/screens/TransactionEntryScreen';
+import {demo,Transaction} from './src/data/demo';
+import {EntryKind,makeMockTransaction,MockEntryDraft} from './src/data/mockEntry';
 import {colors, radius, shadow} from './src/theme/tokens';
 
 const tabs: {key:Tab;label:string;icon:IconName}[] = [
@@ -16,47 +19,80 @@ const tabs: {key:Tab;label:string;icon:IconName}[] = [
 ];
 
 function AppContent() {
-  const [tab,setTab] = useState<Tab>('home');
+  const [tab,setTab]=useState<Tab>('home');
+  const [entryKind,setEntryKind]=useState<EntryKind|null>(null);
+  const [transactions,setTransactions]=useState<Transaction[]>(demo.transactions);
+  const [notice,setNotice]=useState('');
+  const nextMockId=useRef(0);
+
+  const openEntry=(kind:EntryKind)=>{
+    setNotice('');
+    setEntryKind(kind);
+  };
+
+  const saveEntry=(draft:MockEntryDraft)=>{
+    nextMockId.current+=1;
+    const saved=makeMockTransaction(draft,`d02-${Date.now()}-${nextMockId.current}`);
+    setTransactions(existing=>[saved,...existing]);
+    setEntryKind(null);
+    setTab('transactions');
+    setNotice('Namuna qo‘shildi. Yozuv faqat ushbu ochiq sessiyada saqlanadi.');
+  };
 
   return <SafeAreaView style={styles.safe} edges={['top','bottom']}>
     <StatusBar style="dark"/>
-    <View style={styles.body}>
-      {tab==='home'
-        ? <DashboardScreen onOpenTransactions={()=>setTab('transactions')}/>
-        : <OtherScreen tab={tab}/>
-      }
-    </View>
-    <View style={styles.navOuter}>
-      <View style={styles.nav}>
-        {tabs.map(item=>{
-          const active = tab===item.key;
-          return <Pressable
-            key={item.key}
-            accessibilityRole="tab"
-            accessibilityState={{selected:active}}
-            accessibilityLabel={item.label}
-            onPress={()=>setTab(item.key)}
-            style={[styles.navItem,active&&styles.navActive]}
-          >
-            <AppIcon
-              name={item.icon}
-              color={active?colors.primary:colors.faint}
-              size={21}
-              strokeWidth={active?2.2:1.8}
-            />
-            <Text
-              style={[styles.navLabel,active&&styles.navLabelActive]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >{item.label}</Text>
-          </Pressable>;
-        })}
-      </View>
-    </View>
+    {entryKind!==null
+      ? <TransactionEntryScreen
+          initialKind={entryKind}
+          onCancel={()=>setEntryKind(null)}
+          onSave={saveEntry}
+        />
+      : <>
+        <View style={styles.body}>
+          {tab==='home'
+            ? <DashboardScreen
+                onOpenTransactions={()=>setTab('transactions')}
+                onAddTransaction={openEntry}
+                transactions={transactions}
+              />
+            : <OtherScreen
+                tab={tab}
+                transactions={transactions}
+                demoCount={transactions.length-demo.transactions.length}
+                notice={notice}
+                onAddTransaction={openEntry}
+              />
+          }
+        </View>
+        <View style={styles.navOuter}>
+          <View style={styles.nav}>
+            {tabs.map(item=>{
+              const active=tab===item.key;
+              return <Pressable
+                key={item.key}
+                accessibilityRole="tab"
+                accessibilityState={{selected:active}}
+                accessibilityLabel={item.label}
+                onPress={()=>{setTab(item.key);setNotice('');}}
+                style={[styles.navItem,active&&styles.navActive]}
+              >
+                <AppIcon
+                  name={item.icon}
+                  color={active?colors.primary:colors.faint}
+                  size={21}
+                  strokeWidth={active?2.2:1.8}
+                />
+                <Text style={[styles.navLabel,active&&styles.navLabelActive]} numberOfLines={1} adjustsFontSizeToFit>{item.label}</Text>
+              </Pressable>;
+            })}
+          </View>
+        </View>
+      </>
+    }
   </SafeAreaView>;
 }
 
-export default function App() {
+export default function App(){
   return <SafeAreaProvider><AppContent/></SafeAreaProvider>;
 }
 
