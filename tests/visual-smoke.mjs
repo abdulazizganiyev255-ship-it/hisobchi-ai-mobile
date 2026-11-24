@@ -61,9 +61,15 @@ try {
     screenshots.push(await capture(page,'goal-form'));
 
     await page.getByRole('button',{name:'Maqsad muddatini tanlash'}).click();
-    await page.getByText('Qachon bo‘lgan?').waitFor();
+    await page.getByText('Qachongacha?').waitFor();
     screenshots.push(await capture(page,'goal-calendar'));
+    await page.getByRole('button',{name:'Keyingi oy'}).click();
+    await page.getByRole('button',{name:/^\\d{4}-\\d{2}-15$/}).click();
+    screenshots.push(await capture(page,'goal-with-future-deadline'));
+    await page.getByRole('button',{name:'Maqsad muddatini tanlash'}).click();
     await page.getByRole('button',{name:'Yopish',exact:true}).click();
+    await page.getByRole('button',{name:'Olib tashlash'}).click();
+    await page.getByText('Muddatsiz').waitFor();
 
     await page.getByRole('textbox',{name:'Maqsad nomi'}).fill('Yangi maqsad');
     await page.getByRole('textbox',{name:'Maqsad summasi (so‘m)'}).fill('5000000');
