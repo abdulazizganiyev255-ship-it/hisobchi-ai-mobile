@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Alert, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {AppIcon} from '../components/AppIcon';
+import {BalanceRibbon} from '../components/BalanceRibbon';
 import {ExpenseChart} from '../components/ExpenseChart';
 import {TransactionRow} from '../components/TransactionRow';
 import {demo, formatMoney} from '../data/demo';
@@ -14,59 +15,210 @@ export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>vo
   const narrow = width < 360;
   const month = demo.months[period];
 
-  return <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-    <View style={styles.header}>
-      <View style={styles.brandIcon}><AppIcon name="chart" color={colors.primarySoft} size={23}/></View>
-      <View style={styles.heading}><Text style={styles.appName}>Hisobchi <Text style={{color:colors.primary}}>AI</Text></Text><Text style={styles.greeting}>Xayrli kun! 👋</Text></View>
-      <Pressable style={styles.bell} accessibilityRole="button" accessibilityLabel="Bildirishnomalar" onPress={()=>Alert.alert('Demo rejimi','Bildirishnomalar keyingi bosqichda ulanadi.')}><AppIcon name="bell" color={colors.text} size={20}/></Pressable>
-    </View>
-    <View style={styles.demoLine}><View style={styles.demoDot}/><Text style={styles.demoText}>DEMO MA’LUMOTLAR · HAQIQIY HISOB EMAS</Text></View>
+  const explainDemo = (feature:string) => Alert.alert(
+    'Dizayn prototipi',
+    `${feature} oynasi D02 bosqichida interaktiv mock oqimga ulanadi. Hozir real hisobga yozilmaydi.`
+  );
 
-    <LinearGradient colors={['#164B78','#10385D','#0C2B4B']} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.balanceCard}>
-      <View style={styles.balanceWavesA}/><View style={styles.balanceWavesB}/>
-      <View style={styles.balanceTop}><View style={styles.balanceTitle}><View style={styles.balanceIcon}><AppIcon name="wallet" color={colors.primarySoft} size={18}/></View><Text style={styles.balanceTitleText}>Umumiy balans</Text></View><Pressable style={styles.eyeBtn} accessibilityRole="button" accessibilityLabel={visible?'Balansni yashirish':'Balansni ko‘rsatish'} onPress={()=>setVisible(s=>!s)}><AppIcon name={visible?'eye':'eye-off'} size={20} color={colors.text}/></Pressable></View>
-      <Text style={[styles.balanceValue,narrow&&{fontSize:27}]} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.75}>{visible?formatMoney(demo.balance):'••• ••• so‘m'}</Text>
-      <Text style={styles.balanceFoot}>Barcha hisoblar bo‘yicha</Text>
+  return <ScrollView
+    style={styles.scroll}
+    contentContainerStyle={styles.content}
+    showsVerticalScrollIndicator={false}
+  >
+    <View style={styles.header}>
+      <View style={styles.brandMark}><Text style={styles.brandMonogram}>h.</Text></View>
+      <View style={styles.heading}>
+        <Text style={styles.appName}>Hisobchi <Text style={styles.brandAccent}>AI</Text></Text>
+        <Text style={styles.greeting}>Moliyaviy xotirjamlik, har kuni.</Text>
+      </View>
+      <Pressable
+        style={styles.bell}
+        accessibilityRole="button"
+        accessibilityLabel="Bildirishnomalar"
+        onPress={()=>explainDemo('Bildirishnomalar')}
+      ><AppIcon name="bell" color={colors.primary} size={20}/></Pressable>
+    </View>
+
+    <View style={styles.welcome}>
+      <Text style={styles.eyebrow}>XAYRLI KUN ✦</Text>
+      <Text style={[styles.welcomeTitle,narrow&&{fontSize:25}]}>Pul rejangiz — bir qarashda.</Text>
+    </View>
+
+    <View style={styles.demoLine}>
+      <View style={styles.demoDot}/>
+      <Text style={styles.demoText}>NAMUNA MA’LUMOT · HAQIQIY BALANS EMAS</Text>
+    </View>
+
+    <LinearGradient
+      colors={['#844263','#6D2C4E','#4A1F36']}
+      start={{x:0,y:0}}
+      end={{x:1,y:1}}
+      style={styles.balanceCard}
+    >
+      <View pointerEvents="none" style={styles.ribbon}><BalanceRibbon/></View>
+      <View style={styles.balanceTop}>
+        <View style={styles.balanceTitleRow}>
+          <View style={styles.balanceIcon}><AppIcon name="wallet" color="#FFE8DD" size={16}/></View>
+          <Text style={styles.balanceTitle}>Umumiy balans</Text>
+        </View>
+        <Pressable
+          style={styles.eyeBtn}
+          accessibilityRole="button"
+          accessibilityLabel={visible?'Balansni yashirish':'Balansni ko‘rsatish'}
+          onPress={()=>setVisible(v=>!v)}
+        ><AppIcon name={visible?'eye':'eye-off'} color="#FFEBE9" size={21}/></Pressable>
+      </View>
+      <Text
+        style={[styles.balanceValue,narrow&&{fontSize:28}]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >{visible?formatMoney(demo.balance):'••• ••• so‘m'}</Text>
+      <Text style={styles.balanceFoot}>Barcha hisoblar · namuna</Text>
+      <View style={styles.cardSeal}><Text style={styles.cardSealText}>HISOBCHI / DEMO</Text></View>
     </LinearGradient>
 
-    <Pressable accessibilityRole="button" accessibilityLabel="Xavfsiz sarflash haqida" onPress={()=>Alert.alert('Xavfsiz sarflash','Hozir namuna ko‘rsatilgan. Kelajakda haqiqiy limit rejalashtirilgan to‘lovlar va balansdan hisoblanadi.')}>
-      <LinearGradient colors={[colors.cardLight,colors.cardLightBottom]} start={{x:0,y:0}} end={{x:1,y:1}} style={styles.safeCard}>
-        <View style={styles.safeIcon}><AppIcon name="shield" size={26} color="#0874B5"/></View>
-        <View style={{flex:1,minWidth:0}}><Text style={styles.safeTitle}>Bugun xavfsiz sarflash</Text><Text style={[styles.safeAmount,narrow&&{fontSize:21}]} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(demo.safeToSpendToday)}</Text><Text style={styles.safeSubtitle}>Namuna limit · hali hisoblanmagan</Text></View>
-        <AppIcon name="chevron" color={colors.ink} size={19}/>
-      </LinearGradient>
+    <View style={styles.quickActions}>
+      <Pressable
+        style={[styles.action,styles.primaryAction]}
+        accessibilityRole="button"
+        accessibilityLabel="Xarajat qo‘shish"
+        onPress={()=>explainDemo('Xarajat qo‘shish')}
+      >
+        <View style={styles.primaryActionIcon}><AppIcon name="plus" color={colors.white} size={20}/></View>
+        <Text style={styles.primaryActionText}>Xarajat</Text>
+      </Pressable>
+      <Pressable
+        style={[styles.action,styles.secondaryAction]}
+        accessibilityRole="button"
+        accessibilityLabel="Kirim qo‘shish"
+        onPress={()=>explainDemo('Kirim qo‘shish')}
+      >
+        <View style={styles.secondaryActionIcon}><AppIcon name="wallet" color={colors.primary} size={18}/></View>
+        <Text style={styles.secondaryActionText}>Kirim</Text>
+      </Pressable>
+    </View>
+
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Bugungi sarf rejasi haqida"
+      onPress={()=>Alert.alert(
+        'Sarf rejasi · demo',
+        '145 000 so‘m namuna qiymat. Haqiqiy Safe-to-Spend tasdiqlangan hisob qoldig‘i, majburiyatlar va rezervlardan Finance Engine orqali hisoblanadi.'
+      )}
+    >
+      <View style={styles.safeCard}>
+        <View style={styles.safeIcon}><AppIcon name="shield" size={23} color={colors.primary}/></View>
+        <View style={styles.safeBody}>
+          <Text style={styles.safeEyebrow}>KUNLIK SARF REJASI</Text>
+          <Text style={[styles.safeAmount,narrow&&{fontSize:23}]} numberOfLines={1} adjustsFontSizeToFit>{formatMoney(demo.safeToSpendToday)}</Text>
+          <Text style={styles.safeSubtitle}>Namuna · hisoblab chiqilmagan</Text>
+        </View>
+        <View style={styles.safeChevron}><AppIcon name="chevron" color={colors.primary} size={16}/></View>
+      </View>
     </Pressable>
 
     <View style={styles.chartCard}>
-      <View style={styles.sectionHeader}><View style={styles.sectionTitleRow}><AppIcon name="chart" color={colors.primary} size={19}/><Text style={styles.sectionTitle}>Xarajatlar tahlili</Text></View><Pressable style={styles.periodBtn} accessibilityRole="button" accessibilityLabel="Davrni almashtirish" onPress={()=>setPeriod(x=>x==='current'?'previous':'current')}><Text style={styles.periodText}>{month.label}</Text><AppIcon name="chevron-down" color={colors.text} size={13}/></Pressable></View>
+      <View style={styles.sectionHeader}>
+        <View style={styles.sectionTitleRow}>
+          <View style={styles.sectionIcon}><AppIcon name="chart" color={colors.primary} size={17}/></View>
+          <Text style={styles.sectionTitle}>Xarajatlar</Text>
+        </View>
+        <Pressable
+          style={styles.periodBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Tahlil davrini almashtirish"
+          onPress={()=>setPeriod(x=>x==='current'?'previous':'current')}
+        >
+          <Text style={styles.periodText}>{month.label}</Text>
+          <AppIcon name="chevron-down" color={colors.primary} size={13}/>
+        </Pressable>
+      </View>
       <Text style={styles.chartAmount}>{formatMoney(month.total)}</Text>
-      <Text style={styles.chartDetail}>{period==='current'?'O‘tgan oyga nisbatan': 'Oldingi davrga nisbatan'} · {month.change<0?'−':'+'}{Math.abs(month.change)}%</Text>
+      <Text style={styles.chartDetail}>Namuna tendensiya · {month.change<0?'−':'+'}{Math.abs(month.change)}%</Text>
       <ExpenseChart values={month.chart}/>
     </View>
 
     <View style={styles.transactionsCard}>
-      <View style={styles.transactionsHeader}><Text style={styles.transactionsTitle}>So‘nggi operatsiyalar</Text><Pressable accessibilityRole="button" accessibilityLabel="Barcha operatsiyalar" onPress={onOpenTransactions} style={styles.arrow}><AppIcon name="chevron" color={colors.ink} size={20}/></Pressable></View>
-      {demo.transactions.slice(0,3).map((item,i)=><React.Fragment key={item.id}>{i>0&&<View style={styles.separator}/>}<TransactionRow item={item} light/></React.Fragment>)}
+      <View style={styles.transactionsHeader}>
+        <View>
+          <Text style={styles.transactionsTitle}>So‘nggi operatsiyalar</Text>
+          <Text style={styles.transactionsHint}>Namuna yozuvlar</Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Barcha operatsiyalar"
+          onPress={onOpenTransactions}
+          style={styles.arrow}
+        ><AppIcon name="chevron" color={colors.primary} size={19}/></Pressable>
+      </View>
+      {demo.transactions.slice(0,3).map((item,i)=><React.Fragment key={item.id}>
+        {i>0&&<View style={styles.separator}/>}
+        <TransactionRow item={item} light/>
+      </React.Fragment>)}
     </View>
-    <Text style={styles.disclaimer}>Hisobchi AI · Dizayn prototipi v0.1</Text>
+
+    <Text style={styles.disclaimer}>Hisobchi AI · D01 UI prototip · real hisob emas</Text>
   </ScrollView>;
 }
 
 const styles=StyleSheet.create({
-  scroll:{flex:1},content:{paddingHorizontal:spacing.lg,paddingTop:18,paddingBottom:28,gap:16},
-  header:{flexDirection:'row',gap:12,alignItems:'center'},
-  brandIcon:{width:45,height:45,borderRadius:14,backgroundColor:'#125284',alignItems:'center',justifyContent:'center'},
-  heading:{flex:1},appName:{fontWeight:'800',fontSize:23,letterSpacing:-0.6,color:colors.text},greeting:{color:colors.muted,fontSize:12,marginTop:3},
-  bell:{width:42,height:42,backgroundColor:colors.surface,borderRadius:21,alignItems:'center',justifyContent:'center',borderWidth:1,borderColor:colors.divider},
-  demoLine:{flexDirection:'row',alignItems:'center',gap:7,marginTop:-7},demoDot:{height:5,width:5,borderRadius:3,backgroundColor:colors.primary},demoText:{fontSize:9,letterSpacing:1,color:colors.faint,fontWeight:'700'},
-  balanceCard:{minHeight:166,borderRadius:radius.xl,padding:20,overflow:'hidden',...shadow.card},
-  balanceWavesA:{position:'absolute',width:200,height:200,borderRadius:100,backgroundColor:'rgba(64,198,255,0.12)',right:-85,bottom:-130},
-  balanceWavesB:{position:'absolute',width:180,height:180,borderRadius:90,backgroundColor:'rgba(153,219,255,0.06)',right:45,top:-130},
-  balanceTop:{flexDirection:'row',justifyContent:'space-between',alignItems:'center'},balanceTitle:{flexDirection:'row',alignItems:'center',gap:9},balanceIcon:{width:32,height:32,borderRadius:10,backgroundColor:'rgba(142,219,255,0.12)',alignItems:'center',justifyContent:'center'},balanceTitleText:{color:colors.text,fontSize:15,fontWeight:'600'},eyeBtn:{padding:8,margin:-8},
-  balanceValue:{color:'#FFFFFF',fontWeight:'800',fontSize:32,letterSpacing:-0.8,marginTop:19},balanceFoot:{color:'#B2D1E5',fontSize:11,marginTop:8},
-  safeCard:{borderRadius:radius.lg,padding:16,minHeight:108,flexDirection:'row',alignItems:'center',gap:12,...shadow.light},safeIcon:{height:47,width:47,backgroundColor:'#C7EFFF',borderRadius:15,alignItems:'center',justifyContent:'center'},safeTitle:{color:colors.ink,fontWeight:'600',fontSize:12},safeAmount:{color:colors.ink,fontWeight:'800',fontSize:24,letterSpacing:-0.5,marginTop:5},safeSubtitle:{color:'#547C9C',fontSize:10,marginTop:4},
-  chartCard:{borderRadius:radius.lg,backgroundColor:colors.surface,padding:18,borderWidth:1,borderColor:'rgba(124,197,235,0.13)'},
-  sectionHeader:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:8},sectionTitleRow:{flexDirection:'row',alignItems:'center',gap:9,flexShrink:1},sectionTitle:{color:colors.text,fontWeight:'700',fontSize:16},periodBtn:{backgroundColor:colors.surfaceRaised,borderRadius:radius.pill,paddingVertical:9,paddingHorizontal:11,flexDirection:'row',alignItems:'center',gap:6},periodText:{color:colors.text,fontSize:11,fontWeight:'600'},chartAmount:{fontWeight:'700',fontSize:20,color:colors.text,marginTop:13},chartDetail:{fontSize:11,color:colors.muted,marginTop:4},
-  transactionsCard:{backgroundColor:colors.cardLight,borderRadius:radius.lg,paddingHorizontal:16,paddingVertical:12},transactionsHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginBottom:7},transactionsTitle:{color:colors.ink,fontWeight:'800',fontSize:17,letterSpacing:-0.4},arrow:{width:32,height:32,borderRadius:16,backgroundColor:'rgba(255,255,255,0.65)',justifyContent:'center',alignItems:'center'},separator:{height:1,backgroundColor:'#D1E4F0',marginLeft:57},
-  disclaimer:{color:colors.faint,textAlign:'center',fontSize:10,marginTop:1}
+  scroll:{flex:1},
+  content:{paddingHorizontal:spacing.lg,paddingTop:16,paddingBottom:32,gap:16},
+  header:{flexDirection:'row',gap:11,alignItems:'center'},
+  brandMark:{width:43,height:43,borderRadius:15,backgroundColor:colors.primary,alignItems:'center',justifyContent:'center'},
+  brandMonogram:{fontSize:23,fontWeight:'800',color:'#FDF3EC',letterSpacing:-1.2},
+  heading:{flex:1},
+  appName:{fontWeight:'800',fontSize:19,letterSpacing:-0.45,color:colors.text},
+  brandAccent:{color:colors.primary},
+  greeting:{color:colors.muted,fontSize:11,marginTop:3},
+  bell:{width:44,height:44,backgroundColor:colors.surface,borderRadius:21,alignItems:'center',justifyContent:'center',borderWidth:1,borderColor:colors.divider},
+  welcome:{gap:5,marginTop:8},
+  eyebrow:{color:colors.primary,fontSize:10,fontWeight:'800',letterSpacing:2},
+  welcomeTitle:{color:colors.text,fontSize:29,fontWeight:'800',letterSpacing:-1.1,maxWidth:320,lineHeight:37},
+  demoLine:{flexDirection:'row',alignItems:'center',gap:7,marginTop:-5},
+  demoDot:{height:5,width:5,borderRadius:3,backgroundColor:colors.primary},
+  demoText:{fontSize:9,letterSpacing:0.6,color:colors.faint,fontWeight:'700'},
+  balanceCard:{minHeight:194,borderRadius:radius.hero,padding:21,overflow:'hidden',...shadow.card},
+  ribbon:{position:'absolute',right:-21,top:-7,opacity:0.88},
+  balanceTop:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',zIndex:1},
+  balanceTitleRow:{flexDirection:'row',alignItems:'center',gap:9},
+  balanceIcon:{width:31,height:31,borderRadius:11,backgroundColor:'rgba(255,239,230,0.17)',alignItems:'center',justifyContent:'center'},
+  balanceTitle:{color:'#FDEFE9',fontSize:14,fontWeight:'600'},
+  eyeBtn:{minHeight:44,minWidth:44,alignItems:'center',justifyContent:'center',margin:-8},
+  balanceValue:{color:'#FFFFFF',fontWeight:'800',fontSize:31,letterSpacing:-0.8,marginTop:22,zIndex:1,paddingRight:12},
+  balanceFoot:{color:'#F6D7E1',fontSize:11,marginTop:8,zIndex:1},
+  cardSeal:{marginTop:20,alignSelf:'flex-start',zIndex:1},
+  cardSealText:{fontSize:8,color:'#E6BFCF',fontWeight:'700',letterSpacing:2},
+  quickActions:{flexDirection:'row',gap:11},
+  action:{flex:1,minHeight:56,borderRadius:radius.lg,flexDirection:'row',alignItems:'center',justifyContent:'center',gap:10},
+  primaryAction:{backgroundColor:colors.primary},
+  secondaryAction:{backgroundColor:colors.surface,borderWidth:1,borderColor:colors.divider},
+  primaryActionIcon:{height:28,width:28,borderRadius:14,alignItems:'center',justifyContent:'center',backgroundColor:'rgba(255,255,255,0.14)'},
+  secondaryActionIcon:{height:28,width:28,borderRadius:14,alignItems:'center',justifyContent:'center',backgroundColor:colors.primarySoft},
+  primaryActionText:{fontSize:14,fontWeight:'800',color:colors.white},
+  secondaryActionText:{fontSize:14,fontWeight:'800',color:colors.primary},
+  safeCard:{minHeight:118,borderRadius:radius.xl,padding:17,backgroundColor:'#F5E5DF',borderWidth:1,borderColor:'#EBD5D0',flexDirection:'row',alignItems:'center',gap:14},
+  safeIcon:{height:45,width:45,backgroundColor:'#FFF8F5',borderRadius:15,alignItems:'center',justifyContent:'center'},
+  safeBody:{flex:1,minWidth:0},
+  safeEyebrow:{color:colors.primary,fontWeight:'800',fontSize:10,letterSpacing:0.8},
+  safeAmount:{color:colors.ink,fontWeight:'800',fontSize:26,letterSpacing:-0.8,marginTop:5},
+  safeSubtitle:{color:colors.muted,fontSize:10,marginTop:4},
+  safeChevron:{alignItems:'center',justifyContent:'center'},
+  chartCard:{borderRadius:radius.xl,backgroundColor:colors.surface,padding:18,borderWidth:1,borderColor:colors.divider},
+  sectionHeader:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:8},
+  sectionTitleRow:{flexDirection:'row',alignItems:'center',gap:8,flexShrink:1},
+  sectionIcon:{width:29,height:29,borderRadius:11,backgroundColor:colors.primarySoft,alignItems:'center',justifyContent:'center'},
+  sectionTitle:{color:colors.text,fontWeight:'800',fontSize:17,letterSpacing:-0.3},
+  periodBtn:{backgroundColor:colors.background,borderRadius:radius.pill,minHeight:44,paddingVertical:9,paddingHorizontal:12,flexDirection:'row',alignItems:'center',gap:6},
+  periodText:{color:colors.primary,fontSize:11,fontWeight:'700'},
+  chartAmount:{fontWeight:'800',fontSize:23,color:colors.text,marginTop:15,letterSpacing:-0.5},
+  chartDetail:{fontSize:11,color:colors.muted,marginTop:4},
+  transactionsCard:{backgroundColor:colors.surface,borderRadius:radius.xl,paddingHorizontal:16,paddingVertical:15,borderWidth:1,borderColor:colors.divider},
+  transactionsHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginBottom:7},
+  transactionsTitle:{color:colors.ink,fontWeight:'800',fontSize:17,letterSpacing:-0.3},
+  transactionsHint:{fontSize:10,color:colors.muted,marginTop:4},
+  arrow:{width:44,height:44,borderRadius:22,backgroundColor:colors.primarySoft,justifyContent:'center',alignItems:'center'},
+  separator:{height:1,backgroundColor:colors.line,marginLeft:57},
+  disclaimer:{color:colors.faint,textAlign:'center',fontSize:10,marginTop:1},
 });
