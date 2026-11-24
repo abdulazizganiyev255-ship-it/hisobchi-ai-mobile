@@ -1,7 +1,7 @@
 import React from 'react';
 import Svg, { Circle, Line, Path, Polyline, Rect } from 'react-native-svg';
 
-export type IconName = 'home' | 'chart' | 'wallet' | 'receipt' | 'user' | 'eye' | 'eye-off' | 'shield' | 'chevron' | 'chevron-down' | 'bell' | 'cart' | 'bus' | 'coffee' | 'heart' | 'arrow-left' | 'check' | 'plus';
+export type IconName = 'home' | 'chart' | 'wallet' | 'receipt' | 'user' | 'eye' | 'eye-off' | 'shield' | 'chevron' | 'chevron-down' | 'bell' | 'cart' | 'bus' | 'coffee' | 'heart' | 'arrow-left' | 'check' | 'plus' | 'sparkles' | 'mic';
 
 type Props = { name: IconName; color?: string; size?: number; strokeWidth?: number };
 
@@ -27,6 +27,8 @@ export function AppIcon({name, color = '#FFFFFF', size = 22, strokeWidth = 1.8}:
     case 'heart': shape = path('M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z'); break;
     case 'arrow-left': shape = path('M20 12H4m7-7-7 7 7 7'); break;
     case 'check': shape = path('M4 12l5 5L20 6'); break;
+    case 'sparkles': shape = <>{path('M12 2l2.1 6.9L21 11l-6.9 2.1L12 20l-2.1-6.9L3 11l6.9-2.1L12 2zM19 18l.9 1.8L22 20.7l-2.1.9L19 24l-.9-2.4-2.1-.9 2.1-.9L19 18z')}</>; break;
+    case 'mic': shape = <><Rect x="9" y="2" width="6" height="13" rx="3" {...p}/>{path('M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8')}</>; break;
     case 'plus': shape = <><Line x1="12" y1="4" x2="12" y2="20" {...p}/><Line x1="4" y1="12" x2="20" y2="12" {...p}/></>; break;
   }
   return <Svg width={size} height={size} viewBox="0 0 24 24" accessible={false}>{shape}</Svg>;
