@@ -1,79 +1,53 @@
-# Hisobchi AI Mobile — UI Prototype v0.1
+# Hisobchi AI Mobile — D01 Design Foundation
 
-A React Native (Expo + TypeScript) design prototype for the Hisobchi AI personal finance app in Uzbekistan.
+A React Native / Expo / TypeScript UI prototype for the Hisobchi AI finance app in Uzbekistan.
 
-> ⚠️ **Demo only.** All balances, budgets, graphs and transactions are hard-coded sample data. There is no authentication, bank connection, AI call, Supabase integration or network API.
+> **UI-only demo:** balances, transactions, insights and charts use local examples. There is **no** Supabase connection, authentication, AI model, speech-to-text or payment integration. Nothing in this branch writes financial data.
 
-## 1) Requirements
+## Approved visual direction
 
-- Node.js 22.13+ (recommended Node.js 22 LTS), npm and Git
-- Android smartphone with compatible Expo Go installed, or Android emulator
-- Expo SDK 58 compatible Expo Go (check https://expo.dev/go for your device)
+- Warm ivory `#F7F1EB` and white `#FFFBF7` surfaces
+- Plum `#6D2C4E` accent with a sculptural decorative balance-card ribbon
+- iPhone-inspired minimalism: generous breathing room, rounded pills, restrained typography and warm chart colors
+- Five tabs: **Bosh / Tarix / AI / Tahlil / Profil**
+- Localized UZS formatting
+- Demo/unknown financial values explicitly distinguished from live data
 
-## 2) Run locally (Windows PowerShell)
+## Run on Windows PowerShell
 
 ```powershell
 cd hisobchi-ai-mobile
-npm install
-npx expo install --fix
+npm ci
 npm run typecheck
-npx expo start --tunnel
+npx expo start
 ```
 
-Scan the displayed QR code in Expo Go. `--tunnel` may ask to install `@expo/ngrok`; consent and allow internet traffic. If local Wi-Fi is available, `npx expo start` is usually simpler.
+Scan the QR code using compatible Expo Go. The repo uses Expo SDK 58 and requires a compatible Node.js version (Node 22 recommended).
 
-> The package versions in this source are an initial SDK 58 set. `npx expo install --fix` aligns SDK native module versions with the installed Expo SDK before the first run; review any package changes before committing.
+If dependencies are out of sync, review `npx expo install --check` output and reconcile them in a **separate reviewed change**, rather than changing dependencies automatically.
 
-## 3) Upload to a new **private** GitHub repo
+## Current D01 scope
 
-Create an **empty** GitHub repo named `hisobchi-ai-mobile` (no README, license or `.gitignore` checkbox). In PowerShell, run from the extracted project folder:
+- Shared visual tokens: `src/theme/tokens.ts`
+- Five-tab navigation shell: `App.tsx`
+- Premium dashboard: `src/screens/DashboardScreen.tsx`
+- History, AI, analytics and profile: `src/screens/OtherScreens.tsx`
+- Sculptural ribbon: `src/components/BalanceRibbon.tsx`
+- Unified chart and transaction-row colors
+- Preserved interactions: balance hide/show, month switch and history shortcut
+- Add-expense, add-income and notifications currently show an explanatory demo alert rather than claim real functionality
 
-```powershell
-git init
-# If another Git remote already exists, inspect with: git remote -v
-git add .
-git commit -m "feat: initial Hisobchi AI mobile design prototype"
-git branch -M main
-git remote add origin https://github.com/abdulazizganiyev255-ship-it/hisobchi-ai-mobile.git
-git push -u origin main
-```
+## Design QA
 
-Sign into GitHub when Git asks. GitHub HTTPS does not accept a normal account password for Git pushes; use browser authentication / Git Credential Manager or a suitable token.
+See `docs/design/D01-foundation.md` for visual/interaction acceptance checks.
 
-## 4) Project structure
+## Security & data integrity
 
-- `App.tsx` — app entry, bottom navigation and base background
-- `src/theme/tokens.ts` — colors, radii, spacing, shadows
-- `src/data/demo.ts` — sample data and UZS formatting
-- `src/components/AppIcon.tsx` — reusable SVG icon primitives
-- `src/components/ExpenseChart.tsx` — sample graph
-- `src/components/TransactionRow.tsx` — reusable transaction row
-- `src/screens/DashboardScreen.tsx` — main home screen, balance visibility and month filter
-- `src/screens/OtherScreens.tsx` — demo sections for navigation
+Do not put production Supabase keys or actual financial transactions in this frontend. The backend security audit identified unsafe legacy anonymous-access policies. Production integration must be blocked until Auth, RLS, least-privilege API, financial ledger and negative isolation tests pass.
 
-## 5) What's interactive
+## Next milestones
 
-- Balance show/hide eye control
-- This month / last month switch (cycles)
-- Bottom navigation between four tabs
-- Transaction history shortcut
-- Safe-to-spend explanatory dialog
-
-## 6) Product quality and security notes
-
-- **Do not** connect production Supabase or insert secrets into code.
-- Safe-to-spend is **not** yet computed; the displayed limit must never be treated as financial advice or a real budget.
-- Before production: validate data access controls, authenticated API integration, RLS, loading and error states, keyboard/screen-reader accessibility, edge cases, device previews and localized copy.
-- The chart uses static demo values, not an expense aggregation implementation.
-- This repository intentionally has no `.env` or real customer data.
-
-## 7) Acceptance checks
-
-1. Run `npm run typecheck` and `npx expo install --check` with packages installed.
-2. Open in Expo Go and check 360dp / 393dp width devices.
-3. Toggle eye icon, change chart period, switch tabs and open transaction history.
-4. Verify long currency amounts do not clip, swipe works, navbar stays visible.
-
-## Technology
-
-Expo SDK 58 / React Native 0.88 / TypeScript / react-native-svg / expo-linear-gradient / react-native-safe-area-context.
+- **D02:** transaction-entry UI, editable mock drafts, calendar, full navigation and all UI states
+- **D03:** additional screens and accessibility QA
+- **D04:** iPhone/device screenshots and targeted visual corrections
+- **I01:** backend Auth + Ledger integration on isolated staging, after P0 security controls are fixed
