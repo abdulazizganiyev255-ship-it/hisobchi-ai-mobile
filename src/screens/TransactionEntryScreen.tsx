@@ -99,7 +99,7 @@ export function TransactionEntryScreen({initialKind,onCancel,onSave}:Props) {
             placeholder="0"
             placeholderTextColor="#B59FA7"
             style={styles.moneyInput}
-            maxLength={12}
+            maxLength={32}
             selectionColor={colors.primary}
             accessibilityLabel="Summa, so‘mda"
             testID="entry-amount"
@@ -167,7 +167,7 @@ export function TransactionEntryScreen({initialKind,onCancel,onSave}:Props) {
 
       <View style={styles.infoCard}>
         <AppIcon name="shield" color={colors.primary} size={20}/>
-        <Text style={styles.infoText}>Bu faqat dizayn sinovi. Operatsiya sessiya tarixiga qo‘shiladi, bank yoki Supabase hisobiga yozilmaydi.</Text>
+        <Text style={styles.infoText}>Namuna faqat ushbu sessiyada saqlanadi. Haqiqiy hisobga ta’sir qilmaydi.</Text>
       </View>
     </ScrollView>
 
