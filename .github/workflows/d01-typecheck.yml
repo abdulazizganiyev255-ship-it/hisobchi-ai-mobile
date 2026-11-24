@@ -21,5 +21,5 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run typecheck
-      - name: Calendar date-only unit tests
-        run: node --experimental-strip-types --test tests/calendar.test.mjs
+      - name: Calendar and integer UZS validation tests
+        run: node --experimental-strip-types --test tests/calendar.test.mjs tests/amount-validation.test.mjs
