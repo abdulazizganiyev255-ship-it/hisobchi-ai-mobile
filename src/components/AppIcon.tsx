@@ -12,7 +12,6 @@ export function AppIcon({name, color = '#FFFFFF', size = 22, strokeWidth = 1.8}:
   // consistently on mobile and web. Parent provides the accessible action label.
   if(name==='sparkles'){
     return <Text
-      accessible={false}
       style={{color,fontSize:size,fontWeight:'700',width:size,height:size,lineHeight:size,textAlign:'center'}}
     >✦</Text>;
   }
