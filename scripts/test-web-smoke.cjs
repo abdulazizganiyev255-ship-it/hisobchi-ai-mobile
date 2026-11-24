@@ -84,14 +84,14 @@ async function smoke(browser, size) {
     await visible(page.getByText('3 840 000 so‘m', {exact: true}), 'Current-month sample restored');
     await capture(page, size, 'dashboard');
 
-    await nav('Operatsiyalar').click();
+    await nav('Faoliyat').click();
     await visible(page.getByRole('button', {name: 'Yangi operatsiya qo‘shish'}), 'Add transaction CTA');
     await visible(page.getByText('259 000 so‘m', {exact: true}), 'Baseline expenses');
     await checkWidth(page, size, 'Transactions');
     await capture(page, size, 'transactions');
 
     const add = page.getByRole('button', {name: 'Yangi operatsiya qo‘shish'});
-    const tab = nav('Operatsiyalar');
+    const tab = nav('Faoliyat');
     const addBox = await add.boundingBox();
     const tabBox = await tab.boundingBox();
     const listBox = await page.getByTestId('transactions-scroll').boundingBox();
