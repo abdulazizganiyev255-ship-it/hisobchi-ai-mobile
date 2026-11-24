@@ -3,7 +3,8 @@ import {Alert,KeyboardAvoidingView,Platform,Pressable,ScrollView,StyleSheet,Text
 import {CalendarSheet} from '../components/CalendarSheet';
 import {AppIcon} from '../components/AppIcon';
 import {formatUzDate,toLocalISODate} from '../data/calendar';
-import {categories,cleanMoneyInput,EntryKind,MAX_MOCK_AMOUNT,MockEntryDraft,validateMockEntry} from '../data/mockEntry';
+import {categories,cleanMoneyInput,EntryKind,MockEntryDraft,validateMockEntry} from '../data/mockEntry';
+import {parseMockAmount} from '../data/amountValidation';
 import {colors,radius,shadow,spacing} from '../theme/tokens';
 
 type Props={
@@ -30,11 +31,11 @@ export function TransactionEntryScreen({initialKind,onCancel,onSave}:Props) {
   };
 
   const draft:MockEntryDraft={kind,amountDigits,categoryId,occurredOn,note};
-  const amountNumber=Number(amountDigits||'0');
-  const hint=amountNumber>MAX_MOCK_AMOUNT?'Summa juda katta':amountDigits?new Intl.NumberFormat('ru-RU').format(amountNumber)+' so‘m':'Summani kiriting';
+  const parsedAmount=parseMockAmount(amountDigits);
+  const hint=amountDigits===''?'Summani kiriting':parsedAmount===null?'Musbat butun so‘m miqdorini kiriting':new Intl.NumberFormat('ru-RU').format(parsedAmount)+' so‘m';
 
   const handleCancel=()=>{
-    const changed=amountDigits!==''||note.trim()!==''||occurredOn!==todayISO;
+    const changed=amountDigits!==''||note.trim()!==''||occurredOn!==todayISO||kind!==initialKind||categoryId!==categories[initialKind][0].id;
     if(!changed){onCancel();return;}
     Alert.alert(
       'Kiritishni bekor qilish?',
