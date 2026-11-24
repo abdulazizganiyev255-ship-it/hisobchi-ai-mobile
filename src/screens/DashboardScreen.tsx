@@ -70,7 +70,7 @@ export function DashboardScreen({onOpenTransactions,onAddTransaction,transaction
         ><AppIcon name={visible?'eye':'eye-off'} color="#FFEBE9" size={21}/></Pressable>
       </View>
       <Text
-        style={[styles.balanceValue,narrow&&{fontSize:28}]}
+        style={[styles.balanceValue,narrow&&{fontSize:27}]}
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.7}
@@ -181,13 +181,13 @@ const styles=StyleSheet.create({
   demoDot:{height:5,width:5,borderRadius:3,backgroundColor:colors.primary},
   demoText:{fontSize:9,letterSpacing:0.6,color:colors.faint,fontWeight:'700'},
   balanceCard:{minHeight:194,borderRadius:radius.hero,padding:21,overflow:'hidden',...shadow.card},
-  ribbon:{position:'absolute',right:-21,top:-7,opacity:0.88},
+  ribbon:{position:'absolute',right:-48,top:-7,opacity:0.7},
   balanceTop:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',zIndex:1},
   balanceTitleRow:{flexDirection:'row',alignItems:'center',gap:9},
   balanceIcon:{width:31,height:31,borderRadius:11,backgroundColor:'rgba(255,239,230,0.17)',alignItems:'center',justifyContent:'center'},
   balanceTitle:{color:'#FDEFE9',fontSize:14,fontWeight:'600'},
   eyeBtn:{minHeight:44,minWidth:44,alignItems:'center',justifyContent:'center',margin:-8},
-  balanceValue:{color:'#FFFFFF',fontWeight:'800',fontSize:31,letterSpacing:-0.8,marginTop:22,zIndex:1,paddingRight:12},
+  balanceValue:{color:'#FFFFFF',fontWeight:'800',fontSize:31,letterSpacing:-0.8,marginTop:22,zIndex:1,paddingRight:12,textShadowColor:'rgba(38,7,25,0.52)',textShadowOffset:{width:0,height:1},textShadowRadius:4},
   balanceFoot:{color:'#F6D7E1',fontSize:11,marginTop:8,zIndex:1},
   cardSeal:{marginTop:20,alignSelf:'flex-start',zIndex:1},
   cardSealText:{fontSize:8,color:'#E6BFCF',fontWeight:'700',letterSpacing:2},

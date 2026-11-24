@@ -5,6 +5,7 @@ import {TransactionRow} from '../components/TransactionRow';
 import {ExpenseChart} from '../components/ExpenseChart';
 import {demo, formatMoney, Transaction} from '../data/demo';
 import {EntryKind} from '../data/mockEntry';
+import type {FinanceSection} from './FinanceSetupScreen';
 import {colors, radius, spacing} from '../theme/tokens';
 
 export type Tab = 'home' | 'transactions' | 'ai' | 'analytics' | 'profile';
@@ -37,12 +38,13 @@ const details:Record<Exclude<Tab,'home'>,Detail> = {
   }
 };
 
-export function OtherScreen({tab,transactions,demoCount,notice,onAddTransaction}:{
+export function OtherScreen({tab,transactions,demoCount,notice,onAddTransaction,onOpenFinanceSection}:{
   tab:Exclude<Tab,'home'>;
   transactions:Transaction[];
   demoCount:number;
   notice:string;
   onAddTransaction:(kind:EntryKind)=>void;
+  onOpenFinanceSection:(section:FinanceSection)=>void;
 }) {
   const detail = details[tab];
   return <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
@@ -121,7 +123,19 @@ export function OtherScreen({tab,transactions,demoCount,notice,onAddTransaction}
           </View>
         </View>
         <View style={styles.divider}/>
-        <View style={styles.settingRow}><AppIcon name="wallet" color={colors.primary} size={19}/><Text style={styles.settingTitle}>Hisoblar va balans</Text><Text style={styles.settingHint}>Keyin ulanadi</Text></View>
+        <Pressable
+          style={styles.settingRow}
+          accessibilityRole="button"
+          accessibilityLabel="Hisoblar oynasini ochish"
+          onPress={()=>onOpenFinanceSection('accounts')}
+        ><AppIcon name="wallet" color={colors.primary} size={19}/><Text style={styles.settingTitle}>Hisoblar</Text><AppIcon name="chevron" color={colors.primary} size={17}/></Pressable>
+        <View style={styles.divider}/>
+        <Pressable
+          style={styles.settingRow}
+          accessibilityRole="button"
+          accessibilityLabel="Maqsadlar oynasini ochish"
+          onPress={()=>onOpenFinanceSection('goals')}
+        ><AppIcon name="shield" color={colors.primary} size={19}/><Text style={styles.settingTitle}>Maqsadlar</Text><AppIcon name="chevron" color={colors.primary} size={17}/></Pressable>
         <View style={styles.divider}/>
         <View style={styles.settingRow}><AppIcon name="shield" color={colors.primary} size={19}/><Text style={styles.settingTitle}>Xavfsizlik</Text><Text style={styles.settingHint}>Keyin ulanadi</Text></View>
         <View style={styles.divider}/>

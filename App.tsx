@@ -8,6 +8,11 @@ import {OtherScreen, Tab} from './src/screens/OtherScreens';
 import {TransactionEntryScreen} from './src/screens/TransactionEntryScreen';
 import {demo,Transaction} from './src/data/demo';
 import {EntryKind,makeMockTransaction,MockEntryDraft} from './src/data/mockEntry';
+import {FinanceSetupScreen,FinanceSection} from './src/screens/FinanceSetupScreen';
+import {
+  AccountDraft,createMockAccount,createMockGoal,GoalDraft,
+  initialMockAccounts,initialMockGoals,MockAccount,MockGoal
+} from './src/data/financeSetup';
 import {colors, radius, shadow} from './src/theme/tokens';
 
 const tabs: {key:Tab;label:string;icon:IconName}[] = [
@@ -23,6 +28,9 @@ function AppContent() {
   const [entryKind,setEntryKind]=useState<EntryKind|null>(null);
   const [transactions,setTransactions]=useState<Transaction[]>(demo.transactions);
   const [notice,setNotice]=useState('');
+  const [profileSection,setProfileSection]=useState<FinanceSection|null>(null);
+  const [accounts,setAccounts]=useState<MockAccount[]>(initialMockAccounts);
+  const [goals,setGoals]=useState<MockGoal[]>(initialMockGoals);
   const nextMockId=useRef(0);
 
   const openEntry=(kind:EntryKind)=>{
@@ -39,6 +47,18 @@ function AppContent() {
     setNotice('Namuna qo‘shildi. Yozuv faqat ushbu ochiq sessiyada saqlanadi.');
   };
 
+  const saveAccount=(draft:AccountDraft)=>{
+    nextMockId.current+=1;
+    const item=createMockAccount(draft,`account-d03-${nextMockId.current}`);
+    setAccounts(current=>[...current,item]);
+  };
+
+  const saveGoal=(draft:GoalDraft,todayISO:string)=>{
+    nextMockId.current+=1;
+    const item=createMockGoal(draft,`goal-d03-${nextMockId.current}`,todayISO);
+    setGoals(current=>[...current,item]);
+  };
+
   return <SafeAreaView style={styles.safe} edges={['top','bottom']}>
     <StatusBar style="dark"/>
     {entryKind!==null
@@ -47,6 +67,15 @@ function AppContent() {
           onCancel={()=>setEntryKind(null)}
           onSave={saveEntry}
         />
+      : profileSection!==null
+        ? <FinanceSetupScreen
+            section={profileSection}
+            onBack={()=>setProfileSection(null)}
+            accounts={accounts}
+            goals={goals}
+            onAddAccount={saveAccount}
+            onAddGoal={saveGoal}
+          />
       : <>
         <View style={styles.body}>
           {tab==='home'
@@ -61,6 +90,7 @@ function AppContent() {
                 demoCount={transactions.length-demo.transactions.length}
                 notice={notice}
                 onAddTransaction={openEntry}
+                onOpenFinanceSection={setProfileSection}
               />
           }
         </View>
@@ -76,12 +106,17 @@ function AppContent() {
                 onPress={()=>{setTab(item.key);setNotice('');}}
                 style={[styles.navItem,active&&styles.navActive]}
               >
-                <AppIcon
-                  name={item.icon}
-                  color={active?colors.primary:colors.faint}
-                  size={21}
-                  strokeWidth={active?2.2:1.8}
-                />
+                {item.key==='ai'
+                  ? <Text
+                      style={[styles.aiSymbol,active&&styles.aiSymbolActive]}
+                    >✦</Text>
+                  : <AppIcon
+                      name={item.icon}
+                      color={active?colors.primary:colors.faint}
+                      size={21}
+                      strokeWidth={active?2.2:1.8}
+                    />
+                }
                 <Text style={[styles.navLabel,active&&styles.navLabelActive]} numberOfLines={1} adjustsFontSizeToFit>{item.label}</Text>
               </Pressable>;
             })}
@@ -115,4 +150,6 @@ const styles=StyleSheet.create({
   navActive:{backgroundColor:colors.primarySoft},
   navLabel:{fontSize:10,color:colors.muted,fontWeight:'600'},
   navLabelActive:{color:colors.primary,fontWeight:'800'},
+  aiSymbol:{fontSize:23,lineHeight:24,width:24,height:24,textAlign:'center',color:colors.faint,fontWeight:'800'},
+  aiSymbolActive:{color:colors.primary},
 });

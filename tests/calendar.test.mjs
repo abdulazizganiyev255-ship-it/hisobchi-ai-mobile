@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  toLocalISODate,parseISODate,monthCells,shiftMonth,monthTitle,formatUzDate
+  toLocalISODate,parseISODate,monthCells,shiftMonth,monthTitle,formatUzDate,isSelectableDay
 } from '../src/data/calendar.ts';
 
 test('local date-only formatter roundtrips a leap day',()=>{
@@ -36,4 +36,13 @@ test('Uzbek date copy is deterministic',()=>{
   assert.equal(monthTitle('2026-11'),'Noyabr 2026');
   assert.equal(formatUzDate('2026-11-24'),'24 noyabr 2026');
   assert.equal(formatUzDate('invalid'),'Sana belgilanmagan');
+});
+
+test('expense and goal calendars use opposite date boundaries',()=>{
+  assert.equal(isSelectableDay('2026-11-23','2026-11-24','past'),true);
+  assert.equal(isSelectableDay('2026-11-25','2026-11-24','past'),false);
+  assert.equal(isSelectableDay('2026-11-23','2026-11-24','future'),false);
+  assert.equal(isSelectableDay('2026-11-24','2026-11-24','future'),true);
+  assert.equal(isSelectableDay('2026-12-01','2026-11-24','future'),true);
+  assert.equal(isSelectableDay('2026-02-30','2026-11-24','future'),false);
 });
