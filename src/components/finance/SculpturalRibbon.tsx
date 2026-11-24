@@ -1,4 +1,4 @@
-import Svg, {Defs, Ellipse, LinearGradient, Path, Stop} from 'react-native-svg';
+import Svg, {Defs, Ellipse, G, LinearGradient, Path, Stop} from 'react-native-svg';
 
 /**
  * Decorative signature ribbon for the approved plum/ivory Home direction.
@@ -32,37 +32,40 @@ export function SculpturalRibbon() {
           <Stop offset="100%" stopColor="#FFF7F5" stopOpacity="0.02"/>
         </LinearGradient>
       </Defs>
-      <Ellipse cx="119" cy="146" rx="84" ry="26" fill="#260E1C" opacity="0.18"/>
-      <Path
-        d="M32 161 C67 177 124 162 150 132 C181 96 172 59 136 47 C100 35 64 46 55 76"
-        fill="none" stroke="#27101E" opacity="0.22"
-        strokeWidth={37} strokeLinecap="round"
-      />
-      <Path
-        d="M32 157 C67 172 124 158 150 127 C181 91 172 54 136 43 C100 31 64 42 55 72"
-        fill="none" stroke="url(#ribbonRear)"
-        strokeWidth={31} strokeLinecap="round"
-      />
-      <Path
-        d="M55 72 C59 47 85 32 111 36 C145 41 161 68 150 88 C139 108 100 113 77 102 C51 89 43 67 51 51"
-        fill="none" stroke="#2A1123" opacity="0.16"
-        strokeWidth={37} strokeLinecap="round"
-      />
-      <Path
-        d="M55 68 C59 43 85 28 111 32 C145 37 161 64 150 84 C139 104 100 109 77 98 C51 85 43 63 51 47"
-        fill="none" stroke="url(#ribbonFront)"
-        strokeWidth={30} strokeLinecap="round"
-      />
-      <Path
-        d="M52 51 C57 41 69 36 84 34 C109 30 135 46 144 66"
-        fill="none" stroke="url(#ribbonGlint)"
-        strokeWidth={6} strokeLinecap="round" opacity="0.88"
-      />
-      <Path
-        d="M49 158 C86 164 132 145 152 113"
-        fill="none" stroke="url(#ribbonGlint)"
-        strokeWidth={5} strokeLinecap="round" opacity="0.44"
-      />
+      <G id="floating-shadow">
+        <Ellipse cx="119" cy="146" rx="79" ry="21" fill="#260E1C" opacity="0.12"/>
+      </G>
+      <G id="rear-ribbon-underpass">
+        <Path
+          d="M32 157 C67 172 124 158 150 127 C159 116 168 102 170 90"
+          fill="none" stroke="url(#ribbonRear)"
+          strokeWidth={31} strokeLinecap="round"
+        />
+        <Path
+          d="M171 56 C163 46 149 44 136 43 C100 31 64 42 55 72"
+          fill="none" stroke="url(#ribbonRear)"
+          strokeWidth={31} strokeLinecap="round"
+        />
+      </G>
+      <G id="foreground-ribbon-overpass">
+        <Path
+          d="M55 68 C59 43 85 28 111 32 C145 37 161 64 150 84 C139 104 100 109 77 98 C51 85 43 63 51 47"
+          fill="none" stroke="url(#ribbonFront)"
+          strokeWidth={30} strokeLinecap="round"
+        />
+      </G>
+      <G id="satin-highlights">
+        <Path
+          d="M52 51 C57 41 69 36 84 34 C109 30 135 46 144 66"
+          fill="none" stroke="url(#ribbonGlint)"
+          strokeWidth={6} strokeLinecap="round" opacity="0.88"
+        />
+        <Path
+          d="M49 158 C86 164 132 145 152 113"
+          fill="none" stroke="url(#ribbonGlint)"
+          strokeWidth={5} strokeLinecap="round" opacity="0.40"
+        />
+      </G>
     </Svg>
   );
 }
