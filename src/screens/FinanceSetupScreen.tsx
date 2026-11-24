@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {
-  KeyboardAvoidingView,Platform,Pressable,ScrollView,
+  Alert,KeyboardAvoidingView,Platform,Pressable,ScrollView,
   StyleSheet,Text,TextInput,View
 } from 'react-native';
 import {AppIcon,IconName} from '../components/AppIcon';
@@ -76,9 +76,19 @@ export function FinanceSetupScreen({section,onBack,accounts,goals,onAddAccount,o
   }
 
   function cancelCreate(){
-    setCalendarOpen(false);
-    setCreating(false);
-    setError(null);
+    const changed=isAccounts
+      ? account.name.trim()!==''||account.openingBalanceDigits!==''||account.kind!=='card'
+      : goal.title.trim()!==''||goal.targetDigits!==''||goal.savedDigits!==''||goal.dueOn!==null;
+    const discard=()=>{
+      setCalendarOpen(false);
+      setCreating(false);
+      setError(null);
+    };
+    if(!changed){discard();return;}
+    Alert.alert('O‘zgarishlarni bekor qilish?', 'Saqlanmagan namuna ma’lumot yo‘qoladi.', [
+      {text:'Qolish',style:'cancel'},
+      {text:'Bekor qilish',style:'destructive',onPress:discard},
+    ]);
   }
 
   function save(){
