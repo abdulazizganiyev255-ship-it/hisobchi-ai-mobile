@@ -49,8 +49,8 @@ export function CalendarSheet({visible,value,todayISO,mode='past',onClose,onSele
         <View style={styles.grabber}/>
         <View style={styles.heading}>
           <View style={{flex:1}}>
-            <Text style={styles.eyebrow}>SANA TANLASH</Text>
-            <Text style={styles.title}>Qachon bo‘lgan?</Text>
+            <Text style={styles.eyebrow}>{mode==='future'?'MAQSAD MUDDATI':'SANA TANLASH'}</Text>
+            <Text style={styles.title}>{mode==='future'?'Qachongacha?':'Qachon bo‘lgan?'}</Text>
           </View>
           <Pressable style={styles.close} accessibilityRole="button" accessibilityLabel="Yopish" onPress={onClose}>
             <Text style={styles.closeText}>✕</Text>
