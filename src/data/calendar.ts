@@ -53,3 +53,14 @@ export function monthCells(monthKey:string):CalendarCell[] {
     };
   });
 }
+
+export type DateSelectionMode='past'|'future';
+
+export function isSelectableDay(
+  dateISO:string,
+  todayISO:string,
+  mode:DateSelectionMode='past',
+):boolean {
+  if(!parseISODate(dateISO)||!parseISODate(todayISO))return false;
+  return mode==='past'?dateISO<=todayISO:dateISO>=todayISO;
+}
