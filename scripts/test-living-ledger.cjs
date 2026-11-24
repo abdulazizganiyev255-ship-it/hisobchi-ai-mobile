@@ -62,7 +62,7 @@ assert.match(screen, /<SourceTag label="DEMO · hisoblanmagan"/, 'SafeSpend must
 assert.match(screen, /DEMO MUHIT — HAQIQIY HISOB EMAS/, 'Home must disclose demo mode');
 assert.match(screen, /const month = demo\.months\[period\]/, 'Monthly display must use fixed demo fixture');
 assert.match(screen, /\['current', 'previous'\] as const/, 'Home month selector has two options');
-assert.match(screen, /<LedgerMiniBars/, 'Home chart uses accessible sample bars');
+assert.match(screen, /<PremiumCashFlowChart/, 'Home chart uses illustrative accessible curved SVG');
 assert.match(screen, /filterAndSortTransactions\(transactions, 'all', ''\)/, 'Recent items read session transactions');
 assert.match(primitives, /accessibilityRole="image"/, 'Bars require chart alternative');
 assert.match(screen, /setExplanationOpen\(true\)/, 'Explanation action must be real');
