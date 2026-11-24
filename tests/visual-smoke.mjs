@@ -63,7 +63,7 @@ try {
     await page.getByRole('button',{name:'Maqsad muddatini tanlash'}).click();
     await page.getByText('Qachon bo‘lgan?').waitFor();
     screenshots.push(await capture(page,'goal-calendar'));
-    await page.getByRole('button',{name:'Yopish'}).click();
+    await page.getByRole('button',{name:'Yopish',exact:true}).click();
 
     await page.getByRole('textbox',{name:'Maqsad nomi'}).fill('Yangi maqsad');
     await page.getByRole('textbox',{name:'Maqsad summasi (so‘m)'}).fill('5000000');
