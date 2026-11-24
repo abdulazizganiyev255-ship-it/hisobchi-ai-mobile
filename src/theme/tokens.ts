@@ -13,7 +13,7 @@ export const colors = {
   plumMid: '#8B496A',
   text: '#19191D',
   muted: '#65575E',
-  faint: '#8E7C82',
+  faint: '#75646B', // WCAG AA body contrast on ivory and warm-white surfaces
   cardLight: '#FFFBF7',
   cardLightBottom: '#F4E8E4',
   ink: '#19191D',
