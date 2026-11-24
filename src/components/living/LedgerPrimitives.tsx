@@ -4,14 +4,14 @@ import {type Transaction, formatMoney} from '../../data/demo';
 import {ledger} from '../../theme/livingLedger';
 
 /** Exposes visible financial provenance; the meaning is not color alone. */
-export function SourceTag({label}: {label: string}) {
-  return <View style={styles.tag}><Text style={styles.tagText}>{label}</Text></View>;
+export function SourceTag({label, tone = 'ledger'}: {label: string; tone?: 'ledger' | 'plum'}) {
+  return <View style={[styles.tag, tone === 'plum' && styles.tagPlum]}><Text style={[styles.tagText, tone === 'plum' && styles.tagTextPlum]}>{label}</Text></View>;
 }
 
 /** Illustrative normalized series. Its 9 bars DO NOT encode days or currency. */
 export function LedgerMiniBars({
-  values, description,
-}: {values: readonly number[]; description: string}) {
+  values, description, tone = 'ledger',
+}: {values: readonly number[]; description: string; tone?: 'ledger' | 'plum'}) {
   if (values.length === 0) {
     return <Text style={styles.empty}>Grafik uchun namuna nuqtalari yo‘q</Text>;
   }
@@ -24,7 +24,7 @@ export function LedgerMiniBars({
       accessible
       accessibilityRole="image"
       accessibilityLabel={description}
-      style={styles.bars}
+      style={[styles.bars, tone === 'plum' && styles.barsPlum]}
       testID="living-ledger-chart"
     >
       {safe.map((value, index) => (
@@ -33,7 +33,9 @@ export function LedgerMiniBars({
             style={[
               styles.bar,
               {height: 9 + Math.round(59 * value)},
+              tone === 'plum' && styles.barPlum,
               index === maxIndex && styles.activeBar,
+              tone === 'plum' && index === maxIndex && styles.activeBarPlum,
             ]}
           />
         </View>
@@ -43,21 +45,21 @@ export function LedgerMiniBars({
 }
 
 /** Responsive two-part ledger row. No color-only positive/negative signal. */
-export function LedgerTransactionRow({item}: {item: Transaction}) {
+export function LedgerTransactionRow({item, tone = 'ledger'}: {item: Transaction; tone?: 'ledger' | 'plum'}) {
   // Always use the immutable ISO date; seeded "Bugun/Kecha" labels go stale.
   const stableDate = item.occurredOn.slice(8, 10) + '.' +
     item.occurredOn.slice(5, 7) + '.' + item.occurredOn.slice(0, 4);
   return (
-    <View style={styles.transactionRow}>
-      <View style={styles.transactionIcon}>
-        <AppIcon name={item.icon} size={19} color={ledger.dark}/>
+    <View style={[styles.transactionRow, tone === 'plum' && styles.transactionRowPlum]}>
+      <View style={[styles.transactionIcon, tone === 'plum' && styles.transactionIconPlum]}>
+        <AppIcon name={item.icon} size={19} color={tone === 'plum' ? '#663448' : ledger.dark}/>
       </View>
       <View style={styles.transactionInfo}>
-        <Text style={styles.transactionTitle}>{item.title}</Text>
-        <Text style={styles.transactionDate}>{stableDate}</Text>
+        <Text style={[styles.transactionTitle, tone === 'plum' && styles.transactionTitlePlum]}>{item.title}</Text>
+        <Text style={[styles.transactionDate, tone === 'plum' && styles.transactionDatePlum]}>{stableDate}</Text>
       </View>
       <Text
-        style={styles.transactionAmount}
+        style={[styles.transactionAmount, tone === 'plum' && styles.transactionAmountPlum]}
         accessibilityLabel={(item.amount > 0 ? 'Daromad: ' : 'Xarajat: ') +
           formatMoney(Math.abs(item.amount))}
       >
@@ -68,6 +70,16 @@ export function LedgerTransactionRow({item}: {item: Transaction}) {
 }
 
 const styles = StyleSheet.create({
+  tagPlum: {backgroundColor: '#F1E5E9'},
+  tagTextPlum: {color: '#663448'},
+  barsPlum: {borderBottomColor: '#D9CACB'},
+  barPlum: {backgroundColor: '#CBA7B6'},
+  activeBarPlum: {backgroundColor: '#663448'},
+  transactionRowPlum: {borderBottomColor: '#E5D9D9'},
+  transactionIconPlum: {backgroundColor: '#F1E5E9'},
+  transactionTitlePlum: {color: '#292228'},
+  transactionDatePlum: {color: '#675A61'},
+  transactionAmountPlum: {color: '#292228'},
   tag: {
     alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 6,
     backgroundColor: ledger.badge, borderRadius: 999,

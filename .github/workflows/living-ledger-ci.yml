@@ -7,6 +7,7 @@ on:
       - design/splus-living-ledger-transactions-v02
       - design/splus-living-ledger-analytics-v03
       - integration/s10-foundation
+      - design/plum-home-v01
   pull_request:
     branches:
       - design/splus-d01-d03-ux-concepts
@@ -34,6 +35,7 @@ jobs:
           npm run test:calendar
           npm run test:integration
           npm run test:finance-foundation
+          npm run test:plum-home
           npm run test:design-system
           npm run test:ui-contract
           node scripts/test-living-ledger.cjs
