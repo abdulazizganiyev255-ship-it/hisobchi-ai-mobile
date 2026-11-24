@@ -5,10 +5,11 @@ import {AppIcon} from '../components/AppIcon';
 import {BalanceRibbon} from '../components/BalanceRibbon';
 import {ExpenseChart} from '../components/ExpenseChart';
 import {TransactionRow} from '../components/TransactionRow';
-import {demo, formatMoney} from '../data/demo';
+import {demo, formatMoney, Transaction} from '../data/demo';
+import {EntryKind} from '../data/mockEntry';
 import {colors, radius, shadow, spacing} from '../theme/tokens';
 
-export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>void}) {
+export function DashboardScreen({onOpenTransactions,onAddTransaction,transactions}: {onOpenTransactions:()=>void;onAddTransaction:(kind:EntryKind)=>void;transactions:Transaction[]}) {
   const [visible,setVisible] = useState(true);
   const [period,setPeriod] = useState<'current'|'previous'>('current');
   const {width} = useWindowDimensions();
@@ -17,7 +18,7 @@ export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>vo
 
   const explainDemo = (feature:string) => Alert.alert(
     'Dizayn prototipi',
-    `${feature} oynasi D02 bosqichida interaktiv mock oqimga ulanadi. Hozir real hisobga yozilmaydi.`
+    `${feature} keyingi bosqichda ulanadi. Hozir real hisobga yozilmaydi.`
   );
 
   return <ScrollView
@@ -83,7 +84,7 @@ export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>vo
         style={[styles.action,styles.primaryAction]}
         accessibilityRole="button"
         accessibilityLabel="Xarajat qo‘shish"
-        onPress={()=>explainDemo('Xarajat qo‘shish')}
+        onPress={()=>onAddTransaction('expense')}
       >
         <View style={styles.primaryActionIcon}><AppIcon name="plus" color={colors.white} size={20}/></View>
         <Text style={styles.primaryActionText}>Xarajat</Text>
@@ -92,7 +93,7 @@ export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>vo
         style={[styles.action,styles.secondaryAction]}
         accessibilityRole="button"
         accessibilityLabel="Kirim qo‘shish"
-        onPress={()=>explainDemo('Kirim qo‘shish')}
+        onPress={()=>onAddTransaction('income')}
       >
         <View style={styles.secondaryActionIcon}><AppIcon name="wallet" color={colors.primary} size={18}/></View>
         <Text style={styles.secondaryActionText}>Kirim</Text>
@@ -143,7 +144,7 @@ export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>vo
       <View style={styles.transactionsHeader}>
         <View>
           <Text style={styles.transactionsTitle}>So‘nggi operatsiyalar</Text>
-          <Text style={styles.transactionsHint}>Namuna yozuvlar</Text>
+          <Text style={styles.transactionsHint}>Namuna yozuvlar · sessiya davomida</Text>
         </View>
         <Pressable
           accessibilityRole="button"
@@ -152,13 +153,13 @@ export function DashboardScreen({onOpenTransactions}: {onOpenTransactions:()=>vo
           style={styles.arrow}
         ><AppIcon name="chevron" color={colors.primary} size={19}/></Pressable>
       </View>
-      {demo.transactions.slice(0,3).map((item,i)=><React.Fragment key={item.id}>
+      {transactions.slice(0,3).map((item,i)=><React.Fragment key={item.id}>
         {i>0&&<View style={styles.separator}/>}
         <TransactionRow item={item} light/>
       </React.Fragment>)}
     </View>
 
-    <Text style={styles.disclaimer}>Hisobchi AI · D01 UI prototip · real hisob emas</Text>
+    <Text style={styles.disclaimer}>Hisobchi AI · D02 mock prototip · real hisob emas</Text>
   </ScrollView>;
 }
 
