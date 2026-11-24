@@ -2,7 +2,7 @@ import {useEffect,useState} from 'react';
 import {Modal,Pressable,StyleSheet,Text,View} from 'react-native';
 import {AppIcon} from './AppIcon';
 import {colors,radius,spacing,shadow} from '../theme/tokens';
-import {monthCells,monthTitle,shiftMonth} from '../data/calendar';
+import {DateSelectionMode,isSelectableDay,monthCells,monthTitle,shiftMonth} from '../data/calendar';
 
 const DAY_LABELS=['Du','Se','Cho','Pa','Ju','Sha','Ya'];
 
@@ -10,11 +10,12 @@ type Props={
   visible:boolean;
   value:string;
   todayISO:string;
+  mode?:DateSelectionMode;
   onClose:()=>void;
   onSelect:(iso:string)=>void;
 };
 
-export function CalendarSheet({visible,value,todayISO,onClose,onSelect}:Props) {
+export function CalendarSheet({visible,value,todayISO,mode='past',onClose,onSelect}:Props) {
   const [month,setMonth]=useState(value.slice(0,7));
 
   useEffect(()=>{
@@ -22,11 +23,11 @@ export function CalendarSheet({visible,value,todayISO,onClose,onSelect}:Props) {
   },[value,visible]);
 
   const cells=monthCells(month);
-  const canNext=month<todayISO.slice(0,7);
-  const canPrevious=month>'1900-01';
+  const canNext=mode==='past'?month<todayISO.slice(0,7):month<'2100-12';
+  const canPrevious=mode==='future'?month>todayISO.slice(0,7):month>'1900-01';
 
   const select=(iso:string)=>{
-    if(iso>todayISO)return;
+    if(!isSelectableDay(iso,todayISO,mode))return;
     onSelect(iso);
   };
 
@@ -82,8 +83,7 @@ export function CalendarSheet({visible,value,todayISO,onClose,onSelect}:Props) {
           {DAY_LABELS.map(label=><View key={label} style={styles.weekCell}><Text style={styles.weekLabel}>{label}</Text></View>)}
           {cells.map(cell=>{
             const selected=cell.dateISO===value;
-            const future=cell.dateISO>todayISO;
-            const blocked=!cell.isCurrentMonth||future;
+            const blocked=!cell.isCurrentMonth||!isSelectableDay(cell.dateISO,todayISO,mode);
             return <View key={cell.dateISO} style={styles.cell}>
               <Pressable
                 accessibilityRole="button"
@@ -96,7 +96,7 @@ export function CalendarSheet({visible,value,todayISO,onClose,onSelect}:Props) {
                 <Text style={[
                   styles.dayText,
                   !cell.isCurrentMonth&&styles.outMonth,
-                  future&&styles.futureText,
+                  blocked&&styles.futureText,
                   selected&&styles.selectedText,
                 ]}>{cell.day}</Text>
               </Pressable>
@@ -106,7 +106,7 @@ export function CalendarSheet({visible,value,todayISO,onClose,onSelect}:Props) {
         <Pressable style={styles.today} accessibilityRole="button" onPress={()=>select(todayISO)}>
           <Text style={styles.todayText}>Bugun</Text>
         </Pressable>
-        <Text style={styles.disclaimer}>Namuna ma’lumoti · kelajakdagi sana tanlanmaydi</Text>
+        <Text style={styles.disclaimer}>{mode==='future'?'Maqsad muddati · o‘tgan sana tanlanmaydi':'Namuna ma’lumoti · kelajakdagi sana tanlanmaydi'}</Text>
       </View>
     </View>
   </Modal>;
