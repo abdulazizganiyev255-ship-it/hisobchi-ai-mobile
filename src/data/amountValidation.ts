@@ -6,7 +6,9 @@
 export const MAX_MOCK_AMOUNT=999_999_999_999;
 
 export function cleanMoneyInput(text:string):string {
-  return text.replace(/[^0-9]/g,'');
+  // Only spacing separators are safe to normalize. Never erase '-' or '.';
+  // that would silently turn -500 into 500 or 12.5 into 125.
+  return text.replace(/[\s\u00a0\u202f]/g,'');
 }
 
 export function parseMockAmount(text:string):number|null {
