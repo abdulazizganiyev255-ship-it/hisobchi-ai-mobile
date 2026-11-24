@@ -57,12 +57,12 @@ async function check(browser, size) {
     await page.getByTestId('living-ledger-demo-notice').waitFor({state: 'visible', timeout: 30000});
     await page.getByText('145 000', {exact: true}).waitFor({state: 'visible'});
     await page.getByTestId('living-ledger-period-total').waitFor({state: 'visible'});
-    const balanceCard = await page.getByTestId('plum-home-balance-card').boundingBox();
+    const balanceCard = await page.getByTestId('midnight-home-balance-card').boundingBox();
     assert.ok(balanceCard && balanceCard.height >= 170, name + ' balance card must be legible');
     await page.getByTestId('living-ledger-chart').waitFor({state: 'visible'});
     assert.equal(await page.getByRole('button', {name: 'Namuna balansni yashirish'}).count(), 0,
       name + ' removed unwanted balance toggle');
-    const safetyTitle = await page.getByTestId('plum-home-safety-title').boundingBox();
+    const safetyTitle = await page.getByTestId('midnight-home-safety-title').boundingBox();
     assert.ok(safetyTitle && safetyTitle.height <= 25,
       name + ' safety heading should remain one line on compact screens');
     assert.equal((await page.getByTestId('living-ledger-period-total').textContent()).trim(), '3 840 000 so‘m');

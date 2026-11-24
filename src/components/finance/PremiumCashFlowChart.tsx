@@ -4,6 +4,7 @@ type Props = {
   values: readonly number[];
   previousValues: readonly number[];
   description: string;
+  tone?: 'plum' | 'night';
 };
 
 type Point = {x: number; y: number};
@@ -47,7 +48,13 @@ export function smoothCurve(points: readonly Point[]): string {
  * An ILLUSTRATIVE normalized nine-point comparison, NOT a bank statement,
  * calendar series or UZS-valued plot. Previous month is dots, not a fake line.
  */
-export function PremiumCashFlowChart({values, previousValues, description}: Props) {
+export function PremiumCashFlowChart({values, previousValues, description, tone = 'plum'}: Props) {
+  const isNight = tone === 'night';
+  const line = isNight ? '#C7FB58' : '#6A3550';
+  const dot = isNight ? '#778C7F' : '#C7B0BA';
+  const grid = isNight ? '#28333A' : '#EEE4E5';
+  const area = isNight ? '#B7F14D' : '#9B5C78';
+  const surface = isNight ? '#121820' : '#FFFCF8';
   const current = pointsFor(values);
   const previous = pointsFor(previousValues);
   if (current.length < 2) return null;
@@ -68,25 +75,25 @@ export function PremiumCashFlowChart({values, previousValues, description}: Prop
     >
       <Defs>
         <LinearGradient id="premiumLineArea" x1="0%" y1="0%" x2="0%" y2="100%">
-          <Stop offset="0%" stopColor="#9B5C78" stopOpacity="0.20"/>
-          <Stop offset="100%" stopColor="#9B5C78" stopOpacity="0"/>
+          <Stop offset="0%" stopColor={area} stopOpacity={isNight ? "0.25" : "0.20"}/>
+          <Stop offset="100%" stopColor={area} stopOpacity="0"/>
         </LinearGradient>
       </Defs>
       {[42, 86, 131].map(y => (
         <Path key={y} d={'M 13 ' + y + ' H 307'}
-          stroke="#EEE4E5" strokeWidth={1}/>
+          stroke={grid} strokeWidth={1}/>
       ))}
       <Path d={filled} fill="url(#premiumLineArea)"/>
-      <Path d={curve} fill="none" stroke="#6A3550"
+      <Path d={curve} fill="none" stroke={line}
         strokeWidth={3.6} strokeLinecap="round" strokeLinejoin="round"/>
       {previous.map((p, i) => (
         <Circle key={'previous-' + i} cx={p.x} cy={p.y} r={2.8}
-          fill="#C7B0BA" opacity={0.92}/>
+          fill={dot} opacity={0.92}/>
       ))}
       {current.map((p, i) =>
         (i === current.length - 1) ? (
           <Circle key="last-point" cx={p.x} cy={p.y} r={5.1}
-            fill="#6A3550" stroke="#FFFCF8" strokeWidth={2.8}/>
+            fill={line} stroke={surface} strokeWidth={2.8}/>
         ) : null
       )}
     </Svg>

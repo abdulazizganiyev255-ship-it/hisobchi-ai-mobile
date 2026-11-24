@@ -4,14 +4,14 @@ import {type Transaction, formatMoney} from '../../data/demo';
 import {ledger} from '../../theme/livingLedger';
 
 /** Exposes visible financial provenance; the meaning is not color alone. */
-export function SourceTag({label, tone = 'ledger'}: {label: string; tone?: 'ledger' | 'plum'}) {
-  return <View style={[styles.tag, tone === 'plum' && styles.tagPlum]}><Text style={[styles.tagText, tone === 'plum' && styles.tagTextPlum]}>{label}</Text></View>;
+export function SourceTag({label, tone = 'ledger'}: {label: string; tone?: 'ledger' | 'plum' | 'night'}) {
+  return <View style={[styles.tag, tone === 'plum' && styles.tagPlum, tone === 'night' && styles.tagNight]}><Text style={[styles.tagText, tone === 'plum' && styles.tagTextPlum, tone === 'night' && styles.tagTextNight]}>{label}</Text></View>;
 }
 
 /** Illustrative normalized series. Its 9 bars DO NOT encode days or currency. */
 export function LedgerMiniBars({
   values, description, tone = 'ledger',
-}: {values: readonly number[]; description: string; tone?: 'ledger' | 'plum'}) {
+}: {values: readonly number[]; description: string; tone?: 'ledger' | 'plum' | 'night'}) {
   if (values.length === 0) {
     return <Text style={styles.empty}>Grafik uchun namuna nuqtalari yo‘q</Text>;
   }
@@ -45,21 +45,21 @@ export function LedgerMiniBars({
 }
 
 /** Responsive two-part ledger row. No color-only positive/negative signal. */
-export function LedgerTransactionRow({item, tone = 'ledger'}: {item: Transaction; tone?: 'ledger' | 'plum'}) {
+export function LedgerTransactionRow({item, tone = 'ledger'}: {item: Transaction; tone?: 'ledger' | 'plum' | 'night'}) {
   // Always use the immutable ISO date; seeded "Bugun/Kecha" labels go stale.
   const stableDate = item.occurredOn.slice(8, 10) + '.' +
     item.occurredOn.slice(5, 7) + '.' + item.occurredOn.slice(0, 4);
   return (
-    <View style={[styles.transactionRow, tone === 'plum' && styles.transactionRowPlum]}>
-      <View style={[styles.transactionIcon, tone === 'plum' && styles.transactionIconPlum]}>
-        <AppIcon name={item.icon} size={19} color={tone === 'plum' ? '#663448' : ledger.dark}/>
+    <View style={[styles.transactionRow, tone === 'plum' && styles.transactionRowPlum, tone === 'night' && styles.transactionRowNight]}>
+      <View style={[styles.transactionIcon, tone === 'plum' && styles.transactionIconPlum, tone === 'night' && styles.transactionIconNight]}>
+        <AppIcon name={item.icon} size={19} color={tone === 'night' ? '#C7FB58' : tone === 'plum' ? '#663448' : ledger.dark}/>
       </View>
       <View style={styles.transactionInfo}>
-        <Text style={[styles.transactionTitle, tone === 'plum' && styles.transactionTitlePlum]}>{item.title}</Text>
-        <Text style={[styles.transactionDate, tone === 'plum' && styles.transactionDatePlum]}>{stableDate}</Text>
+        <Text style={[styles.transactionTitle, tone === 'plum' && styles.transactionTitlePlum, tone === 'night' && styles.transactionTitleNight]}>{item.title}</Text>
+        <Text style={[styles.transactionDate, tone === 'plum' && styles.transactionDatePlum, tone === 'night' && styles.transactionDateNight]}>{stableDate}</Text>
       </View>
       <Text
-        style={[styles.transactionAmount, tone === 'plum' && styles.transactionAmountPlum]}
+        style={[styles.transactionAmount, tone === 'plum' && styles.transactionAmountPlum, tone === 'night' && styles.transactionAmountNight]}
         accessibilityLabel={(item.amount > 0 ? 'Daromad: ' : 'Xarajat: ') +
           formatMoney(Math.abs(item.amount))}
       >
@@ -70,6 +70,13 @@ export function LedgerTransactionRow({item, tone = 'ledger'}: {item: Transaction
 }
 
 const styles = StyleSheet.create({
+  tagNight: {backgroundColor: '#22321F'},
+  tagTextNight: {color: '#D1FDA0'},
+  transactionRowNight: {borderBottomColor: '#2C343D'},
+  transactionIconNight: {backgroundColor: '#253123'},
+  transactionTitleNight: {color: '#F6F8F5'},
+  transactionDateNight: {color: '#ABB6BC'},
+  transactionAmountNight: {color: '#F6F8F5'},
   tagPlum: {backgroundColor: '#F1E5E9'},
   tagTextPlum: {color: '#663448'},
   barsPlum: {borderBottomColor: '#D9CACB'},

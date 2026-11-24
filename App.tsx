@@ -14,7 +14,7 @@ import {LedgerTransactionEditorScreen} from './src/screens/LedgerTransactionEdit
 import {OnboardingScreen} from './src/screens/OnboardingScreen';
 import {colors, radius} from './src/theme/tokens';
 import {ledger} from './src/theme/livingLedger';
-import {semanticV1} from './src/theme/semantic';
+import {night} from './src/theme/night';
 
 const tabs: {key: Tab; label: string; icon: IconName}[] = [
   {key: 'home', label: 'Bosh sahifa', icon: 'home'},
@@ -32,7 +32,7 @@ function AppContent() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const nextId = useRef(1000);
   const ledgerShell = !showOnboarding && (editor !== null || tab === 'home' || tab === 'transactions' || tab === 'analytics');
-  const plumHome = !showOnboarding && editor === null && tab === 'home';
+  const nightHome = !showOnboarding && editor === null && tab === 'home';
 
   // Native Android Back should leave overlays before returning to Home.
   // React Native Modal handles its own Back press via onRequestClose.
@@ -79,8 +79,8 @@ function AppContent() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, ledgerShell && styles.homeSafe, plumHome && styles.plumSafe]} edges={['top', 'bottom']}>
-      <StatusBar style={ledgerShell ? 'dark' : 'light'}/>
+    <SafeAreaView style={[styles.safe, ledgerShell && styles.homeSafe, nightHome && styles.nightSafe]} edges={['top', 'bottom']}>
+      <StatusBar style={nightHome ? 'light' : ledgerShell ? 'dark' : 'light'}/>
       {!ledgerShell && <LinearGradient
         style={StyleSheet.absoluteFill}
         colors={[colors.backgroundDeep, colors.background, '#103454']}
@@ -135,8 +135,8 @@ function AppContent() {
         )}
       </View>
       {editor === null && !showOnboarding && (
-        <View style={[styles.navOuter, ledgerShell && styles.homeNavOuter, plumHome && styles.plumNavOuter]}>
-          <View style={[styles.nav, ledgerShell && styles.homeNav, plumHome && styles.plumNav]}>
+        <View style={[styles.navOuter, ledgerShell && styles.homeNavOuter, nightHome && styles.nightNavOuter]}>
+          <View style={[styles.nav, ledgerShell && styles.homeNav, nightHome && styles.nightNav]}>
             {tabs.map(item => {
               const active = tab === item.key;
               return (
@@ -146,24 +146,20 @@ function AppContent() {
                   accessibilityState={{selected: active}}
                   accessibilityLabel={item.label}
                   onPress={() => setTab(item.key)}
-                  style={[styles.navItem, active && styles.navActive, ledgerShell && active && styles.homeNavActive, plumHome && active && styles.plumNavActive]}
+                  style={[styles.navItem, active && styles.navActive, ledgerShell && active && styles.homeNavActive, nightHome && active && styles.nightNavActive]}
                 >
                   <AppIcon
                     name={item.icon}
-                    color={plumHome ? (active ? semanticV1.brand.primary : semanticV1.text.secondary) : ledgerShell ? (active ? ledger.dark : ledger.subtext) : (active ? colors.primarySoft : colors.faint)}
+                    color={nightHome ? (active ? night.lime : night.subtext) : ledgerShell ? (active ? ledger.dark : ledger.subtext) : (active ? colors.primarySoft : colors.faint)}
                     size={21}
                     strokeWidth={active ? 2.3 : 1.8}
                   />
                   <Text
-                    style={[styles.navLabel, active && styles.navLabelActive, ledgerShell && styles.homeNavLabel, ledgerShell && active && styles.homeNavLabelActive, plumHome && styles.plumNavLabel, plumHome && active && styles.plumNavLabelActive]}
+                    style={[styles.navLabel, active && styles.navLabelActive, ledgerShell && styles.homeNavLabel, ledgerShell && active && styles.homeNavLabelActive, nightHome && styles.nightNavLabel, nightHome && active && styles.nightNavLabelActive]}
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
-                    {ledgerShell && item.key === 'transactions'
-                      ? 'Faoliyat'
-                      : ledgerShell && item.key === 'home'
-                        ? 'Bosh'
-                        : item.label}
+                    {item.label}
                   </Text>
                 </Pressable>
               );
@@ -183,12 +179,12 @@ const styles = StyleSheet.create({
   safe: {flex: 1, backgroundColor: colors.background},
   body: {flex: 1},
   homeSafe: {backgroundColor: ledger.paper},
-  plumSafe: {backgroundColor: semanticV1.bg.canvas},
-  plumNavOuter: {backgroundColor: semanticV1.bg.canvas, borderTopColor: semanticV1.border.subtle},
-  plumNav: {backgroundColor: semanticV1.bg.canvas},
-  plumNavActive: {backgroundColor: semanticV1.brand.tint},
-  plumNavLabel: {color: semanticV1.text.secondary, fontSize: 11},
-  plumNavLabelActive: {color: semanticV1.brand.primary},
+  nightSafe: {backgroundColor: night.canvas},
+  nightNavOuter: {backgroundColor: night.canvas, borderTopWidth: 1, borderTopColor: night.line},
+  nightNav: {backgroundColor: night.canvas, borderWidth: 0, borderRadius: 0},
+  nightNavActive: {backgroundColor: '#22321F'},
+  nightNavLabel: {color: night.subtext, fontSize: 10},
+  nightNavLabelActive: {color: night.lime},
   navOuter: {paddingHorizontal: 16, paddingBottom: 8, paddingTop: 5},
   homeNavOuter: {backgroundColor: ledger.paper, borderTopWidth: 1, borderTopColor: ledger.rule},
   homeNav: {backgroundColor: ledger.paper, borderWidth: 0, borderRadius: 0},

@@ -6,11 +6,11 @@ import {
 } from 'react-native';
 import {AppIcon} from '../components/AppIcon';
 import {PremiumCashFlowChart} from '../components/finance/PremiumCashFlowChart';
-import {SculpturalRibbon} from '../components/finance/SculpturalRibbon';
+import {MidnightOrbit} from '../components/finance/MidnightOrbit';
 import {LedgerTransactionRow, SourceTag} from '../components/living/LedgerPrimitives';
 import {demo, formatMoney, type Transaction} from '../data/demo';
 import {filterAndSortTransactions} from '../data/transactions';
-import {semanticV1} from '../theme/semantic';
+import {night} from '../theme/night';
 
 type Props = {
   transactions: Transaction[];
@@ -18,14 +18,11 @@ type Props = {
   onOpenTransactions: () => void;
 };
 
-const C = semanticV1;
-const plum = C.brand.primary;
-const ink = C.text.primary;
-
 /**
- * Quiet Finance D02: distinct re-composition, not a palette swap.
- * Demo Home values are fixed reference examples; only recent records reflect
- * mutable session transactions. No live balance, AI conclusions or forecast.
+ * Midnight Finance V03 visual direction (original layout).
+ * Fixed Home balance, safety amount and chart remain labelled DEMO values.
+ * Session transaction rows are deliberately distinct and dynamic.
+ * No bank balance, Safe-to-Spend result or real AI insight is implied.
  */
 export function LivingLedgerDashboardScreen({
   transactions, onAdd, onOpenTransactions,
@@ -33,7 +30,7 @@ export function LivingLedgerDashboardScreen({
   const [explanationOpen, setExplanationOpen] = useState(false);
   const [period, setPeriod] = useState<'current' | 'previous'>('current');
   const {width, height} = useWindowDimensions();
-  const compact = width < 355;
+  const compact = width < 365;
   const shortScreen = height < 720;
   const month = demo.months[period];
   const otherMonth = demo.months[period === 'current' ? 'previous' : 'current'];
@@ -52,9 +49,11 @@ export function LivingLedgerDashboardScreen({
       >
         <View style={styles.header}>
           <View style={styles.brand} accessible accessibilityLabel="Hisobchi AI">
-            <View style={styles.brandSymbol}><Text style={styles.brandSymbolText}>h</Text></View>
+            <View style={styles.brandSymbol}>
+              <Text style={styles.brandSymbolText}>h.</Text>
+            </View>
             <View style={styles.brandCopy}>
-              <Text style={styles.brandName}>Hisobchi<Text style={styles.brandAI}> AI</Text></Text>
+              <Text style={styles.brandName}>hisobchi<Text style={styles.brandAI}> ai</Text></Text>
               <Text style={styles.brandKicker}>PULINGIZNI TUSHUNING</Text>
             </View>
           </View>
@@ -64,7 +63,7 @@ export function LivingLedgerDashboardScreen({
             onPress={() => setExplanationOpen(true)}
             style={({pressed}) => [styles.helpButton, pressed && styles.pressed]}
           >
-            <AppIcon name="shield" color={plum} size={19}/>
+            <AppIcon name="shield" color={night.lime} size={19}/>
           </Pressable>
         </View>
 
@@ -74,9 +73,9 @@ export function LivingLedgerDashboardScreen({
         </View>
 
         <LinearGradient
-          colors={['#FFFCF8', '#F5EDE9', '#EEDFE4']}
+          colors={[night.heroStart, night.heroEnd, '#101820']}
           start={{x: 0, y: 0}} end={{x: 1, y: 1}}
-          testID="plum-home-balance-card"
+          testID="midnight-home-balance-card"
           style={[styles.hero, shortScreen && styles.heroShort]}
         >
           <View
@@ -84,37 +83,37 @@ export function LivingLedgerDashboardScreen({
             accessible={false}
             accessibilityElementsHidden
             importantForAccessibility="no-hide-descendants"
-            style={styles.ribbonLayer}
+            style={styles.orbitLayer}
           >
-            <SculpturalRibbon/>
+            <MidnightOrbit/>
           </View>
           <View style={styles.heroCopy}>
-            <Text style={styles.balanceEyebrow}>UMUMIY BALANS</Text>
-            <View accessible accessibilityLabel={'Demo balans: ' + formatMoney(demo.balance)}>
-              <Text
-                style={[styles.balanceValue, compact && styles.balanceValueCompact]}
-                accessibilityElementsHidden
-                importantForAccessibility="no"
-              >{balance}</Text>
-              <Text
-                style={styles.currencyLabel}
-                accessibilityElementsHidden
-                importantForAccessibility="no"
-              >so‘m</Text>
+            <View style={styles.heroTop}>
+              <Text style={styles.balanceEyebrow}>UMUMIY BALANS</Text>
+              <View style={styles.heroStatusDot}/>
             </View>
-            <View style={styles.heroDivider}/>
+            <View accessible accessibilityLabel={'Demo balans: ' + formatMoney(demo.balance)}>
+              <Text style={[styles.balanceValue, compact && styles.balanceValueCompact]}
+                accessibilityElementsHidden importantForAccessibility="no">{balance}</Text>
+              <Text style={styles.currencyLabel}
+                accessibilityElementsHidden importantForAccessibility="no">so‘m</Text>
+            </View>
             <View style={styles.heroFoot}>
-              <View style={styles.heroFootMark}/>
-              <Text style={styles.heroFootText}>Namuna balans · bank ulanmagan</Text>
+              <View style={styles.heroFootLine}/>
+              <Text style={styles.heroFootText}>NAMUNA · BANK ULANMAGAN</Text>
             </View>
           </View>
         </LinearGradient>
 
         <View style={[styles.safetyCard, shortScreen && styles.safetyCardShort]}>
+          <View style={styles.safetyAccent}/>
           <View style={styles.safetyCopy}>
-            <Text testID="plum-home-safety-title" style={styles.safetyLabel}>
-              Bugun xavfsiz sarflash
-            </Text>
+            <View style={styles.safetyHeading}>
+              <AppIcon name="shield" color={night.lime} size={16}/>
+              <Text testID="midnight-home-safety-title" style={styles.safetyLabel}>
+                Bugun xavfsiz sarflash
+              </Text>
+            </View>
             <View style={styles.safetyFigure} accessible accessibilityLabel={
               'Xavfsiz sarflash, hisoblanmagan namuna: ' +
               formatMoney(demo.safeToSpendToday)
@@ -124,7 +123,7 @@ export function LivingLedgerDashboardScreen({
               <Text style={styles.safetyUnit}
                 accessibilityElementsHidden importantForAccessibility="no">so‘m</Text>
             </View>
-            <SourceTag label="DEMO · hisoblanmagan" tone="plum"/>
+            <SourceTag label="DEMO · hisoblanmagan" tone="night"/>
           </View>
           <Pressable
             testID="living-ledger-safe-explainer"
@@ -133,7 +132,7 @@ export function LivingLedgerDashboardScreen({
             onPress={() => setExplanationOpen(true)}
             style={({pressed}) => [styles.safetyInfoButton, pressed && styles.pressed]}
           >
-            <AppIcon name="chevron" color={plum} size={22}/>
+            <AppIcon name="chevron" color={night.lime} size={21}/>
           </Pressable>
         </View>
 
@@ -148,18 +147,20 @@ export function LivingLedgerDashboardScreen({
           ]}
         >
           <View style={styles.addCircle}>
-            <AppIcon name="plus" size={22} color={plum}/>
+            <AppIcon name="plus" size={21} color={night.canvas}/>
           </View>
           <View style={styles.addCopy}>
             <Text style={styles.addTitle}>Xarajat qo‘shish</Text>
-            <Text style={styles.addDetail}>Tez va oddiy qayd etish</Text>
+            <Text style={styles.addDetail}>Bir necha soniyada qayd eting</Text>
           </View>
-          <AppIcon name="chevron" color="#FFFFFF" size={19}/>
+          <View style={styles.addChevron}>
+            <AppIcon name="chevron" color={night.canvas} size={19}/>
+          </View>
         </Pressable>
 
         <View style={styles.sectionHeader}>
           <View style={styles.sectionCopy}>
-            <Text style={styles.sectionKicker}>SARF-XARAJATLAR</Text>
+            <Text style={styles.sectionKicker}>SARF-XARAJATLAR · NAMUNA</Text>
             <Text style={styles.sectionTitle}>Xarajatlar ritmi</Text>
           </View>
           <View style={styles.periodSelector} accessibilityRole="radiogroup">
@@ -189,7 +190,7 @@ export function LivingLedgerDashboardScreen({
         <View style={styles.chartCard}>
           <View style={styles.chartTopRow}>
             <View>
-              <Text style={styles.chartEyebrow}>DAVR BO‘YICHA · NAMUNA</Text>
+              <Text style={styles.chartEyebrow}>OYLIK XARAJAT · NAMUNA</Text>
               <Text
                 testID="living-ledger-period-total"
                 style={[styles.chartAmount, compact && styles.chartAmountCompact]}
@@ -199,10 +200,11 @@ export function LivingLedgerDashboardScreen({
               </Text>
             </View>
             <View style={styles.chartAccent}>
-              <AppIcon name="chart" color={plum} size={19}/>
+              <AppIcon name="chart" color={night.lime} size={19}/>
             </View>
           </View>
           <PremiumCashFlowChart
+            tone="night"
             values={month.chart}
             previousValues={otherMonth.chart}
             description={
@@ -228,7 +230,7 @@ export function LivingLedgerDashboardScreen({
 
         <View style={styles.activityHeading}>
           <View style={styles.sectionCopy}>
-            <Text style={styles.sectionKicker}>SESSIYADAGI YOZUVLAR</Text>
+            <Text style={styles.sectionKicker}>JONLI SESSIYA</Text>
             <Text style={styles.sectionTitle}>So‘nggi operatsiyalar</Text>
           </View>
           <Pressable
@@ -238,21 +240,17 @@ export function LivingLedgerDashboardScreen({
             style={({pressed}) => [styles.allButton, pressed && styles.pressed]}
           >
             <Text style={styles.allText}>Barchasi</Text>
-            <AppIcon name="chevron" color={plum} size={16}/>
+            <AppIcon name="chevron" color={night.lime} size={16}/>
           </Pressable>
         </View>
         <View style={styles.activityCard}>
           {recent.length > 0 ? recent.map(item =>
-            <LedgerTransactionRow key={item.id} item={item} tone="plum"/>
+            <LedgerTransactionRow key={item.id} item={item} tone="night"/>
           ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyTitle}>Hozircha yozuv yo‘q</Text>
               <Text style={styles.emptyText}>Birinchi sessiya xarajatingizni kiriting.</Text>
-              <Pressable
-                accessibilityRole="button"
-                onPress={onAdd}
-                style={styles.emptyAction}
-              >
+              <Pressable accessibilityRole="button" onPress={onAdd} style={styles.emptyAction}>
                 <Text style={styles.emptyActionText}>Xarajat qo‘shish</Text>
               </Pressable>
             </View>
@@ -278,7 +276,7 @@ export function LivingLedgerDashboardScreen({
             onPress={closeExplainer}
           />
           <View style={styles.modalSheet}>
-            <SourceTag label="DEMO · hisoblanmagan" tone="plum"/>
+            <SourceTag label="DEMO · hisoblanmagan" tone="night"/>
             <Text accessibilityRole="header" style={styles.modalTitle}>
               Bu raqam nimani bildiradi?
             </Text>
@@ -307,167 +305,88 @@ export function LivingLedgerDashboardScreen({
 }
 
 const styles = StyleSheet.create({
-  screen: {flex: 1, backgroundColor: C.bg.canvas},
-  container: {paddingHorizontal: 20, paddingTop: 13, paddingBottom: 42},
-  containerShort: {paddingTop: 7},
-  header: {minHeight: 49, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
-  brand: {flexDirection: 'row', alignItems: 'center', gap: 10},
-  brandSymbol: {
-    width: 41, height: 41, borderRadius: 15, backgroundColor: plum,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  brandSymbolText: {
-    fontSize: 29, fontWeight: '800', letterSpacing: -2.5,
-    color: '#FFFFFF', marginTop: -5,
-  },
+  screen: {flex: 1, backgroundColor: night.canvas},
+  container: {paddingHorizontal: 19, paddingTop: 9, paddingBottom: 40},
+  containerShort: {paddingTop: 5},
+  header: {minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
+  brand: {flexDirection: 'row', alignItems: 'center', gap: 11},
+  brandSymbol: {width: 41, height: 41, borderRadius: 13, backgroundColor: night.lime, justifyContent: 'center', alignItems: 'center'},
+  brandSymbolText: {fontSize: 25, letterSpacing: -2, fontWeight: '900', color: night.canvas, marginTop: -4},
   brandCopy: {gap: 2},
-  brandName: {fontSize: 21, fontWeight: '800', letterSpacing: -0.8, color: ink},
-  brandAI: {color: plum},
-  brandKicker: {fontSize: 9, fontWeight: '800', letterSpacing: 1.4, color: C.text.secondary},
-  helpButton: {
-    height: 44, width: 44, borderRadius: 15, borderWidth: 1,
-    borderColor: '#E4D8D7', backgroundColor: '#FFFCF8',
-    justifyContent: 'center', alignItems: 'center',
-  },
+  brandName: {fontSize: 23, fontWeight: '900', letterSpacing: -1.15, color: night.ink},
+  brandAI: {color: night.lime},
+  brandKicker: {color: night.subtext, fontSize: 9, fontWeight: '800', letterSpacing: 1.75},
+  helpButton: {height: 44, width: 44, borderRadius: 15, backgroundColor: night.surface, borderWidth: 1, borderColor: night.line, justifyContent: 'center', alignItems: 'center'},
   pressed: {opacity: 0.7},
-  demoNotice: {
-    alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center',
-    gap: 7, marginTop: 9, paddingVertical: 6, paddingHorizontal: 10,
-    backgroundColor: C.brand.tint, borderRadius: 99,
-  },
-  demoDot: {height: 6, width: 6, borderRadius: 3, backgroundColor: plum},
-  demoNoticeText: {fontSize: 10, fontWeight: '800', letterSpacing: 0.25, color: plum},
-  hero: {
-    marginTop: 12, minHeight: 190, padding: 20, borderRadius: 28,
-    overflow: 'hidden', justifyContent: 'center', borderWidth: 1,
-    borderColor: '#E8D9DD',
-  },
-  heroShort: {minHeight: 174, paddingVertical: 15},
-  ribbonLayer: {position: 'absolute', right: -41, top: -28, opacity: 0.79},
-  heroCopy: {zIndex: 1, width: '90%'},
-  balanceEyebrow: {
-    color: plum, fontSize: 10, fontWeight: '800',
-    letterSpacing: 1.4, marginBottom: 13,
-  },
-  balanceValue: {
-    fontSize: 37, fontWeight: '800', letterSpacing: -1.9, color: ink,
-    includeFontPadding: false,
-  },
-  balanceValueCompact: {fontSize: 31},
-  currencyLabel: {fontSize: 15, fontWeight: '700', color: C.text.secondary, marginTop: 2},
-  heroDivider: {height: 1, backgroundColor: '#D8C7CD', marginTop: 15, width: '75%'},
-  heroFoot: {flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 10},
-  heroFootMark: {width: 6, height: 6, borderRadius: 3, backgroundColor: '#98677D'},
-  heroFootText: {fontSize: 11, fontWeight: '600', color: C.text.secondary},
-  safetyCard: {
-    marginTop: 12, minHeight: 111, paddingVertical: 13, paddingHorizontal: 16,
-    backgroundColor: C.bg.surface, borderRadius: 23, flexDirection: 'row',
-    alignItems: 'center', justifyContent: 'space-between',
-    borderWidth: 1, borderColor: '#E6DADD',
-  },
-  safetyCardShort: {minHeight: 104, paddingVertical: 10},
-  safetyCopy: {gap: 5},
-  safetyLabel: {color: C.text.secondary, fontSize: 12, fontWeight: '700'},
+  demoNotice: {alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 9, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: '#202A22'},
+  demoDot: {width: 6, height: 6, borderRadius: 3, backgroundColor: night.lime},
+  demoNoticeText: {fontSize: 10, fontWeight: '800', color: '#D4EFAD', letterSpacing: 0.15},
+  hero: {marginTop: 12, minHeight: 177, borderRadius: 24, borderWidth: 1, borderColor: '#34463F', paddingHorizontal: 18, paddingVertical: 17, overflow: 'hidden', justifyContent: 'center'},
+  heroShort: {minHeight: 163, paddingVertical: 14},
+  orbitLayer: {position: 'absolute', right: -62, top: -52, opacity: 0.87},
+  heroCopy: {zIndex: 1},
+  heroTop: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
+  heroStatusDot: {width: 6, height: 6, borderRadius: 3, backgroundColor: night.lime},
+  balanceEyebrow: {fontSize: 10, fontWeight: '800', letterSpacing: 1.3, color: '#D5E9D4', marginBottom: 10},
+  balanceValue: {fontSize: 34, letterSpacing: -1.5, color: night.ink, fontWeight: '900', includeFontPadding: false},
+  balanceValueCompact: {fontSize: 30},
+  currencyLabel: {fontSize: 14, fontWeight: '700', color: '#D4DFD9', marginTop: 1},
+  heroFoot: {flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 20},
+  heroFootLine: {width: 16, height: 2, borderRadius: 2, backgroundColor: night.lime},
+  heroFootText: {fontSize: 10, fontWeight: '800', letterSpacing: 0.35, color: '#D9E5DC'},
+  safetyCard: {marginTop: 10, minHeight: 107, backgroundColor: night.surface, borderWidth: 1, borderColor: night.line, borderRadius: 22, paddingHorizontal: 14, paddingVertical: 11, flexDirection: 'row', alignItems: 'center', gap: 8, overflow: 'hidden'},
+  safetyCardShort: {minHeight: 101, paddingVertical: 8},
+  safetyAccent: {position: 'absolute', top: 18, bottom: 18, left: 0, width: 3, borderRadius: 3, backgroundColor: night.lime},
+  safetyCopy: {flex: 1, gap: 5, minWidth: 0},
+  safetyHeading: {flexDirection: 'row', alignItems: 'center', gap: 7},
+  safetyLabel: {fontSize: 12, color: night.subtext, fontWeight: '700', flexShrink: 1},
   safetyFigure: {flexDirection: 'row', alignItems: 'baseline', gap: 6},
-  safetyValue: {
-    color: ink, fontSize: 29, fontWeight: '800',
-    letterSpacing: -1.1, includeFontPadding: false,
-  },
-  safetyUnit: {color: C.text.secondary, fontSize: 13, fontWeight: '700'},
-  safetyInfoButton: {
-    width: 48, height: 48, borderRadius: 18,
-    backgroundColor: C.brand.tint, alignItems: 'center', justifyContent: 'center',
-  },
-  addButton: {
-    minHeight: 59, marginTop: 12, paddingVertical: 7, paddingHorizontal: 13,
-    flexDirection: 'row', alignItems: 'center', gap: 11,
-    borderRadius: 19, backgroundColor: plum,
-  },
-  addButtonShort: {marginTop: 10},
-  addPressed: {opacity: 0.78},
-  addCircle: {
-    width: 39, height: 39, borderRadius: 14,
-    backgroundColor: '#F6E9EB', justifyContent: 'center', alignItems: 'center',
-  },
-  addCopy: {flex: 1, minWidth: 0, gap: 3},
-  addTitle: {fontSize: 15, fontWeight: '800', color: '#FFFFFF'},
-  addDetail: {fontSize: 11, fontWeight: '600', color: '#F1DBE4'},
-  sectionHeader: {
-    flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between',
-    marginTop: 27, gap: 8,
-  },
-  sectionCopy: {flex: 1, minWidth: 0, gap: 5},
-  sectionKicker: {
-    fontSize: 10, color: C.text.secondary,
-    fontWeight: '800', letterSpacing: 1.1,
-  },
-  sectionTitle: {fontSize: 20, color: ink, fontWeight: '800', letterSpacing: -0.55},
-  periodSelector: {
-    flexDirection: 'row', backgroundColor: C.brand.tint,
-    padding: 3, gap: 2, borderRadius: 15,
-  },
-  periodItem: {
-    minHeight: 44, justifyContent: 'center',
-    paddingHorizontal: 8, borderRadius: 12,
-  },
-  periodActive: {backgroundColor: plum},
-  periodLabel: {fontSize: 11, fontWeight: '800', color: plum},
-  periodLabelActive: {color: '#FFFFFF'},
-  chartCard: {
-    marginTop: 13, borderRadius: 25, backgroundColor: C.bg.surface,
-    paddingHorizontal: 16, paddingTop: 17, paddingBottom: 14,
-    borderWidth: 1, borderColor: '#E7DCDC',
-  },
-  chartTopRow: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
-  chartEyebrow: {fontSize: 10, color: C.text.secondary, fontWeight: '800', letterSpacing: 0.6},
-  chartAmount: {
-    fontSize: 28, fontWeight: '800', letterSpacing: -1.0,
-    color: ink, marginTop: 4,
-  },
-  chartAmountCompact: {fontSize: 25},
-  chartAccent: {
-    width: 38, height: 38, borderRadius: 14,
-    backgroundColor: C.brand.tint, alignItems: 'center', justifyContent: 'center',
-  },
-  legendRow: {flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 2},
+  safetyValue: {color: night.ink, fontSize: 28, fontWeight: '900', letterSpacing: -1.05, includeFontPadding: false},
+  safetyUnit: {color: night.subtext, fontWeight: '700', fontSize: 13},
+  safetyInfoButton: {width: 44, height: 44, borderRadius: 15, backgroundColor: night.surfaceRaised, alignItems: 'center', justifyContent: 'center'},
+  addButton: {minHeight: 61, borderRadius: 20, backgroundColor: night.lime, marginTop: 11, paddingHorizontal: 12, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 10},
+  addButtonShort: {marginTop: 9},
+  addPressed: {backgroundColor: night.limePressed},
+  addCircle: {width: 40, height: 40, borderRadius: 14, backgroundColor: '#E7FFAE', alignItems: 'center', justifyContent: 'center'},
+  addCopy: {flex: 1, gap: 3, minWidth: 0},
+  addTitle: {fontSize: 16, fontWeight: '900', color: night.canvas},
+  addDetail: {fontSize: 11, fontWeight: '600', color: '#26351C'},
+  addChevron: {width: 29, height: 29, borderRadius: 11, alignItems: 'center', justifyContent: 'center', backgroundColor: '#DFFF94'},
+  sectionHeader: {marginTop: 25, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 8},
+  sectionCopy: {flex: 1, minWidth: 0, gap: 4},
+  sectionKicker: {fontSize: 10, fontWeight: '800', letterSpacing: 1.05, color: night.faint},
+  sectionTitle: {fontSize: 20, fontWeight: '800', letterSpacing: -0.5, color: night.ink},
+  periodSelector: {flexDirection: 'row', borderRadius: 15, backgroundColor: night.surfaceRaised, padding: 3, gap: 2},
+  periodItem: {minHeight: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 7},
+  periodActive: {backgroundColor: night.lime},
+  periodLabel: {fontSize: 11, fontWeight: '800', color: night.subtext},
+  periodLabelActive: {color: night.canvas},
+  chartCard: {marginTop: 13, backgroundColor: night.surface, borderWidth: 1, borderColor: night.line, borderRadius: 24, paddingHorizontal: 14, paddingTop: 17, paddingBottom: 16},
+  chartTopRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
+  chartEyebrow: {fontSize: 10, fontWeight: '800', color: night.subtext, letterSpacing: 0.6},
+  chartAmount: {marginTop: 5, fontSize: 28, letterSpacing: -0.9, fontWeight: '900', color: night.ink},
+  chartAmountCompact: {fontSize: 24},
+  chartAccent: {width: 40, height: 40, borderRadius: 14, backgroundColor: '#22301D', alignItems: 'center', justifyContent: 'center'},
+  legendRow: {marginTop: 0, flexDirection: 'row', alignItems: 'center', gap: 14},
   legendItem: {flexDirection: 'row', alignItems: 'center', gap: 6},
-  legendLine: {backgroundColor: plum, width: 19, height: 3, borderRadius: 3},
-  legendDot: {backgroundColor: '#C7B0BA', height: 6, width: 6, borderRadius: 3},
-  legendText: {fontSize: 11, color: C.text.secondary, fontWeight: '600'},
-  chartNote: {
-    marginTop: 12, fontSize: 10, fontWeight: '600', letterSpacing: 0.1,
-    color: C.text.secondary, lineHeight: 15,
-  },
-  activityHeading: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    gap: 8, marginTop: 27, marginBottom: 11,
-  },
-  allButton: {minHeight: 44, alignItems: 'center', flexDirection: 'row', gap: 3},
-  allText: {color: plum, fontSize: 13, fontWeight: '800'},
-  activityCard: {
-    backgroundColor: C.bg.surface, borderRadius: 23,
-    paddingHorizontal: 14, overflow: 'hidden',
-    borderWidth: 1, borderColor: '#E7DCDC',
-  },
+  legendLine: {width: 18, height: 3, borderRadius: 3, backgroundColor: night.lime},
+  legendDot: {width: 6, height: 6, borderRadius: 3, backgroundColor: night.chartSecondary},
+  legendText: {fontSize: 11, fontWeight: '600', color: night.subtext},
+  chartNote: {marginTop: 12, fontSize: 10, color: night.subtext, fontWeight: '600', lineHeight: 16},
+  activityHeading: {marginTop: 26, marginBottom: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8},
+  allButton: {minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 2},
+  allText: {fontSize: 13, fontWeight: '800', color: night.lime},
+  activityCard: {backgroundColor: night.surface, borderRadius: 22, borderWidth: 1, borderColor: night.line, paddingHorizontal: 13, overflow: 'hidden'},
   emptyState: {padding: 13, gap: 10},
-  emptyTitle: {fontWeight: '800', fontSize: 16, color: ink},
-  emptyText: {fontSize: 14, color: C.text.secondary},
-  emptyAction: {minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start'},
-  emptyActionText: {fontWeight: '800', fontSize: 14, color: plum},
-  footer: {color: C.text.secondary, fontSize: 12, lineHeight: 19, marginTop: 18},
-  modalRoot: {
-    flex: 1, backgroundColor: 'rgba(33,21,30,0.55)', justifyContent: 'flex-end',
-  },
-  modalSheet: {
-    paddingTop: 23, paddingHorizontal: 23, paddingBottom: 34,
-    backgroundColor: C.bg.canvas, borderTopLeftRadius: 28,
-    borderTopRightRadius: 28, gap: 14,
-  },
-  modalTitle: {fontSize: 25, fontWeight: '800', letterSpacing: -0.7, color: ink},
-  modalBody: {fontSize: 15, lineHeight: 23, color: C.text.secondary},
-  closeButton: {
-    minHeight: 52, marginTop: 3, backgroundColor: plum, borderRadius: 16,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  closeText: {color: '#FFFFFF', fontSize: 16, fontWeight: '800'},
+  emptyTitle: {fontSize: 16, color: night.ink, fontWeight: '800'},
+  emptyText: {fontSize: 14, color: night.subtext},
+  emptyAction: {minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center'},
+  emptyActionText: {fontWeight: '800', color: night.lime, fontSize: 14},
+  footer: {marginTop: 18, fontSize: 12, color: night.subtext, lineHeight: 19},
+  modalRoot: {flex: 1, backgroundColor: 'rgba(0,0,0,0.72)', justifyContent: 'flex-end'},
+  modalSheet: {paddingTop: 24, paddingHorizontal: 23, paddingBottom: 34, backgroundColor: night.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, gap: 14},
+  modalTitle: {fontSize: 25, color: night.ink, fontWeight: '900', letterSpacing: -0.6},
+  modalBody: {fontSize: 15, color: night.subtext, lineHeight: 23},
+  closeButton: {minHeight: 52, borderRadius: 16, backgroundColor: night.lime, alignItems: 'center', justifyContent: 'center'},
+  closeText: {fontSize: 16, color: night.canvas, fontWeight: '900'},
 });
