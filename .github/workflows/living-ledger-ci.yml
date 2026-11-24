@@ -9,6 +9,7 @@ on:
       - integration/s10-foundation
       - design/plum-home-v01
       - design/quiet-finance-home-v02
+      - design/midnight-finance-home-v03
   pull_request:
     branches:
       - design/splus-d01-d03-ux-concepts
