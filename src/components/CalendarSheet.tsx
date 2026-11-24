@@ -130,7 +130,7 @@ const styles=StyleSheet.create({
   weekCell:{width:'14.2857%',alignItems:'center',justifyContent:'center',height:34},
   weekLabel:{fontSize:11,color:colors.faint,fontWeight:'700'},
   cell:{width:'14.2857%',alignItems:'center',justifyContent:'center',height:45},
-  dayButton:{minHeight:43,width:'95%',alignItems:'center',justifyContent:'center',borderRadius:15},
+  dayButton:{minHeight:44,width:'95%',alignItems:'center',justifyContent:'center',borderRadius:15},
   selectedButton:{backgroundColor:colors.primary},
   dayText:{fontSize:13,color:colors.text,fontWeight:'700'},
   outMonth:{color:'#C8B6BA'},
