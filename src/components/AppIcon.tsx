@@ -1,4 +1,5 @@
 import React from 'react';
+import {Text} from 'react-native';
 import Svg, { Circle, Line, Path, Polyline, Rect } from 'react-native-svg';
 
 export type IconName = 'home' | 'chart' | 'wallet' | 'receipt' | 'user' | 'eye' | 'eye-off' | 'shield' | 'chevron' | 'chevron-down' | 'bell' | 'cart' | 'bus' | 'coffee' | 'heart' | 'arrow-left' | 'check' | 'plus' | 'sparkles' | 'mic';
@@ -6,6 +7,15 @@ export type IconName = 'home' | 'chart' | 'wallet' | 'receipt' | 'user' | 'eye' 
 type Props = { name: IconName; color?: string; size?: number; strokeWidth?: number };
 
 export function AppIcon({name, color = '#FFFFFF', size = 22, strokeWidth = 1.8}: Props) {
+  // The complex SVG path for sparkles failed to paint in the actual Expo Web
+  // screenshots. Keep the approved minimal symbol but render a native text glyph
+  // consistently on mobile and web. Parent provides the accessible action label.
+  if(name==='sparkles'){
+    return <Text
+      accessible={false}
+      style={{color,fontSize:size,fontWeight:'700',width:size,height:size,lineHeight:size,textAlign:'center'}}
+    >✦</Text>;
+  }
   const p = {fill: 'none' as const, stroke: color, strokeWidth, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const};
   const path = (d: string) => <Path d={d} {...p} />;
   let shape: React.ReactNode;
@@ -27,11 +37,6 @@ export function AppIcon({name, color = '#FFFFFF', size = 22, strokeWidth = 1.8}:
     case 'heart': shape = path('M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z'); break;
     case 'arrow-left': shape = path('M20 12H4m7-7-7 7 7 7'); break;
     case 'check': shape = path('M4 12l5 5L20 6'); break;
-    case 'sparkles': shape = <>
-      <Path d="M12 2 14.3 9.7 22 12 14.3 14.3 12 22 9.7 14.3 2 12 9.7 9.7Z" {...p}/>
-      <Line x1="19" y1="1" x2="19" y2="5" {...p}/>
-      <Line x1="17" y1="3" x2="21" y2="3" {...p}/>
-    </>; break;
     case 'mic': shape = <><Rect x="9" y="2" width="6" height="13" rx="3" {...p}/>{path('M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8')}</>; break;
     case 'plus': shape = <><Line x1="12" y1="4" x2="12" y2="20" {...p}/><Line x1="4" y1="12" x2="20" y2="12" {...p}/></>; break;
   }
