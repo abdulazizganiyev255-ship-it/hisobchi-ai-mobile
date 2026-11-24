@@ -59,14 +59,14 @@ async function verifySize(browser, size) {
 
   try {
     await page.goto(BASE, {waitUntil: 'domcontentloaded', timeout: 90000});
-    await tab('Operatsiyalar').click();
+    await tab('Faoliyat').click();
     await page.getByText('Operatsiyalar', {exact: true}).first().waitFor({state: 'visible'});
     await page.getByTestId('ledger-transactions-add').waitFor({state: 'visible'});
     await page.getByText('259 000 so‘m', {exact: true}).waitFor({state: 'visible'});
     await assertFits(page, label + ' history');
     if (size.width === 320) {
       const firstRow = await page.getByRole('button', {name: /Transport, xarajat 12 000 so‘m. Tahrirlash/}).boundingBox();
-      const bottomNav = await tab('Operatsiyalar').boundingBox();
+      const bottomNav = await tab('Faoliyat').boundingBox();
       assert.ok(firstRow && bottomNav, '320px first ledger row and bottom navigation must be measurable');
       assert.ok(firstRow.y + firstRow.height <= bottomNav.y - 3,
         '320px first ledger row should be entirely readable above the bottom navigation without scrolling');

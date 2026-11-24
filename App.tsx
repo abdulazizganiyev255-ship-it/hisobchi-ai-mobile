@@ -18,7 +18,7 @@ import {semanticV1} from './src/theme/semantic';
 
 const tabs: {key: Tab; label: string; icon: IconName}[] = [
   {key: 'home', label: 'Bosh sahifa', icon: 'home'},
-  {key: 'transactions', label: 'Operatsiyalar', icon: 'receipt'},
+  {key: 'transactions', label: 'Faoliyat', icon: 'receipt'},
   {key: 'analytics', label: 'Tahlil', icon: 'chart'},
   {key: 'profile', label: 'Profil', icon: 'user'},
 ];
@@ -160,7 +160,7 @@ function AppContent() {
                     adjustsFontSizeToFit
                   >
                     {ledgerShell && item.key === 'transactions'
-                      ? 'Tarix'
+                      ? 'Faoliyat'
                       : ledgerShell && item.key === 'home'
                         ? 'Bosh'
                         : item.label}

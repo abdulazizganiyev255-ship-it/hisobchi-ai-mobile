@@ -33,5 +33,6 @@ assert.match(chart, /accessibilityRole="image"/, 'Chart accessible description')
 assert.match(chart, /testID="living-ledger-chart"/, 'Chart test id preserved');
 assert.match(app, /plumHome && styles\.plumNav/);
 assert.match(app, /<LivingLedgerDashboardScreen/);
+assert.match(app, /label: 'Faoliyat'/, 'Approved bottom tab label must be Faoliyat');
 assert.doesNotMatch(home, /bankka ulandi|serverga saqlandi/i);
 console.log('PASS Quiet Finance design, curved chart, demo isolation and interactions');
