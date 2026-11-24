@@ -5,7 +5,10 @@ import {
 } from '../src/data/amountValidation.ts';
 
 test('money input removes formatting without discarding significant digits',()=>{
-  assert.equal(cleanMoneyInput('1 234 567 so‘m'),'1234567');
+  assert.equal(cleanMoneyInput('1 234 567'),'1234567');
+  assert.equal(cleanMoneyInput('-500'),'-500');
+  assert.equal(cleanMoneyInput('12.5'),'12.5');
+  assert.equal(cleanMoneyInput('1e6'),'1e6');
   assert.equal(cleanMoneyInput('9999999999999'),'9999999999999');
 });
 
@@ -16,7 +19,7 @@ test('positive integer UZS can be parsed exactly inside mock limit',()=>{
 });
 
 test('zero, negatives, fractions, scientific notation and overflow are rejected',()=>{
-  for(const s of ['', '0', '-1','12.5','1e6','NaN','1000000000000','9007199254740993']){
+  for(const s of ['', '0', '-1','12.5','1e6','NaN','1000000000000','9007199254740993','1234so‘m']){
     assert.equal(parseMockAmount(s),null,s);
   }
 });
