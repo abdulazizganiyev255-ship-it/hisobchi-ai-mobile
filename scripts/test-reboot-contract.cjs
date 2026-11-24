@@ -24,6 +24,9 @@ assert.match(shell,/setRecords\(old=>old\.filter/,'Editor delete must update sha
 assert.match(home,/const report=sessionReport\(items\)/,'Home must use computed session values');
 assert.match(home,/Kirim − chiqim, bank balansi emas/,'Net cannot masquerade as bank balance');
 assert.match(home,/onSafeInfo/,'Unknown safe-to-spend must be explainable');
+assert.match(home,/report\.categories\[0\]\.name/,'Spending signal must derive from shared deterministic report');
+assert.match(home,/testID="reboot-top-category"/,'Category signal must be testable');
+assert.match(home,/onPress=\{onActivity\}/,'Top category must open records, not a dead link');
 assert.doesNotMatch(home,/demo\.balance|demo\.safeToSpendToday/,'No unrelated hardcoded financial demo totals');
 assert.match(analysis,/calculateAnalytics\(items,period,todayLocal\(\)\)/,'Analytics uses trusted source');
 assert.match(activity,/filterAndSortTransactions\(items,filter,query\)/,'Search/filter stays functional');

@@ -74,6 +74,13 @@ async function scenario(browser,size){
     await page.getByTestId('reboot-analysis-month').click();
     await page.getByTestId('reboot-analysis-all').click();
 
+    await page.getByRole('tab',{name:'Bosh sahifa'}).click();
+    await page.getByTestId('reboot-top-category').scrollIntoViewIfNeeded();
+    assert.equal((await page.getByTestId('reboot-top-category').textContent()).trim(),'Oziq-ovqat');
+    await snap(page,size,'07-dynamic-spending-signal');
+    await page.getByTestId('reboot-signal-details').click();
+    await page.getByTestId('reboot-activity').waitFor({state:'visible'});
+
     await page.getByRole('tab',{name:'Faoliyat'}).click();
     await page.getByTestId('reboot-item-session-1000').click();
     await page.getByTestId('reboot-entry-amount').fill('200000');

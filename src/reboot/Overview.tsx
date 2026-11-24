@@ -62,6 +62,34 @@ export function Overview({items,onExpense,onIncome,onActivity,onEdit,onSafeInfo}
         </View>
       </View>
 
+      {report.categories.length>0?(
+        <View style={s.signal} testID="reboot-spending-signal">
+          <View style={s.signalHead}>
+            <Eyebrow>ASOSIY XARAJAT SIGNALI</Eyebrow>
+            <Text style={s.signalStatus}>SESSIYADAN</Text>
+          </View>
+          <Text style={s.signalTitle}>Qaysi yo‘nalish ko‘proq?</Text>
+          <View style={s.signalFigure}>
+            <Text testID="reboot-top-category" style={s.signalCategory} numberOfLines={1}>
+              {report.categories[0].name}
+            </Text>
+            <Text style={s.signalMoney}>{formatMoney(report.categories[0].amount)}</Text>
+          </View>
+          <View style={s.signalProgress}>
+            <View style={[s.signalProgressFill,{width:(String(report.categories[0].percent)+'%') as import('react-native').DimensionValue}]}/>
+          </View>
+          <View style={s.signalFooter}>
+            <Text style={s.signalFootnote}>{report.categories[0].percent}% · barcha qayd etilgan xarajatlardan</Text>
+            <Pressable testID="reboot-signal-details" accessibilityRole="button"
+              accessibilityLabel="Xarajatlarni Faoliyatda ko‘rish"
+              onPress={onActivity} style={s.signalLink}>
+              <Text style={s.signalLinkText}>Tekshirish</Text>
+              <AppIcon name="chevron" size={15} color={T.cobalt}/>
+            </Pressable>
+          </View>
+        </View>
+      ):null}
+
       <View style={s.section}><SectionHead title="Oxirgi yozuvlar" note="OPERATSIYALAR" action="Barchasi" onAction={onActivity}/>
         <View style={s.list}>{recent.length?recent.map(x=>
           <TransactionLine key={x.id} item={x} onPress={()=>onEdit(x)}/>):
@@ -107,5 +135,18 @@ const s=StyleSheet.create({
   plotNote:{fontSize:10,color:T.muted,marginTop:9,lineHeight:15},
   list:{borderWidth:1,borderColor:T.border,borderRadius:13,backgroundColor:T.paper,paddingHorizontal:12},
   empty:{fontSize:12,paddingVertical:20,color:T.muted},
+  signal:{marginTop:27,backgroundColor:T.cobaltWash,borderWidth:1,borderColor:'#D1DDFB',borderRadius:13,padding:15},
+  signalHead:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:8},
+  signalStatus:{fontSize:9,fontWeight:'900',letterSpacing:.7,color:T.cobalt},
+  signalTitle:{fontSize:13,color:T.secondary,marginTop:11,fontWeight:'700'},
+  signalFigure:{flexDirection:'row',alignItems:'baseline',justifyContent:'space-between',gap:8,marginTop:5},
+  signalCategory:{fontSize:20,fontWeight:'900',color:T.ink,letterSpacing:-.6,flex:1},
+  signalMoney:{fontSize:13,fontWeight:'800',color:T.ink},
+  signalProgress:{height:5,backgroundColor:'#D0D9F6',borderRadius:3,overflow:'hidden',marginTop:15},
+  signalProgressFill:{height:5,borderRadius:3,backgroundColor:T.cobalt},
+  signalFooter:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:7,marginTop:10},
+  signalFootnote:{flex:1,fontSize:10,lineHeight:15,color:T.muted},
+  signalLink:{minHeight:44,flexDirection:'row',alignItems:'center',gap:2},
+  signalLinkText:{fontSize:11,color:T.cobalt,fontWeight:'900'},
   foot:{color:T.muted,fontSize:9,fontWeight:'800',letterSpacing:.45,marginTop:24},
 });
