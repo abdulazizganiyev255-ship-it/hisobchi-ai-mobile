@@ -32,6 +32,13 @@ try {
     const screenshots=[];
     screenshots.push(await capture(page,'home'));
 
+    const aiTab=page.getByRole('tab',{name:'AI'});
+    await aiTab.getByText('✦').waitFor({state:'visible'});
+    await aiTab.click();
+    await page.getByText('AI yordamchi').waitFor();
+    screenshots.push(await capture(page,'ai'));
+    await page.getByRole('tab',{name:'Bosh'}).click();
+
     await page.getByRole('tab',{name:'Profil'}).click();
     await page.getByText('Demo profil').waitFor();
     screenshots.push(await capture(page,'profile'));
